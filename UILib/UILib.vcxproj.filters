@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Imagex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UILib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIRootView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIDC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIButtonEx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIResPath.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UISkin.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIStream.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIToolTip.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UITextImpl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UILabel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIMenuButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UICheckButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIRadioButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIComboButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIStateButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UISlider.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIWebTab.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIWebTabBar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIVScroll.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIScrollView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIMoreWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIToolBar.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIRootView2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIPageView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UICheckBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIRadioBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIProgress.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UITimer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIAnimation.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UILine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIGif.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIMenu.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIMenuWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UINotice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIFontMgr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UILoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIPopupWnd.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Imagex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UILib.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIBase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIRootView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIDC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIButtonEx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIUtility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIResPath.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UISkin.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIStream.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIToolTip.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UITextImpl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UILabel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMenuButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UICheckButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIRadioButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIComboButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIStateButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UISlider.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIWebTab.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIWebTabBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIVScroll.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIScrollView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMoreWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIToolBar.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIRootView2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIPageView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UICheckBox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIRadioBox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIProgress.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UITimer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIAnimation.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UILine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIGif.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMenu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMenuWnd.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UINotice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIFontMgr.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UILoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UILib.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

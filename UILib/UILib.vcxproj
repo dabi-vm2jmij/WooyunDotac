@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1E367F20-5B9B-4282-BC25-8B712681EFC5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>UILib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UILIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UILIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Imagex.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="UIAnimation.h" />
+    <ClInclude Include="UIBase.h" />
+    <ClInclude Include="UIButton.h" />
+    <ClInclude Include="UIButtonEx.h" />
+    <ClInclude Include="UICheckBox.h" />
+    <ClInclude Include="UICheckButton.h" />
+    <ClInclude Include="UIComboButton.h" />
+    <ClInclude Include="UIControl.h" />
+    <ClInclude Include="UIDC.h" />
+    <ClInclude Include="UIEdit.h" />
+    <ClInclude Include="UIFontMgr.h" />
+    <ClInclude Include="UIGif.h" />
+    <ClInclude Include="UIImage.h" />
+    <ClInclude Include="UILabel.h" />
+    <ClInclude Include="UILib.h" />
+    <ClInclude Include="UILine.h" />
+    <ClInclude Include="UILoader.h" />
+    <ClInclude Include="UIMenu.h" />
+    <ClInclude Include="UIMenuButton.h" />
+    <ClInclude Include="UIMenuWnd.h" />
+    <ClInclude Include="UIMoreWnd.h" />
+    <ClInclude Include="UINotice.h" />
+    <ClInclude Include="UIPageView.h" />
+    <ClInclude Include="UIPopupWnd.h" />
+    <ClInclude Include="UIProgress.h" />
+    <ClInclude Include="UIRadioBox.h" />
+    <ClInclude Include="UIRadioButton.h" />
+    <ClInclude Include="UIResource.h" />
+    <ClInclude Include="UIResPath.h" />
+    <ClInclude Include="UIRootView.h" />
+    <ClInclude Include="UIRootView2.h" />
+    <ClInclude Include="UIScrollView.h" />
+    <ClInclude Include="UISkin.h" />
+    <ClInclude Include="UISlider.h" />
+    <ClInclude Include="UIStateButton.h" />
+    <ClInclude Include="UIStream.h" />
+    <ClInclude Include="UITextImpl.h" />
+    <ClInclude Include="UITimer.h" />
+    <ClInclude Include="UIToolBar.h" />
+    <ClInclude Include="UIToolTip.h" />
+    <ClInclude Include="UIUtility.h" />
+    <ClInclude Include="UIView.h" />
+    <ClInclude Include="UIVScroll.h" />
+    <ClInclude Include="UIWebTab.h" />
+    <ClInclude Include="UIWebTabBar.h" />
+    <ClInclude Include="UIWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Imagex.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UIAnimation.cpp" />
+    <ClCompile Include="UIBase.cpp" />
+    <ClCompile Include="UIButton.cpp" />
+    <ClCompile Include="UIButtonEx.cpp" />
+    <ClCompile Include="UICheckBox.cpp" />
+    <ClCompile Include="UICheckButton.cpp" />
+    <ClCompile Include="UIComboButton.cpp" />
+    <ClCompile Include="UIControl.cpp" />
+    <ClCompile Include="UIDC.cpp" />
+    <ClCompile Include="UIEdit.cpp" />
+    <ClCompile Include="UIFontMgr.cpp" />
+    <ClCompile Include="UIGif.cpp" />
+    <ClCompile Include="UIImage.cpp" />
+    <ClCompile Include="UILabel.cpp" />
+    <ClCompile Include="UILib.cpp" />
+    <ClCompile Include="UILine.cpp" />
+    <ClCompile Include="UILoader.cpp" />
+    <ClCompile Include="UIMenu.cpp" />
+    <ClCompile Include="UIMenuButton.cpp" />
+    <ClCompile Include="UIMenuWnd.cpp" />
+    <ClCompile Include="UIMoreWnd.cpp" />
+    <ClCompile Include="UINotice.cpp" />
+    <ClCompile Include="UIPageView.cpp" />
+    <ClCompile Include="UIProgress.cpp" />
+    <ClCompile Include="UIRadioBox.cpp" />
+    <ClCompile Include="UIRadioButton.cpp" />
+    <ClCompile Include="UIResource.cpp" />
+    <ClCompile Include="UIResPath.cpp" />
+    <ClCompile Include="UIRootView.cpp" />
+    <ClCompile Include="UIRootView2.cpp" />
+    <ClCompile Include="UIScrollView.cpp" />
+    <ClCompile Include="UISkin.cpp" />
+    <ClCompile Include="UISlider.cpp" />
+    <ClCompile Include="UIStateButton.cpp" />
+    <ClCompile Include="UIStream.cpp" />
+    <ClCompile Include="UITextImpl.cpp" />
+    <ClCompile Include="UITimer.cpp" />
+    <ClCompile Include="UIToolBar.cpp" />
+    <ClCompile Include="UIToolTip.cpp" />
+    <ClCompile Include="UIUtility.cpp" />
+    <ClCompile Include="UIView.cpp" />
+    <ClCompile Include="UIVScroll.cpp" />
+    <ClCompile Include="UIWebTab.cpp" />
+    <ClCompile Include="UIWebTabBar.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UILib.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
