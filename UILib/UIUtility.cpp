@@ -16,37 +16,27 @@ bool FreeSkin(UINT nSkinId, bool bUpdate)
 	return CUIResource::Get().FreeSkin(nSkinId, bUpdate);
 }
 
-// 加载图片，格式为“xxx.png:n”，n<=4 为帧数，>4 为每帧宽度
+// 加载图片，格式为“xxx.png:n”，n 为帧数
 CImagex GetImage(LPCWSTR lpFileName)
 {
 	wchar_t szFileName[MAX_PATH];
-	int nWidth = 1;
+	int nCount = 1;
 
 	if (LPCWSTR lpFind = wcschr(lpFileName, ':'))
 	{
 		wcsncpy_s(szFileName, lpFileName, lpFind - lpFileName);
 		lpFileName = szFileName;
-		nWidth = _wtoi(lpFind + 1);
+		nCount = _wtoi(lpFind + 1);
 	}
 
 	auto spImage = CUIResource::Get().GetImage(lpFileName);
-	ATLASSERT(nWidth > 0 && nWidth <= spImage->GetWidth());
+	ATLASSERT(nCount > 0 && spImage->GetWidth() % nCount == 0);
 
-	if (!spImage || spImage->IsNull())
+	if (!spImage || spImage->GetWidth() < nCount || nCount <= 1)
 		return spImage;
 
-	if (nWidth <= 1 || nWidth > spImage->GetWidth())
-	{
-		nWidth = spImage->GetWidth();
-	}
-	else if (nWidth <= 4)
-	{
-		ATLASSERT(spImage->GetWidth() % nWidth == 0);
-		nWidth = spImage->GetWidth() / nWidth;
-	}
-
 	CImagex imagex;
-	imagex.Reset(spImage, CRect(0, 0, nWidth, spImage->GetHeight()));
+	imagex.Reset(spImage, CRect(0, 0, spImage->GetWidth() / nCount, spImage->GetHeight()));
 	return imagex;
 }
 

@@ -2,7 +2,7 @@
 #include "UIBase.h"
 
 CUIBase::CUIBase(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0)
-	, m_bControl(false), m_bEnabled(true), m_bVisible(true), m_bKeepEnter(false), m_ppEnter(NULL)
+	, m_bEnabled(true), m_bVisible(true), m_bControl(false), m_bKeepEnter(false), m_ppEnter(NULL)
 {
 }
 

@@ -24,12 +24,12 @@ public:
 	void InvalidateRect(LPCRECT lpRect);
 	void SetEnabled(bool bEnabled);
 	void SetVisible(bool bVisible, bool bUpdate = false);
-	bool IsControl() const { return m_bControl; }
 	bool IsEnabled() const { return m_bEnabled; }
 	bool IsVisible() const { return m_bVisible; }
 	bool IsRealEnabled() const;
 	bool IsRealVisible() const;
 	bool IsChild(const CUIBase *pItem) const;
+	bool IsControl() const { return m_bControl; }
 	bool IsMouseEnter() const { return m_ppEnter != NULL; }
 	void DoMouseEnter();
 	CUIView *GetParent() const;
@@ -55,12 +55,12 @@ protected:
 				items[nCount++] = { pItem, pItem->IsEnabled() };
 		}
 
-		auto begin() const->decltype(items + 0)
+		auto begin() const -> decltype(items + 0)
 		{
 			return items;
 		}
 
-		auto end() const->decltype(items + 0)
+		auto end() const -> decltype(items + 0)
 		{
 			return items + nCount;
 		}
@@ -82,9 +82,9 @@ protected:
 	CRect     m_offset;		// 对齐和偏移，左右互斥、上下互斥
 	CSize     m_size;		// 宽或高小于零为自适应
 	CRect     m_rect;		// 完整区域，包括不可见部分
-	bool      m_bControl;	// 是否 CUIControl
 	bool      m_bEnabled;
 	bool      m_bVisible;
+	bool      m_bControl;	// 是否 CUIControl
 	bool      m_bKeepEnter;	// 保持 MouseEnter 状态
 
 private:
