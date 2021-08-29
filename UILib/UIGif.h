@@ -1,4 +1,5 @@
 #pragma once
+
 #include "UIControl.h"
 
 class UILIB_API CUIGif : public CUIControl

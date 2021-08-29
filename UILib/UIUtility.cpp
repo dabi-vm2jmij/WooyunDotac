@@ -116,24 +116,24 @@ void FillAlpha(CUIDC &dc, LPCRECT lpRect, BYTE nAlpha)
 	image.Detach();
 }
 
-UINT SplitImage(LPCWSTR lpFileName, CImagex imagexs[], UINT nSize)
+UINT SplitImage(LPCWSTR lpFileName, CImagex imagexs[], UINT nCount)
 {
-	if (nSize == 0)
+	if (nCount == 0)
 		return 0;
 
 	imagexs[0] = GetImage(lpFileName);
-	UINT nCount = imagexs[0].GetFrameCount();
+	UINT nTotal = imagexs[0].GetFrameCount();
 
-	if (nSize > nCount)
-		nSize = nCount;
+	if (nCount > nTotal)
+		nCount = nTotal;
 
-	for (UINT i = 1; i < nSize; i++)
+	for (UINT i = 1; i < nCount; i++)
 	{
 		imagexs[i] = imagexs[0];
 		imagexs[i].SetFrameIndex(i);
 	}
 
-	return nSize;
+	return nCount;
 }
 
 void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int))
