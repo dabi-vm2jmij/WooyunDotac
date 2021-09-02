@@ -17,11 +17,7 @@ void CUILabel::MyPaint(CUIDC &dc) const
 
 void CUILabel::OnTextSize(CSize size)
 {
-	if (m_size != size)
-	{
-		SetSize(size);
-		GetParent()->UpdateChilds();
-	}
+	SetSize(size);
 }
 
 void CUILabel::OnLoaded(const IUILoadAttrs &attrs)

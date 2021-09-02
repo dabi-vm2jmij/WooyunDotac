@@ -22,22 +22,73 @@ static int Int2Offset(int nValue, bool bClip)
 
 void CUIBase::SetLeft(int nLeft, bool bClip)
 {
-	m_offset.left = Int2Offset(nLeft, bClip);
+	nLeft = Int2Offset(nLeft, bClip);
+
+	if (m_offset.left != nLeft)
+	{
+		m_offset.left = nLeft;
+		GetParent()->InvalidateLayout();
+	}
 }
 
 void CUIBase::SetRight(int nRight, bool bClip)
 {
-	m_offset.right = Int2Offset(nRight, bClip);
+	nRight = Int2Offset(nRight, bClip);
+
+	if (m_offset.right != nRight)
+	{
+		m_offset.right = nRight;
+		GetParent()->InvalidateLayout();
+	}
 }
 
 void CUIBase::SetTop(int nTop, bool bClip)
 {
-	m_offset.top = Int2Offset(nTop, bClip);
+	nTop = Int2Offset(nTop, bClip);
+
+	if (m_offset.top != nTop)
+	{
+		m_offset.top = nTop;
+		GetParent()->InvalidateLayout();
+	}
 }
 
 void CUIBase::SetBottom(int nBottom, bool bClip)
 {
-	m_offset.bottom = Int2Offset(nBottom, bClip);
+	nBottom = Int2Offset(nBottom, bClip);
+
+	if (m_offset.bottom != nBottom)
+	{
+		m_offset.bottom = nBottom;
+		GetParent()->InvalidateLayout();
+	}
+}
+
+void CUIBase::SetWidth(int nWidth)
+{
+	if (m_size.cx != nWidth)
+	{
+		m_size.cx = nWidth;
+		GetParent()->InvalidateLayout();
+	}
+}
+
+void CUIBase::SetHeight(int nHeight)
+{
+	if (m_size.cy != nHeight)
+	{
+		m_size.cy = nHeight;
+		GetParent()->InvalidateLayout();
+	}
+}
+
+void CUIBase::SetSize(CSize size)
+{
+	if (m_size != size)
+	{
+		m_size = size;
+		GetParent()->InvalidateLayout();
+	}
 }
 
 // 从给定的 lpRect 中切出自己需要的部分
@@ -185,18 +236,6 @@ void CUIBase::GetWindowRect(LPRECT lpRect) const
 	ClientToScreen(hWnd, (LPPOINT)lpRect + 1);
 }
 
-void CUIBase::InvalidateRect(LPCRECT lpRect)
-{
-	CRect rect(m_rcReal);
-	if (lpRect)
-		rect &= *lpRect;
-
-	if (rect.IsRectEmpty())
-		return;
-
-	GetRootView()->InvalidateRect(rect);
-}
-
 void CUIBase::SetEnabled(bool bEnabled)
 {
 	if (bEnabled)
@@ -206,10 +245,9 @@ void CUIBase::SetEnabled(bool bEnabled)
 		return;
 
 	OnEnabled(m_bEnabled = bEnabled);
-	GetRootView()->RaiseMouseMove();
 }
 
-void CUIBase::SetVisible(bool bVisible, bool bUpdate)
+void CUIBase::SetVisible(bool bVisible)
 {
 	if (bVisible)
 		bVisible = true;
@@ -217,13 +255,8 @@ void CUIBase::SetVisible(bool bVisible, bool bUpdate)
 	if (m_bVisible == bVisible)
 		return;
 
-	m_bVisible = bVisible;
-
-	if (!bUpdate)
-		return;
-
-	GetParent()->UpdateChilds();
-	GetRootView()->RaiseMouseMove();
+	m_bVisible = bVisible;	// 不需要 OnVisible，因为有 OnRectChanged
+	GetParent()->InvalidateLayout();
 }
 
 bool CUIBase::IsRealEnabled() const
@@ -251,11 +284,6 @@ bool CUIBase::IsChild(const CUIBase *pItem) const
 	}
 
 	return false;
-}
-
-void CUIBase::DoMouseEnter()
-{
-	GetRootView()->DoMouseEnter(this);
 }
 
 bool CUIBase::DoMouseLeave(bool bForce)
@@ -303,10 +331,10 @@ void CUIBase::OnLoaded(const IUILoadAttrs &attrs)
 
 	int nValue;
 	if (attrs.GetInt(L"width", &nValue))
-		SetWidth(nValue);
+		m_size.cx = nValue;
 
 	if (attrs.GetInt(L"height", &nValue))
-		SetHeight(nValue);
+		m_size.cy = nValue;
 
 	if (attrs.GetInt(L"enabled", &nValue))
 		SetEnabled(nValue != 0);

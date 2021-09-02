@@ -9,8 +9,7 @@ void CUIScrollView::SetVScroll(CUIVScroll *pVScroll)
 {
 	ATLASSERT(pVScroll->GetParent() != this);
 	m_pVScroll = pVScroll;
-	m_pVScroll->OnChanging([this](int){ UpdateChilds(); });
-	m_pVScroll->OnChanged([this](int){ UpdateChilds(); GetRootView()->RaiseMouseMove(); });
+	m_pVScroll->OnChanged([this](int){ InvalidateLayout(); });
 }
 
 void CUIScrollView::CheckVScroll()
@@ -20,11 +19,11 @@ void CUIScrollView::CheckVScroll()
 	if (!m_rect.IsRectEmpty() && m_rect.Height() < (nHeight = CalcHeight()))
 	{
 		m_pVScroll->SetRange(m_rect.Height(), nHeight);
-		m_pVScroll->SetVisible(true, true);
+		m_pVScroll->SetVisible(true);
 	}
 	else
 	{
-		m_pVScroll->SetVisible(false, true);
+		m_pVScroll->SetVisible(false);
 		m_pVScroll->SetCurPos(0);
 	}
 }
@@ -43,6 +42,14 @@ void CUIScrollView::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 		CheckVScroll();
 
 	__super::OnRectChanged(lpOldRect, lpClipRect);
+}
+
+void CUIScrollView::IsNeedLayout(LPRECT lpClipRect)
+{
+	if (m_bNeedLayout)
+		CheckVScroll();
+
+	__super::IsNeedLayout(lpClipRect);
 }
 
 void CUIScrollView::RecalcLayout(LPRECT lpClipRect)

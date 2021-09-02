@@ -19,7 +19,7 @@ void CUICheckButton::SetCheck(bool bCheck)
 
 	if (m_bKeepEnter = bCheck)
 	{
-		DoMouseEnter();
+		GetRootView()->DoMouseEnter(this);
 		OnLButtonDown(m_rect.TopLeft());
 	}
 	else

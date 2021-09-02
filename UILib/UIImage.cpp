@@ -19,11 +19,5 @@ CUIImage::~CUIImage()
 void CUIImage::SetImage(const CImagex &imagex)
 {
 	SetCurImage(imagex);
-
-	CSize size = m_curImagex.Rect().Size();
-	if (m_size != size)
-	{
-		SetSize(size);
-		GetParent()->UpdateChilds();
-	}
+	SetSize(m_curImagex.Rect().Size());
 }

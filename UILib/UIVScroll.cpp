@@ -12,8 +12,8 @@ CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameB
 
 	m_pButton = AddButton(lpFileName);
 	m_pButton->SetTop(0);
-	m_pButton->SetDraggable(true);
 	m_pButton->SetStretch(true);
+	m_pButton->SetDraggable(true);
 
 	// 设置最大宽度
 	int nMaxWidth = 0;
@@ -98,7 +98,7 @@ void CUIVScroll::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 	if (m_rect.Size() != ((CRect *)lpOldRect)->Size())
 	{
 		m_pButton->SetHeight((int)(m_rect.Height() * m_nMinPos / (double)m_nMaxPos + 0.5));
-		ResetOffset(0, false, false);
+		ResetOffset(0, false);
 	}
 
 	__super::OnRectChanged(lpOldRect, lpClipRect);
@@ -115,8 +115,8 @@ void CUIVScroll::OnLButtonDown(CPoint point)
 	else if (point.y > rect.bottom)
 		SetCurPos(GetCurPos() + m_nMinPos);
 
-	m_bLButtonDown = false;		// 以响应下次点击
-	GetRootView()->RaiseMouseMove();
+	// LButtonUp 消息会被滑块处理，重置以响应下次点击
+	m_bLButtonDown = false;
 }
 
 void CUIVScroll::OnChildMoving(CUIControl *, CPoint point)
@@ -124,13 +124,7 @@ void CUIVScroll::OnChildMoving(CUIControl *, CPoint point)
 	ResetOffset(point.y - m_rect.top, true);
 }
 
-void CUIVScroll::OnChildMoved(CUIControl *, CPoint point)
-{
-	if (m_fnOnChanged)
-		m_fnOnChanged(GetCurPos());
-}
-
-void CUIVScroll::ResetOffset(int nOffset, bool bSetPos, bool bUpdate)
+void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
 {
 	CSize size;
 	m_pButton->GetSize(&size);
@@ -148,17 +142,14 @@ void CUIVScroll::ResetOffset(int nOffset, bool bSetPos, bool bUpdate)
 
 	m_pButton->SetTop(nOffset);
 
-	if (bUpdate)
-		UpdateChilds();
-
 	if (!bSetPos)
 		return;
 
 	int nOldPos = GetCurPos();
 	m_fCurPos = nOffset * (m_nMaxPos - m_nMinPos) / (double)nHeight;
 
-	if (m_fnOnChanging && GetCurPos() != nOldPos)
-		m_fnOnChanging(GetCurPos());
+	if (m_fnOnChanged && GetCurPos() != nOldPos)
+		m_fnOnChanged(GetCurPos());
 }
 
 void CUIVScroll::OnLoaded(const IUILoadAttrs &attrs)

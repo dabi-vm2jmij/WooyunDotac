@@ -70,7 +70,6 @@ void CTabDemoWnd::InitUI()
 	m_pWebTabBar->SetTabWidth(180);
 
 	CUIWebTab *pWebTab = m_pWebTabBar->AddWebTab();
-	pWebTab->SetDraggable(true);
 	CUILabel *pLabel = pWebTab->AddLabel();
 	pLabel->SetLeft(10, true);
 	pLabel->SetText(L"新标签页");
@@ -78,15 +77,13 @@ void CTabDemoWnd::InitUI()
 	for (int i = 1; i != 5; i++)
 	{
 		pWebTab = m_pWebTabBar->AddWebTab();
-		pWebTab->SetDraggable(true);
 		pButton = pWebTab->AddButton(L"标签栏\\关闭.png:4");
 		pButton->SetRight(5, true);
 
 		pButton->OnClick([pWebTab]
 		{
 			CUIWebTabBar *pWebTabBar = pWebTab->GetWebTabBar();
-			pWebTabBar->DeleteChild(pWebTab);
-			pWebTabBar->GetRootView()->RaiseMouseMove();
+			pWebTabBar->RemoveChild(pWebTab);
 		});
 	}
 
@@ -104,39 +101,63 @@ void CTabDemoWnd::InitUI()
 	CUISlider *pSlider = pView->AddSlider(L"滑块.png:3", L"滑块bg.png:2");
 	pSlider->SetMaxPos(200);
 	pSlider->SetCurPos(50);
-	pSlider->OnChanging([](int nPos){ ATLTRACE(_T("Changing: %d\n"), nPos); });
 	pSlider->OnChanged([](int nPos){ ATLTRACE(_T("Changed: %d\n"), nPos); });
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 滚动条例子
 	pView = m_rootView.AddView();
 	pView->AddBlank()->SetLeft(80, true);
-	pView->AddBlank()->SetRight(80, true);
+	pView->AddBlank()->SetRight(30, true);
 	pView->AddBlank()->SetTop(50, true);
 	pView->AddBlank()->SetBottom(50, true);
 
+	CUIButtonEx *pBtnDel = pView->AddButtonEx(L"\\按钮.png:3");
+	pBtnDel->SetRight(0, true);
+	pBtnDel->SetWidth(40);
+	pBtnDel->SetText(L"删除");
+
+	CUIButtonEx *pBtnAdd = pView->AddButtonEx(L"\\按钮.png:3");
+	pBtnAdd->SetRight(10, true);
+	pBtnAdd->SetWidth(40);
+	pBtnAdd->SetText(L"添加");
+
 	CUIVScroll *pVScroll = pView->AddVScroll(L"滚动条.png:3", L"滚动条bg.png");
-	pVScroll->SetRight(0, true);
+	pVScroll->SetRight(30, true);
 
 	CUIScrollView *pView2 = pView->AddScrollView();
 	pView2->SetVScroll(pVScroll);
 
 	// 添加模拟数据
-	pButton = pView2->AddButton(L"\\更改.png:3");
-	pButton->SetTop(0, true);
-
-	for (int i = 0; i != 10; i++)
+	for (int i = 0; i != 20; i++)
 	{
 		wchar_t szText[64];
-		swprintf_s(szText, L"i = %d", i);
+		swprintf_s(szText, L"i = %d", i + 1);
 
-		pLabel = pView2->AddLabel();
-		pLabel->SetTop(8, true);
-		pLabel->SetText(szText);
-
-		pButton = pView2->AddButton(L"\\更改.png:3");
-		pButton->SetTop(8, true);
+		CUIButtonEx *pButton = pView2->AddButtonEx(L"\\按钮.png:3");
+		pButton->SetTop(16, true);
+		pButton->SetText(szText);
+		pButton->SetTextColor(RGB(51, 51, 51));
 	}
+
+	pBtnAdd->OnClick([pView2]
+	{
+		wchar_t szText[64];
+		swprintf_s(szText, L"%d", GetTickCount());
+
+		CUIButtonEx *pButton = pView2->AddButtonEx(L"\\按钮.png:3");
+		pButton->SetTop(16, true);
+		pButton->SetText(szText);
+		pButton->SetTextColor(RGB(51, 51, 51));
+	});
+
+	pBtnDel->OnClick([pView2]
+	{
+		if (pView2->GetCount() == 0)
+			return;
+
+		int nIndex = GetTickCount() % pView2->GetCount();
+		pView2->RemoveChild(pView2->GetChild(nIndex));
+	});
 }
 
 void CTabDemoWnd::DrawBg(CUIDC &dc, LPCRECT lpRect)

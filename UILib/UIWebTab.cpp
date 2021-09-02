@@ -4,6 +4,7 @@
 CUIWebTab::CUIWebTab(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName)
 {
 	SetStretch(true);
+	SetDraggable(true);
 }
 
 CUIWebTab::~CUIWebTab()
@@ -46,7 +47,7 @@ void CUIWebTab::SetActive(bool bActive)
 
 	if (m_bKeepEnter = bActive)
 	{
-		DoMouseEnter();
+		GetRootView()->DoMouseEnter(this);
 		OnLButtonDown(m_rect.TopLeft());
 	}
 	else

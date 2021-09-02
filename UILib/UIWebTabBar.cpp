@@ -55,7 +55,6 @@ CUIWebTab *CUIWebTabBar::AddWebTab(CUIWebTab *pWebTab)
 	pWebTab->SetBottom(0);
 	pWebTab->SetWidth(-1);
 	AddChild(pWebTab);
-	UpdateChilds();
 
 	return pWebTab;
 }
@@ -149,13 +148,11 @@ void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
 	}
 
 	pCtrl->SetLeft(point.x - m_rect.left);
-	UpdateChilds();
 }
 
 void CUIWebTabBar::OnChildMoved(CUIControl *pCtrl, CPoint point)
 {
 	pCtrl->SetLeft(MAXINT16);
-	UpdateChilds();
 }
 
 void CUIWebTabBar::OnLoaded(const IUILoadAttrs &attrs)

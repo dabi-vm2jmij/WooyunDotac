@@ -126,7 +126,7 @@ LRESULT CMainFrame::OnTestFunc(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &b
 void CMainFrame::DoSetup()
 {
 	m_pViews[1]->SetVisible(false);
-	m_pViews[2]->SetVisible(true, true);
+	m_pViews[2]->SetVisible(true);
 	ShowBottom(false);
 
 	m_hThread = (HANDLE)_beginthreadex(NULL, 0, WorkThread, this, 0, NULL);

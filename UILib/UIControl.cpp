@@ -43,7 +43,7 @@ bool CUIControl::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (m_bDraggable)
 			{
 				m_ptClick = CPoint(lParam) - m_rect.TopLeft();
-				SetCapture();
+				GetRootView()->SetCapture(this);
 			}
 
 			m_bLButtonDown = true;
@@ -56,7 +56,7 @@ bool CUIControl::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (m_ptClick.cx != MAXINT16)
 			{
-				ReleaseCapture();
+				GetRootView()->SetCapture(NULL);
 				FRIEND(GetParent())->OnChildMoved(this, CPoint(lParam) - m_ptClick);
 				m_ptClick = CSize(MAXINT16, MAXINT16);
 			}
@@ -131,22 +131,6 @@ void CUIControl::SetCurImage(const CImagex &imagex)
 		m_curImagex = imagex;
 		InvalidateRect(NULL);
 	}
-}
-
-void CUIControl::SetCapture()
-{
-	GetRootView()->SetCapture(this);
-}
-
-void CUIControl::ReleaseCapture()
-{
-	GetRootView()->ReleaseCapture();
-}
-
-void CUIControl::SetFocusCtrl(CUIControl *pCtrl)
-{
-	ATLASSERT(pCtrl == NULL || pCtrl == this);
-	GetRootView()->SetFocusCtrl(pCtrl);
 }
 
 void CUIControl::OnLoaded(const IUILoadAttrs &attrs)

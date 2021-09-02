@@ -60,8 +60,7 @@ void CUINotice::RecalcLayout(LPRECT lpClipRect)
 void CUINotice::OnUITimer()
 {
 	m_nCurPos = (m_nCurPos + 1) % (m_vecChilds.size() * 10);
-	UpdateChilds();
-	GetRootView()->RaiseMouseMove();
+	InvalidateLayout();
 
 	if (m_nCurPos % 10)
 		m_uiTimer.Set(30);

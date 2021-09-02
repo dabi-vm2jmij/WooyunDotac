@@ -15,15 +15,14 @@ public:
 	void SetRight(int nRight, bool bClip = false);
 	void SetTop(int nTop, bool bClip = false);
 	void SetBottom(int nBottom, bool bClip = false);
-	void SetWidth(int nWidth) { m_size.cx = nWidth; }
-	void SetHeight(int nHeight) { m_size.cy = nHeight; }
-	void SetSize(CSize size) { m_size = size; }
+	void SetWidth(int nWidth);
+	void SetHeight(int nHeight);
+	void SetSize(CSize size);
 	void GetSize(LPSIZE lpSize) const;
 	void GetClientRect(LPRECT lpRect) const;
 	void GetWindowRect(LPRECT lpRect) const;
-	void InvalidateRect(LPCRECT lpRect);
 	void SetEnabled(bool bEnabled);
-	void SetVisible(bool bVisible, bool bUpdate = false);
+	void SetVisible(bool bVisible);
 	bool IsEnabled() const { return m_bEnabled; }
 	bool IsVisible() const { return m_bVisible; }
 	bool IsRealEnabled() const;
@@ -31,7 +30,6 @@ public:
 	bool IsChild(const CUIBase *pItem) const;
 	bool IsControl() const { return m_bControl; }
 	bool IsMouseEnter() const { return m_ppEnter != NULL; }
-	void DoMouseEnter();
 	CUIView *GetParent() const;
 	CUIRootView *GetRootView() const;
 
@@ -72,6 +70,7 @@ protected:
 	virtual void OnPaint(CUIDC &dc) const {}
 	virtual void OnEnabled(bool bEnabled) {}
 	virtual void OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect) {}
+	virtual void IsNeedLayout(LPRECT lpClipRect) {}
 	virtual void CalcRect(LPRECT lpRect, LPRECT lpClipRect);
 	virtual void OnMouseEnter() {}
 	virtual void OnMouseLeave() {}

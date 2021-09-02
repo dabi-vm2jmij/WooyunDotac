@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIView.h"
 
-CUIView::CUIView(CUIView *pParent) : CUIBase(pParent)
+CUIView::CUIView(CUIView *pParent) : CUIBase(pParent), m_bNeedLayout(false)
 {
 	m_size.SetSize(-1, -1);	// 自适应
 }
@@ -66,7 +66,7 @@ bool CUIView::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CUIView::OnPaint(CUIDC &dc) const
 {
-	CUIBase *pCapture = GetRootView()->GetCapture();
+	CUIBase *pCapture = GetRootView()->m_pCapture;
 	bool bFound = false;
 
 	for (auto pItem : m_vecChilds)
@@ -90,7 +90,26 @@ void CUIView::OnEnabled(bool bEnabled)
 
 void CUIView::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
+	m_bNeedLayout = false;
 	RecalcLayout(lpClipRect);
+}
+
+// 检查所有需要重新布局的控件
+void CUIView::IsNeedLayout(LPRECT lpClipRect)
+{
+	if (m_bNeedLayout)
+	{
+		m_bNeedLayout = false;
+		RecalcLayout(lpClipRect);
+	}
+
+	if (m_rect.IsRectEmpty())
+		return;
+
+	for (auto pItem : m_vecChilds)
+	{
+		pItem->IsNeedLayout(lpClipRect);
+	}
 }
 
 // 将自己的区域分给子控件
@@ -107,32 +126,43 @@ void CUIView::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIView::DeleteChild(CUIBase *pItem)
+void CUIView::InvalidateRect(LPCRECT lpRect)
+{
+	CRect rect(m_rcReal);
+	if (lpRect)
+		rect &= *lpRect;
+
+	if (rect.IsRectEmpty())
+		return;
+
+	GetRootView()->DoInvalidateRect(rect);
+}
+
+void CUIView::InvalidateLayout()
+{
+	if (m_bNeedLayout || m_rect.IsRectEmpty())
+		return;
+
+	m_bNeedLayout = true;
+	GetRootView()->DoInvalidateLayout();
+}
+
+void CUIView::RemoveChild(CUIBase *pItem)
 {
 	for (auto it = m_vecChilds.begin(); it != m_vecChilds.end(); ++it)
 	{
 		if (*it == pItem)
 		{
-			m_vecChilds.erase(it);
-
 			CRect rect;
 			pItem->CalcRect(NULL, rect);
-			delete pItem;
-
-			RecalcLayout(rect);
 			InvalidateRect(rect);
+
+			m_vecChilds.erase(it);
+			delete pItem;
+			InvalidateLayout();
 			break;
 		}
 	}
-}
-
-void CUIView::UpdateChilds()
-{
-	CRect rect;
-	RecalcLayout(rect);
-
-	if (!rect.IsRectEmpty())
-		InvalidateRect(rect);
 }
 
 CUIBase *CUIView::GetChild(UINT nIndex) const
@@ -327,6 +357,7 @@ void CUIView::PushBackChild(CUIBase *pItem)
 {
 	m_vecChilds.reserve(4);
 	m_vecChilds.push_back(pItem);
+	InvalidateLayout();
 }
 
 void CUIView::OnRadioCheck(const CUIRadioBox *pItem)

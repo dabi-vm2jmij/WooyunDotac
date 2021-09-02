@@ -29,9 +29,6 @@ protected:
 	virtual void OnLostCapture();
 	virtual void OnSetFocus() {}
 	virtual void OnKillFocus() {}
-	void SetCapture();
-	void ReleaseCapture();
-	void SetFocusCtrl(CUIControl *pCtrl);
 
 	CImagex m_curImagex;
 	bool    m_bStretch;		// 绘制时使用 StretchDraw

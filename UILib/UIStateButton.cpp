@@ -61,7 +61,7 @@ void CUIStateButton::SetState(int nState)
 		return;
 
 	m_nState = nState;
-	UpdateChilds();
+	InvalidateLayout();
 }
 
 void CUIStateButton::OnChildClick()
@@ -75,8 +75,7 @@ void CUIStateButton::OnChildClick()
 	if (m_nState == nState)
 		return;
 
-	UpdateChilds();
-	GetRootView()->RaiseMouseMove();
+	InvalidateLayout();
 }
 
 void CUIStateButton::OnLoaded(const IUILoadAttrs &attrs)

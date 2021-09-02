@@ -2,7 +2,9 @@
 #include "UIRootView.h"
 #include "UIToolTip.h"
 
-CUIRootView::CUIRootView() : CUIView(NULL), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_hImc(NULL), m_hCursor(NULL)
+UINT CUIRootView::m_nLayoutMsgId = RegisterWindowMessage(_T("UILibLayout"));
+
+CUIRootView::CUIRootView() : CUIView(NULL), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_bPostLayout(false), m_hImc(NULL), m_hCursor(NULL)
 	, m_pCapture(NULL), m_pCurFocus(NULL), m_pWndProc(NULL), m_pOwner(NULL)
 {
 	m_vecEnterItems.reserve(8);
@@ -40,19 +42,6 @@ void CUIRootView::SetWndAlpha(BYTE nWndAlpha)
 		OnPaintLayered(CUIClientDC(GetHwnd()));
 }
 
-void CUIRootView::InvalidateRect(LPCRECT lpRect)
-{
-	CRect rect(m_rect);
-	if (lpRect)
-		rect &= *lpRect;
-
-	if (rect.IsRectEmpty())
-		return;
-
-	::InvalidateRect(GetHwnd(), rect, TRUE);
-	m_rectClip |= rect;
-}
-
 void CUIRootView::PrintWindow(CImage &image)
 {
 	if (m_rect.IsRectEmpty())
@@ -64,6 +53,22 @@ void CUIRootView::PrintWindow(CImage &image)
 
 LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (uMsg == m_nLayoutMsgId)
+	{
+		m_bPostLayout = false;
+
+		CRect rect;
+		IsNeedLayout(rect);
+
+		if (!rect.IsRectEmpty())
+			InvalidateRect(rect);
+
+		if (m_pCapture == NULL)
+			RaiseMouseMove();
+
+		return 0;
+	}
+
 	switch (uMsg)
 	{
 	case WM_NCHITTEST:
@@ -74,7 +79,7 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_SETCURSOR:
 		if (m_hCursor)
 		{
-			::SetCursor(m_hCursor);
+			SetCursor(m_hCursor);
 			return TRUE;
 		}
 		break;
@@ -88,11 +93,9 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_MOUSELEAVE:
-		{
-			m_bMouseEnter = false;
-			CheckMouseLeave(UIHitTest());
-			CUIToolTip::ShowTip(GetHwnd(), L"");
-		}
+		m_bMouseEnter = false;
+		CheckMouseLeave(UIHitTest());
+		CUIToolTip::ShowTip(GetHwnd(), L"");
 		break;
 
 	case WM_SIZE:
@@ -335,7 +338,7 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (hit.bEnabled && dynamic_cast<CUIEdit *>(hit.pItem) == NULL)
 				{
-					SetFocusCtrl(NULL);		// 使输入框失去焦点
+					SetFocus(NULL);		// 使输入框失去焦点
 				}
 				break;
 			}
@@ -429,31 +432,40 @@ void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 	}
 }
 
+void CUIRootView::DoInvalidateRect(LPCRECT lpRect)
+{
+	CRect rect(m_rect);
+	if (lpRect)
+		rect &= *lpRect;
+
+	if (rect.IsRectEmpty())
+		return;
+
+	::InvalidateRect(GetHwnd(), rect, TRUE);
+	m_rectClip |= rect;
+}
+
+void CUIRootView::DoInvalidateLayout()
+{
+	if (m_bPostLayout)
+		return;
+
+	m_bPostLayout = true;
+	PostMessage(GetHwnd(), m_nLayoutMsgId, 0, 0);
+}
+
 void CUIRootView::SetCapture(CUIControl *pCtrl)
 {
-	if (pCtrl == NULL)
-	{
-		ReleaseCapture();
-		return;
-	}
-
-	if (m_pCapture)
+	if (!m_pCapture == !pCtrl)
 		return;
 
-	m_pCapture = pCtrl;
-	::SetCapture(GetHwnd());
+	if (m_pCapture = pCtrl)
+		::SetCapture(GetHwnd());
+	else
+		::ReleaseCapture();
 }
 
-void CUIRootView::ReleaseCapture()
-{
-	if (m_pCapture == NULL)
-		return;
-
-	m_pCapture = NULL;
-	::ReleaseCapture();
-}
-
-void CUIRootView::SetFocusCtrl(CUIControl *pCtrl)
+void CUIRootView::SetFocus(CUIControl *pCtrl)
 {
 	if (m_pCurFocus == pCtrl)
 		return;
@@ -468,6 +480,12 @@ void CUIRootView::SetFocusCtrl(CUIControl *pCtrl)
 
 	if (pCtrl)
 		pCtrl->OnSetFocus();
+}
+
+void CUIRootView::EnableImm(bool bEnabled)
+{
+	if (!m_hImc == !bEnabled)
+		m_hImc = ImmAssociateContext(GetHwnd(), m_hImc);
 }
 
 void CUIRootView::AddTabsEdit(CUIEdit *pEdit)
@@ -532,14 +550,8 @@ void CUIRootView::NextTabsEdit()
 		if (m_vecEdits[i]->IsRealEnabled() && !m_vecEdits[i]->m_rect.IsRectEmpty())
 		{
 			m_vecEdits[i]->SetSel(0, -1);
-			SetFocusCtrl(m_vecEdits[i]);
+			SetFocus(m_vecEdits[i]);
 			break;
 		}
 	}
-}
-
-void CUIRootView::EnableImm(bool bEnabled)
-{
-	if (!m_hImc == !bEnabled)
-		m_hImc = ImmAssociateContext(GetHwnd(), m_hImc);
 }

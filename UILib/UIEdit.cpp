@@ -99,7 +99,7 @@ void CUIEdit::SetFocus()
 		return;
 	}
 
-	SetFocusCtrl(this);
+	GetRootView()->SetFocus(this);
 }
 
 void CUIEdit::SetPassword(bool bPassword)
@@ -193,7 +193,7 @@ void CUIEdit::OnEnabled(bool bEnabled)
 	__super::OnEnabled(bEnabled);
 
 	if (m_bFocus && !bEnabled)
-		SetFocusCtrl(NULL);
+		GetRootView()->SetFocus(NULL);
 
 	InvalidateSel(0, -1);
 }
@@ -203,7 +203,7 @@ void CUIEdit::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 	__super::OnRectChanged(lpOldRect, lpClipRect);
 
 	if (m_bFocus && m_rect.IsRectEmpty())
-		SetFocusCtrl(NULL);
+		GetRootView()->SetFocus(NULL);
 }
 
 void CUIEdit::OnMouseMove(CPoint point)
@@ -217,7 +217,7 @@ void CUIEdit::OnMouseMove(CPoint point)
 void CUIEdit::OnLButtonDown(CPoint point)
 {
 	bool bShift = GetKeyState(VK_SHIFT) < 0;
-	SetCapture();
+	GetRootView()->SetCapture(this);
 
 	if (m_bFocus)
 	{
@@ -241,7 +241,7 @@ void CUIEdit::OnLButtonDown(CPoint point)
 
 void CUIEdit::OnLButtonUp(CPoint point)
 {
-	ReleaseCapture();
+	GetRootView()->SetCapture(NULL);
 }
 
 void CUIEdit::OnRButtonDown(CPoint point)

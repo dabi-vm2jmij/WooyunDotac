@@ -83,7 +83,7 @@ void CUISlider::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	if (m_rect.Size() != ((CRect *)lpOldRect)->Size())
 	{
-		ResetOffset(0, false, false);
+		ResetOffset(0, false);
 	}
 
 	__super::OnRectChanged(lpOldRect, lpClipRect);
@@ -91,13 +91,22 @@ void CUISlider::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 
 void CUISlider::OnLButtonDown(CPoint point)
 {
+	// 移动滑块中心到点击处
 	CSize size;
 	m_pButton->GetSize(&size);
 	ResetOffset(point.x - m_rect.left - size.cx / 2, true);
 
-	m_bLButtonDown = false;		// 以响应下次点击
-	GetRootView()->RaiseMouseMove();
+	// 立即重新布局滑块
+	CRect rect;
+	RecalcLayout(rect);
+	InvalidateRect(rect);
+
+	// 鼠标消息转给滑块
+	GetRootView()->DoMouseEnter(m_pButton);
 	FRIEND(m_pButton)->OnMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+
+	// LButtonUp 消息会被滑块处理，重置以响应下次点击
+	m_bLButtonDown = false;
 }
 
 void CUISlider::OnChildMoving(CUIControl *, CPoint point)
@@ -105,13 +114,7 @@ void CUISlider::OnChildMoving(CUIControl *, CPoint point)
 	ResetOffset(point.x - m_rect.left, true);
 }
 
-void CUISlider::OnChildMoved(CUIControl *, CPoint point)
-{
-	if (m_fnOnChanged)
-		m_fnOnChanged(GetCurPos());
-}
-
-void CUISlider::ResetOffset(int nOffset, bool bSetPos, bool bUpdate)
+void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 {
 	CSize size;
 	m_pButton->GetSize(&size);
@@ -129,9 +132,6 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos, bool bUpdate)
 
 	m_pButton->SetLeft(nOffset);
 
-	if (bUpdate)
-		UpdateChilds();
-
 	if (m_pProgress)
 		m_pProgress->SetValue(nOffset + size.cx / 2, nWidth + size.cx);
 
@@ -141,8 +141,8 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos, bool bUpdate)
 	int nOldPos = GetCurPos();
 	m_fCurPos = nOffset * m_nMaxPos / (double)nWidth;
 
-	if (m_fnOnChanging && GetCurPos() != nOldPos)
-		m_fnOnChanging(GetCurPos());
+	if (m_fnOnChanged && GetCurPos() != nOldPos)
+		m_fnOnChanged(GetCurPos());
 }
 
 void CUISlider::OnLoaded(const IUILoadAttrs &attrs)
