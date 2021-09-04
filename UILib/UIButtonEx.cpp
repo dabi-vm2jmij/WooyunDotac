@@ -151,7 +151,7 @@ void CUIButtonEx::OnLoaded(const IUILoadAttrs &attrs)
 
 		if (LPCWSTR lpStr = attrs.GetStr(szName))
 		{
-			ATLVERIFY(IsColorStr(lpStr, &colors[i]));
+			ATLVERIFY(IsStrColor(lpStr, &colors[i]));
 		}
 		else
 		{

@@ -23,6 +23,6 @@ UILIB_API HFONT GetFont(LPCWSTR lpszName, int nWeight = FW_NORMAL, BYTE bItalic 
 UILIB_API void DrawImage3D(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int dy, int alpha);
 UILIB_API void ScaleImage(const CImage &imgSrc, CImage &imgDst, int nWidth, int nHeight);
 UILIB_API void FormatPath(LPWSTR lpDstPath, LPCWSTR lpSrcPath);
-UILIB_API bool IsColorStr(LPCWSTR lpStr, COLORREF *pColor);
+UILIB_API bool IsStrColor(LPCWSTR lpStr, COLORREF *pColor);
 UILIB_API DWORD BswapRGB(DWORD color);
 }

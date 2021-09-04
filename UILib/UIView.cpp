@@ -80,6 +80,8 @@ void CUIView::OnPaint(CUIDC &dc) const
 	// 最后画，保证在上
 	if (bFound)
 		pCapture->DoPaint(dc);
+
+	__super::OnPaint(dc);
 }
 
 void CUIView::OnEnabled(bool bEnabled)

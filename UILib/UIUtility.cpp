@@ -279,7 +279,7 @@ void FormatPath(LPWSTR lpDstPath, LPCWSTR lpSrcPath)
 	*lpDstPath = 0;
 }
 
-bool IsColorStr(LPCWSTR lpStr, COLORREF *pColor)
+bool IsStrColor(LPCWSTR lpStr, COLORREF *pColor)
 {
 	if (lpStr == NULL || *lpStr != '#')
 		return false;

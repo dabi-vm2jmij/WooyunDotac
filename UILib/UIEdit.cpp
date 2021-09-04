@@ -908,7 +908,7 @@ void CUIEdit::OnLoaded(const IUILoadAttrs &attrs)
 	if (lpStr = attrs.GetStr(L"color"))
 	{
 		COLORREF color = 0;
-		ATLVERIFY(IsColorStr(lpStr, &color));
+		ATLVERIFY(IsStrColor(lpStr, &color));
 		SetTextColor(color);
 	}
 

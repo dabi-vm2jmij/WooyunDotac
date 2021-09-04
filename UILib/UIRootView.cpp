@@ -57,6 +57,7 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		m_bPostLayout = false;
 
+		// 重新布局所有延迟布局的控件
 		CRect rect;
 		IsNeedLayout(rect);
 
@@ -450,6 +451,7 @@ void CUIRootView::DoInvalidateLayout()
 	if (m_bPostLayout)
 		return;
 
+	// 延迟布局所有需要重新布局的控件
 	m_bPostLayout = true;
 	PostMessage(GetHwnd(), m_nLayoutMsgId, 0, 0);
 }

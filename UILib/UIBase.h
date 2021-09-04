@@ -21,6 +21,7 @@ public:
 	void GetSize(LPSIZE lpSize) const;
 	void GetClientRect(LPRECT lpRect) const;
 	void GetWindowRect(LPRECT lpRect) const;
+	void SetDbgColor(COLORREF color) { m_dbgColor = color; }
 	void SetEnabled(bool bEnabled);
 	void SetVisible(bool bVisible);
 	bool IsEnabled() const { return m_bEnabled; }
@@ -67,7 +68,7 @@ protected:
 	virtual void OnLoaded(const IUILoadAttrs &attrs);
 	virtual bool OnHitTest(UIHitTest &hitTest) { return false; }
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
-	virtual void OnPaint(CUIDC &dc) const {}
+	virtual void OnPaint(CUIDC &dc) const;
 	virtual void OnEnabled(bool bEnabled) {}
 	virtual void OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect) {}
 	virtual void IsNeedLayout(LPRECT lpClipRect) {}
@@ -81,6 +82,7 @@ protected:
 	CRect     m_offset;		// 对齐和偏移，左右互斥、上下互斥
 	CSize     m_size;		// 宽或高小于零为自适应
 	CRect     m_rect;		// 完整区域，包括不可见部分
+	COLORREF  m_dbgColor;
 	bool      m_bEnabled;
 	bool      m_bVisible;
 	bool      m_bControl;	// 是否 CUIControl

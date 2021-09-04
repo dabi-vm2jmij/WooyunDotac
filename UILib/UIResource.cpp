@@ -88,7 +88,7 @@ CImagePtr CUIResource::GetImage(LPCWSTR lpFileName)
 	wchar_t szFileName[MAX_PATH];
 	COLORREF color = -1;
 
-	if (IsColorStr(lpFileName, &color))
+	if (IsStrColor(lpFileName, &color))
 	{
 		wcscpy_s(szFileName, lpFileName);
 		CharLowerW(szFileName);
@@ -133,7 +133,7 @@ void CUIResource::UpdateImages()
 {
 	for (auto &it : m_mapImages)
 	{
-		if (IsColorStr(it.first.c_str(), NULL))
+		if (IsStrColor(it.first.c_str(), NULL))
 			continue;
 
 		auto &imgInfo = it.second;

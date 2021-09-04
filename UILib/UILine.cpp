@@ -58,7 +58,7 @@ void CUILine::OnLoaded(const IUILoadAttrs &attrs)
 	if (LPCWSTR lpStr = attrs.GetStr(L"color"))
 	{
 		COLORREF color = 0;
-		ATLVERIFY(IsColorStr(lpStr, &color));
+		ATLVERIFY(IsStrColor(lpStr, &color));
 		SetLineStyle(color, attrs.GetInt(L"style", m_nStyle));
 	}
 }

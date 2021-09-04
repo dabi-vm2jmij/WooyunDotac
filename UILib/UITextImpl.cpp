@@ -225,7 +225,7 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 			if (CountNumber(szText + 1, true) == 6)
 			{
 				vecDrawInfos.push_back(drawInfo);
-				nSize = IsColorStr(szText, &drawInfo.m_color);
+				nSize = IsStrColor(szText, &drawInfo.m_color);
 			}
 			break;
 
@@ -346,7 +346,7 @@ void CUITextImpl::OnLoadedText(const IUILoadAttrs &attrs)
 	if (lpStr = attrs.GetStr(L"color"))
 	{
 		COLORREF color = 0;
-		ATLVERIFY(IsColorStr(lpStr, &color));
+		ATLVERIFY(IsStrColor(lpStr, &color));
 		SetTextColor(color);
 	}
 
