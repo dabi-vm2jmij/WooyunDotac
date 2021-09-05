@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIVScroll.h"
 
-CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg) : CUIControl(pParent), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
+CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg) : CUIControl(pParent), m_nWheelRate(20), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
 {
 	if (lpFileNameBg)
 	{
@@ -86,7 +86,7 @@ bool CUIVScroll::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (uMsg == WM_MOUSEWHEEL)
 	{
 		short zDelta = (short)HIWORD(wParam);
-		SetCurPos(GetCurPos() - zDelta / WHEEL_DELTA * m_nMinPos);
+		SetCurPos(GetCurPos() - zDelta / WHEEL_DELTA * m_nMinPos * m_nWheelRate / 100);
 		return true;
 	}
 
@@ -156,5 +156,10 @@ void CUIVScroll::OnLoaded(const IUILoadAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 
-	SetRange(attrs.GetInt(L"minPos", m_nMinPos), attrs.GetInt(L"maxPos", m_nMaxPos));
+	if (int nRate = attrs.GetInt(L"wheelRate"))
+		SetWheelRate(nRate);
+
+	int nMinPos, nMaxPos;
+	if (attrs.GetInt(L"minPos", &nMinPos) && attrs.GetInt(L"maxPos", &nMaxPos))
+		SetRange(nMinPos, nMaxPos);
 }

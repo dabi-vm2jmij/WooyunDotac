@@ -52,5 +52,7 @@ void CUIProgress::OnLoaded(const IUILoadAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 
-	SetValue(attrs.GetInt(L"curPos", m_nCurPos), attrs.GetInt(L"maxPos", m_nMaxPos));
+	int nCurPos, nMaxPos;
+	if (attrs.GetInt(L"curPos", &nCurPos) && attrs.GetInt(L"maxPos", &nMaxPos))
+		SetValue(nCurPos, nMaxPos);
 }
