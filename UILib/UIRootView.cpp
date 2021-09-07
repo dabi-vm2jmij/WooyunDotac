@@ -4,8 +4,8 @@
 
 UINT CUIRootView::m_nLayoutMsgId = RegisterWindowMessage(_T("UILibLayout"));
 
-CUIRootView::CUIRootView() : CUIView(NULL), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_bPostLayout(false), m_hImc(NULL), m_hCursor(NULL)
-	, m_pCapture(NULL), m_pCurFocus(NULL), m_pWndProc(NULL), m_pOwner(NULL)
+CUIRootView::CUIRootView(IUIWindow *pWindow) : CUIView(NULL), m_pWindow(pWindow), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_bPostLayout(false), m_hImc(NULL), m_hCursor(NULL)
+	, m_pCapture(NULL), m_pCurFocus(NULL)
 {
 	m_vecEnterItems.reserve(8);
 }
@@ -18,41 +18,10 @@ CUIRootView::~CUIRootView()
 	m_vecChilds.clear();
 }
 
-void CUIRootView::Attach(CWindowImplRoot<CWindow> *pOwner, WNDPROC pWndProc)
+BOOL CUIRootView::OnWndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
 {
-	ATLASSERT(m_pWndProc == NULL);
-	m_pOwner   = pOwner;
-	m_pWndProc = pWndProc;
-}
+	lResult = 0;
 
-HWND CUIRootView::GetHwnd() const
-{
-	ATLASSERT(m_pOwner);
-	return m_pOwner ? m_pOwner->m_hWnd : NULL;
-}
-
-void CUIRootView::SetWndAlpha(BYTE nWndAlpha)
-{
-	if (m_nWndAlpha == nWndAlpha)
-		return;
-
-	m_nWndAlpha = nWndAlpha;
-
-	if (m_bLayered)
-		OnPaintLayered(CUIClientDC(GetHwnd()));
-}
-
-void CUIRootView::PrintWindow(CImage &image)
-{
-	if (m_rect.IsRectEmpty())
-		return;
-
-	image.Create(m_rect.Width(), m_rect.Height(), 32, CImage::createAlphaChannel);
-	DoPaint(CImageDC(image), NULL);
-}
-
-LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
 	if (uMsg == m_nLayoutMsgId)
 	{
 		m_bPostLayout = false;
@@ -67,36 +36,14 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (m_pCapture == NULL)
 			RaiseMouseMove();
 
-		return 0;
+		return TRUE;
 	}
 
 	switch (uMsg)
 	{
-	case WM_NCHITTEST:
-		if (OnNcHitTest(lParam))
-			return HTCLIENT;
-		break;
-
-	case WM_SETCURSOR:
-		if (m_hCursor)
-		{
-			SetCursor(m_hCursor);
-			return TRUE;
-		}
-		break;
-
-	case WM_MOUSEMOVE:
-		if (!m_bMouseEnter)
-		{
-			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, GetHwnd() };
-			m_bMouseEnter = TrackMouseEvent(&tme) != 0;
-		}
-		break;
-
-	case WM_MOUSELEAVE:
-		m_bMouseEnter = false;
-		CheckMouseLeave(UIHitTest());
-		CUIToolTip::ShowTip(GetHwnd(), L"");
+	case WM_CREATE:
+		if (GetWindowLong(GetHwnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
+			m_bLayered = true;
 		break;
 
 	case WM_SIZE:
@@ -110,9 +57,61 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_NCPAINT:
 	case 0x00AE:	// WM_NCUAHDRAWCAPTION
 	case 0x00AF:	// WM_NCUAHDRAWFRAME
-		return 0;
+		return TRUE;
 
 	case WM_ERASEBKGND:
+		lResult = TRUE;
+		return TRUE;
+
+	case WM_NCHITTEST:
+		if (OnNcHitTest(lParam))
+		{
+			lResult = HTCLIENT;
+			return TRUE;
+		}
+		break;
+
+	case WM_SETCURSOR:
+		if (m_hCursor)
+		{
+			SetCursor(m_hCursor);
+			lResult = TRUE;
+			return TRUE;
+		}
+		break;
+
+	case WM_MOUSELEAVE:
+		m_bMouseEnter = false;
+		CheckMouseLeave(UIHitTest());
+		CUIToolTip::ShowTip(GetHwnd(), L"");
+		return TRUE;
+
+	case WM_MOUSEMOVE:
+		if (!m_bMouseEnter)
+		{
+			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, GetHwnd() };
+			m_bMouseEnter = TrackMouseEvent(&tme) != 0;
+		}
+
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONUP:
+	case WM_LBUTTONDBLCLK:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONUP:
+	case WM_RBUTTONDBLCLK:
+		if (m_pCapture)
+			m_pCapture->OnMessage(uMsg, wParam, lParam);
+		else
+			OnMouseMessage(uMsg, wParam, lParam);
+		return TRUE;
+
+	case WM_MOUSEWHEEL:
+	case WM_CONTEXTMENU:
+		{
+			CPoint point(lParam);
+			ScreenToClient(GetHwnd(), &point);
+			OnMessage(uMsg, wParam, MAKELPARAM(point.x, point.y));
+		}
 		return TRUE;
 
 	case WM_KEYDOWN:
@@ -122,7 +121,7 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (m_pCurFocus)
 		{
 			m_pCurFocus->OnMessage(uMsg, wParam, lParam);
-			return 0;
+			return TRUE;
 		}
 		break;
 
@@ -154,86 +153,55 @@ LRESULT CUIRootView::MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	case WM_INPUTLANGCHANGE:
+		if (m_pCurFocus && wParam)
+		{
+			if (CUIEdit *pEdit = dynamic_cast<CUIEdit *>(m_pCurFocus))
+			{
+				pEdit->OnInputLangChange(lParam);
+				lResult = TRUE;
+				return TRUE;
+			}
+		}
+		break;
+
 	case WM_CAPTURECHANGED:
 		if (auto pCapture = m_pCapture)
 		{
 			m_pCapture = NULL;
 			pCapture->OnLostCapture();
 			RaiseMouseMove();
-			return 0;
+			return TRUE;
 		}
 		break;
 	}
 
-	LRESULT lResult = m_pWndProc((HWND)m_pOwner, uMsg, wParam, lParam);
-
-	switch (uMsg)
-	{
-	case WM_CREATE:
-		if (lResult != -1 && GetWindowLong(GetHwnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
-			m_bLayered = true;
-		break;
-
-	case WM_INPUTLANGCHANGE:
-		if (lResult == 0 && wParam && m_pCurFocus)
-		{
-			if (CUIEdit *pEdit = dynamic_cast<CUIEdit *>(m_pCurFocus))
-			{
-				pEdit->OnInputLangChange(lParam);
-				lResult = TRUE;
-			}
-		}
-		break;
-
-	case WM_MOUSEMOVE:
-	case WM_LBUTTONDOWN:
-	case WM_LBUTTONUP:
-	case WM_LBUTTONDBLCLK:
-	case WM_RBUTTONDOWN:
-	case WM_RBUTTONUP:
-	case WM_RBUTTONDBLCLK:
-		if (m_pCapture)
-			m_pCapture->OnMessage(uMsg, wParam, lParam);
-		else
-			OnMouseMessage(uMsg, wParam, lParam);
-		break;
-
-	case WM_MOUSEWHEEL:
-	case WM_CONTEXTMENU:
-		{
-			CPoint point(lParam);
-			ScreenToClient(GetHwnd(), &point);
-			OnMessage(uMsg, wParam, MAKELPARAM(point.x, point.y));
-		}
-	}
-
-	return lResult;
+	return FALSE;
 }
 
-void CUIRootView::RaiseMouseMove()
+HWND CUIRootView::GetHwnd() const
+{
+	return m_pWindow->GetHwnd();
+}
+
+void CUIRootView::SetWndAlpha(BYTE nWndAlpha)
+{
+	if (m_nWndAlpha == nWndAlpha)
+		return;
+
+	m_nWndAlpha = nWndAlpha;
+
+	if (m_bLayered)
+		OnPaintLayered(CUIClientDC(GetHwnd()));
+}
+
+void CUIRootView::PrintWindow(CImage &image)
 {
 	if (m_rect.IsRectEmpty())
 		return;
 
-	UIHitTest hitTest;
-	GetCursorPos(&hitTest.point);
-
-	if (WindowFromPoint(hitTest.point) == GetHwnd())
-	{
-		ScreenToClient(GetHwnd(), &hitTest.point);
-		OnHitTest(hitTest);
-	}
-
-	if (m_bMouseEnter)
-	{
-		for (auto hit : hitTest)
-		{
-			if (hit.bEnabled)
-				DoMouseEnter(hit.pItem);
-		}
-	}
-
-	CheckMouseLeave(hitTest);
+	image.Create(m_rect.Width(), m_rect.Height(), 32, CImage::createAlphaChannel);
+	DoPaint(CImageDC(image), NULL);
 }
 
 bool CUIRootView::OnNcHitTest(CPoint point)
@@ -260,10 +228,13 @@ bool CUIRootView::OnNcHitTest(CPoint point)
 
 void CUIRootView::OnSize(CSize size)
 {
-	if (size.cx != m_rect.Width() || size.cy != m_rect.Height())
+	if (m_rect.Width() != size.cx || m_rect.Height() != size.cy)
 	{
+		// 这里不用 CalcRect，而是直接赋值
+		m_rect = m_rcReal = CRect(0, 0, size.cx, size.cy);
+
 		CRect rect;
-		CalcRect(CRect(0, 0, size.cx, size.cy), rect);
+		OnRectChanged(NULL, rect);
 
 		if (!rect.IsRectEmpty())
 			InvalidateRect(rect);
@@ -312,10 +283,7 @@ void CUIRootView::DoPaint(HDC hDC, LPCRECT lpClipRect)
 {
 	CUIDC dc(hDC, lpClipRect, m_bLayered);
 	SetBkMode(dc, TRANSPARENT);
-
-	if (m_fnDrawBg)
-		m_fnDrawBg(dc, m_rect);
-
+	m_pWindow->OnDrawBg(dc, m_rect);
 	__super::OnPaint(dc);
 }
 
@@ -369,6 +337,32 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	}
+}
+
+void CUIRootView::RaiseMouseMove()
+{
+	if (m_rect.IsRectEmpty())
+		return;
+
+	UIHitTest hitTest;
+	GetCursorPos(&hitTest.point);
+
+	if (WindowFromPoint(hitTest.point) == GetHwnd())
+	{
+		ScreenToClient(GetHwnd(), &hitTest.point);
+		OnHitTest(hitTest);
+	}
+
+	if (m_bMouseEnter)
+	{
+		for (auto hit : hitTest)
+		{
+			if (hit.bEnabled)
+				DoMouseEnter(hit.pItem);
+		}
+	}
+
+	CheckMouseLeave(hitTest);
 }
 
 void CUIRootView::DoMouseEnter(CUIBase *pItem)
@@ -556,4 +550,16 @@ void CUIRootView::NextTabsEdit()
 			break;
 		}
 	}
+}
+
+CUIView *CUIRootView::OnCustomUI(LPCWSTR lpName, CUIView *pParent)
+{
+	return m_pWindow->OnCustomUI(lpName, pParent);
+}
+
+void CUIRootView::OnLoaded(const IUILoadAttrs &attrs)
+{
+	__super::OnLoaded(attrs);
+
+	m_pWindow->OnLoadedUI(attrs);
 }

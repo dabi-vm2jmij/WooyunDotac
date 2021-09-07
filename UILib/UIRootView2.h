@@ -7,6 +7,8 @@
 class CUIRootView2 : public CUIRootView
 {
 public:
+	CUIRootView2(IUIWindow *pWindow);
+
 	void InitItems(const std::vector<CUIBase *> &pItems);
 	void ClearItems();
 	void GetSize(LPSIZE lpSize) const;

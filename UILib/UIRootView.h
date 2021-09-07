@@ -2,16 +2,25 @@
 
 #include "UIView.h"
 
+class IUIWindow
+{
+public:
+	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) = 0;
+	virtual void OnLoadedUI(const IUILoadAttrs &attrs) = 0;
+	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) = 0;
+	virtual HWND GetHwnd() const = 0;
+};
+
 class UILIB_API CUIRootView : public CUIView
 {
 	friend class CUIView;
 	friend class CUIEdit;
 public:
-	CUIRootView();
+	CUIRootView(IUIWindow *pWindow);
 	virtual ~CUIRootView();
 
-	void Attach(CWindowImplRoot<CWindow> *pOwner, WNDPROC pWndProc);
-	void OnDrawBg(std::function<void(CUIDC &, LPCRECT)> &&fnDrawBg) { m_fnDrawBg = std::move(fnDrawBg); }
+	BOOL OnWndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
+	HWND GetHwnd() const;
 	void SetWndAlpha(BYTE nWndAlpha);
 	void RaiseMouseMove();
 	void DoMouseEnter(CUIBase *pItem);
@@ -19,9 +28,10 @@ public:
 	void SetFocus(CUIControl *pCtrl);
 	void EnableImm(bool bEnabled);
 	void PrintWindow(CImage &image);
-	HWND GetHwnd() const;
+	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
 
 protected:
+	void OnLoaded(const IUILoadAttrs &attrs) override;
 	bool OnNcHitTest(CPoint point);
 	void OnSize(CSize size);
 	void OnPaint();
@@ -35,6 +45,7 @@ protected:
 	void DelTabsEdit(CUIEdit *pEdit);
 	void NextTabsEdit();
 
+	IUIWindow  *m_pWindow;
 	CImage      m_imageWnd;		// 透明窗口缓存
 	CRect       m_rectClip;		// 当前无效区域
 	BYTE        m_nWndAlpha;	// 透明度：0~255
@@ -47,30 +58,6 @@ protected:
 	CUIControl *m_pCurFocus;
 	std::vector<CUIEdit *> m_vecEdits;
 	std::vector<CUIBase *> m_vecEnterItems;
-	std::function<void(CUIDC &, LPCRECT)> m_fnDrawBg;
 
 	static UINT m_nLayoutMsgId;
-
-private:
-	LRESULT CALLBACK MyWndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	WNDPROC m_pWndProc;
-	CWindowImplRoot<CWindow> *m_pOwner;
 };
-
-#define DECLARE_UI_ROOTVIEW_EX(RootViewT, rootView) \
-protected: \
-	RootViewT rootView; \
-public: \
-	WNDPROC GetWindowProc() final \
-	{ \
-		rootView.Attach(this, __super::GetWindowProc()); \
-		__asm mov eax, lb1 \
-		__asm jmp lb2 \
-		__asm lb1: \
-		__asm add dword ptr [esp + 4], rootView \
-		__asm jmp CUIRootView::MyWndProc \
-		__asm lb2: \
-	}
-
-#define DECLARE_UI_ROOTVIEW(rootView)	DECLARE_UI_ROOTVIEW_EX(CUIRootView, rootView)

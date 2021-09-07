@@ -1,12 +1,11 @@
 #pragma once
 
-class CUIWindow : public CWindowImpl<CUIWindow>, public IUILoadNotify
+class CUIWindow : public CWindowImpl<CUIWindow>, public IUIWindow
 {
 public:
 	DECLARE_WND_CLASS_EX(NULL, CS_DBLCLKS, COLOR_WINDOW)
-	DECLARE_UI_ROOTVIEW(m_rootView)
 
-	CUIWindow() : m_hWndParent(NULL), m_nBorderSize(0), m_nCaptionHeight(0), m_pBtnMax(NULL) {}
+	CUIWindow() : m_rootView(this), m_hWndParent(NULL), m_nBorderSize(0), m_nCaptionHeight(0), m_pBtnMax(NULL) {}
 	virtual ~CUIWindow() = default;
 
 	bool CreateFromXml(LPCWSTR lpXmlName, HWND hParent = NULL);
@@ -15,6 +14,9 @@ public:
 protected:
 	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) override { return NULL; }
 	virtual void OnLoadedUI(const IUILoadAttrs &attrs) override;
+	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override {}
+	virtual HWND GetHwnd() const override { return m_hWnd; }
+
 	virtual void OnClose() { DefWindowProc(); }
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) { return DefWindowProc(); }
 	virtual void OnDestroy() { DefWindowProc(); }
@@ -29,6 +31,7 @@ protected:
 	virtual void OnWindowPosChanging(WINDOWPOS *lpWndPos) { DefWindowProc(); }
 	virtual void OnWindowPosChanged(WINDOWPOS *lpWndPos) { DefWindowProc(); }
 
+	CUIRootView m_rootView;
 	HWND m_hWndParent;
 	int  m_nBorderSize;
 	int  m_nCaptionHeight;
@@ -38,7 +41,7 @@ protected:
 inline bool CUIWindow::CreateFromXml(LPCWSTR lpXmlName, HWND hParent)
 {
 	m_hWndParent = hParent;
-	return UILib::LoadFromXml(lpXmlName, &m_rootView, this);
+	return UILib::LoadFromXml(lpXmlName, &m_rootView);
 }
 
 inline void CUIWindow::OnLoadedUI(const IUILoadAttrs &attrs)
@@ -78,6 +81,9 @@ inline BOOL CUIWindow::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
 	}
 
 	lResult = 0;
+
+	if (m_rootView.OnWndMsg(uMsg, wParam, lParam, lResult))
+		return TRUE;
 
 	switch (uMsg)
 	{

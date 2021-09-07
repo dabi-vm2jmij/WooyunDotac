@@ -37,10 +37,3 @@ public:
 		return GetView(lpszId);
 	}
 };
-
-class IUILoadNotify
-{
-public:
-	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) = 0;
-	virtual void OnLoadedUI(const IUILoadAttrs &attrs) = 0;
-};

@@ -28,7 +28,7 @@ private:
 	LRESULT OnTestFunc(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled);
 	LRESULT OnThreadResult(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 
-	void DrawBg(CUIDC &dc, LPCRECT lpRect);
+	void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override;
 	void ShowBottom(bool bShow);
 	void DoSetup();
 	static UINT WINAPI WorkThread(LPVOID pParam);

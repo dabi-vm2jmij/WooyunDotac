@@ -112,32 +112,31 @@ CUIView *CUILoadAttrs::GetView(LPCWSTR lpszId) const
 class CUILoader
 {
 public:
-	CUILoader(IUILoadNotify *pLoadNotify);
-	~CUILoader();
-
-	bool Load(CUIStream *pStream, CUIView *pRootView);
+	bool Load(CUIStream *pStream, CUIView *pView);
 
 private:
 	bool LoadView(tinyxml2::XMLElement *pElem, CUIView *pParent);
 	bool AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent);
 	void InitFont(const IUILoadAttrs &attrs);
 
-	IUILoadNotify *m_pLoadNotify;
-	CUILoadData    m_loadData;
-
-	CUILoader(const CUILoader &) = delete;
-	CUILoader &operator=(const CUILoader &) = delete;
+	CUILoadData m_loadData;
 };
 
-CUILoader::CUILoader(IUILoadNotify *pLoadNotify) : m_pLoadNotify(pLoadNotify)
+static bool IsNameClass(LPCSTR lpName, LPCVOID pView)
 {
+	if (lpName == NULL)
+		return false;
+
+#ifdef _DEBUG
+	char szName[256];
+	sprintf_s(szName, ".?AVCUI%s@@", lpName);
+	return _stricmp(szName, (*(char ****)pView)[-1][3] + 8) == 0;
+#else
+	return true;
+#endif
 }
 
-CUILoader::~CUILoader()
-{
-}
-
-bool CUILoader::Load(CUIStream *pStream, CUIView *pRootView)
+bool CUILoader::Load(CUIStream *pStream, CUIView *pView)
 {
 	// ¼ÓÔØ xml ×Ö·û´®
 	tinyxml2::XMLDocument doc;
@@ -146,35 +145,18 @@ bool CUILoader::Load(CUIStream *pStream, CUIView *pRootView)
 	if (errId != tinyxml2::XML_SUCCESS)
 		return false;
 
-	tinyxml2::XMLElement *pRoot = doc.RootElement();
-	if (pRoot == NULL || _stricmp(pRoot->Value(), "Window"))
+	tinyxml2::XMLElement *pElem = doc.RootElement();
+	if (pElem == NULL || !IsNameClass(pElem->Value(), pView))
 	{
 		ATLASSERT(0);
 		return false;
 	}
 
 	// ½âÎö xml
-	tinyxml2::XMLElement *pElem = NULL;
-
-	for (pElem = pRoot->FirstChildElement(); pElem && _stricmp(pElem->Value(), "Font") == 0; pElem = pElem->NextSiblingElement())
-	{
-		InitFont(CUILoadAttrs(m_loadData, pElem));
-	}
-
-	if (pElem == NULL || pElem->NextSibling() || _stricmp(pElem->Value(), "RootView"))
-	{
-		ATLASSERT(0);
-		return false;
-	}
-
-	if (!LoadView(pElem, pRootView))
+	if (!LoadView(pElem, pView))
 		return false;
 
-	pRootView->OnLoaded(CUILoadAttrs(m_loadData, pElem));
-
-	if (m_pLoadNotify)
-		m_pLoadNotify->OnLoadedUI(CUILoadAttrs(m_loadData, pRoot));
-
+	pView->OnLoaded(CUILoadAttrs(m_loadData, pElem));
 	return true;
 }
 
@@ -193,15 +175,23 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 {
 	LPCSTR lpName = pElem->Value();
 	CUILoadAttrs attrs(m_loadData, pElem);
-	CUIView *pView = NULL;
-	LPCWSTR lpFileName = attrs.GetStr(L"image");
+
+	if (_stricmp(lpName, "Font") == 0)
+	{
+		InitFont(attrs);
+		return true;
+	}
 
 	if (_stricmp(lpName, "Blank") == 0)
 	{
 		pParent->AddBlank()->OnLoaded(attrs);
 		return true;
 	}
-	else if (_stricmp(lpName, "View") == 0)
+
+	CUIView *pView = NULL;
+	LPCWSTR lpFileName = attrs.GetStr(L"image");
+
+	if (_stricmp(lpName, "View") == 0)
 	{
 		pView = pParent->AddView();
 	}
@@ -299,7 +289,7 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	}
 	else
 	{
-		if (m_pLoadNotify == NULL || (pView = m_pLoadNotify->OnCustomUI((CA2W)lpName, pParent)) == NULL)
+		if ((pView = pParent->GetRootView()->OnCustomUI((CA2W)lpName, pParent)) == NULL)
 		{
 			ATLASSERT(0);
 			return false;
@@ -338,14 +328,14 @@ void CUILoader::InitFont(const IUILoadAttrs &attrs)
 	}
 }
 
-bool UILib::LoadFromXml(LPCWSTR lpXmlName, CUIView *pRootView, IUILoadNotify *pLoadNotify)
+bool UILib::LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 {
 	bool bRet = false;
 
 	if (CUIStream *pStream = GetStream(lpXmlName))
 	{
-		CUILoader loader(pLoadNotify);
-		bRet = loader.Load(pStream, pRootView);
+		CUILoader loader;
+		bRet = loader.Load(pStream, pView);
 		pStream->Release();
 	}
 

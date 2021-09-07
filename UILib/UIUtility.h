@@ -8,7 +8,7 @@ UILIB_API UINT LoadSkin(LPCWSTR lpSkinName, bool bUpdate = false);
 UILIB_API bool FreeSkin(UINT nSkinId, bool bUpdate = false);
 UILIB_API CImagex GetImage(LPCWSTR lpFileName);
 UILIB_API CUIStream *GetStream(LPCWSTR lpFileName);
-UILIB_API bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pRootView, IUILoadNotify *pLoadNotify);
+UILIB_API bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView);
 UILIB_API bool HasAlphaChannel(const CImage &image);
 UILIB_API void AlphaPng(CImage &image);
 UILIB_API void FillAlpha(CImage &image, BYTE nAlpha);

@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "UIRootView2.h"
 
+CUIRootView2::CUIRootView2(IUIWindow *pWindow) : CUIRootView(pWindow)
+{
+}
+
 void CUIRootView2::InitItems(const std::vector<CUIBase *> &pItems)
 {
 	for (auto pItem : pItems)

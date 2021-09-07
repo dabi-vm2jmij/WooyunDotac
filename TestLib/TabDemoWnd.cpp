@@ -35,8 +35,6 @@ int CTabDemoWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CTabDemoWnd::InitUI()
 {
-	m_rootView.OnDrawBg([this](CUIDC &dc, LPCRECT lpRect){ DrawBg(dc, lpRect); });
-
 	CUIResPath resPath(L"Р§зг1");
 
 	CUIView *pView = m_rootView.AddView();
@@ -160,7 +158,7 @@ void CTabDemoWnd::InitUI()
 	});
 }
 
-void CTabDemoWnd::DrawBg(CUIDC &dc, LPCRECT lpRect)
+void CTabDemoWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
 {
 	CRect rect(lpRect);
 	m_imagexBg.StretchBlt(dc, rect);

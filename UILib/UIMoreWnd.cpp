@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "UIMoreWnd.h"
 
-CUIMoreWnd::CUIMoreWnd(LPCWSTR lpFileName)
+CUIMoreWnd::CUIMoreWnd(LPCWSTR lpFileName) : m_rootView(this)
 {
 	m_imagexBg = GetImage(*lpFileName ? lpFileName : L"#ffffff");
-	m_rootView.OnDrawBg([this](CUIDC &dc, LPCRECT lpRect){ m_imagexBg.Draw(dc, lpRect); });
 }
 
 CUIMoreWnd::~CUIMoreWnd()
@@ -29,6 +28,11 @@ HWND CUIMoreWnd::Init(HWND hParent, CPoint point, const std::vector<CUIBase *> &
 		point.y -= size.cy;
 
 	return Create(hParent, CRect(point, size), NULL, WS_POPUP | WS_VISIBLE, WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
+}
+
+void CUIMoreWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
+{
+	m_imagexBg.Draw(dc, lpRect);
 }
 
 void CUIMoreWnd::OnFinalMessage(HWND hWnd)

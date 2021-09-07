@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="gb2312" ?>
-<Window style="0x80ca0000" exStyle="0x80000" width="632" height="370" caption="-1" title="Hello, world!" 背景上="背景.png" 背景下="自定义.png">
-	<RootView>
-		<View top="0*" height="46">
-			<Button right="21*" bottom="0" image="关闭.png:3" tooltip="关闭" id="关闭" />
-			<MenuButton right="10*" bottom="0" image="主菜单.png:3" id="主菜单" />
-			<Label right="2" bottom="0" textex="菜单里有{#ff0000}测试{/}功能→" color="#cccccc" />
-		</View>
-		<View bottom="0*" id="底部" visible="0">
-			<Edit left="123" top="27" width="376" height="20" id="21" />
-			<Button left="514" top="24" image="更改.png:3" id="22" />
-			<CheckBox left="117" top="70" image="复选框.png:2" text="桌面快捷方式" color="#313131" check="1" id="23" />
-			<CheckBox left="249" top="70" image="复选框.png:2" text="添加快速启动" color="#313131" check="1" id="24" />
-		</View>
-		<View top="142" id="中部">
-			<Button left="308" top="0" image="快速安装.png:3" id="安装" />
-			<Button left="528" top="134" image="自定义安装.png:3" id="自定义" />
-			<CheckBox left="24" top="140" image="协议选框.png:2" text="同意" color="#9090a3" check="1" id="check1" />
-			<ButtonEx left="70" top="140" text="悟空游戏宝盒用户协议" color="#8cbde7" underline="1" cursor="hand" />
-		</View>
-		<View top="142" id="中部2" visible="0">
-			<Progress top="71" image="进度条.png:2" width="440" id="进度条" />
-		</View>
-	</RootView>
-</Window>
+<RootView style="0x80ca0000" exStyle="0x80000" width="632" height="370" caption="-1" title="Hello, world!" 背景上="背景.png" 背景下="自定义.png">
+	<View top="0*" height="46">
+		<Button right="21*" bottom="0" image="关闭.png:3" tooltip="关闭" id="关闭" />
+		<MenuButton right="10*" bottom="0" image="主菜单.png:3" id="主菜单" />
+		<Label right="2" bottom="0" textex="菜单里有{#ff0000}测试{/}功能→" color="#cccccc" />
+	</View>
+	<View bottom="0*" id="底部" visible="0">
+		<Edit left="123" top="27" width="376" height="20" id="21" />
+		<Button left="514" top="24" image="更改.png:3" id="22" />
+		<CheckBox left="117" top="70" image="复选框.png:2" text="桌面快捷方式" color="#313131" check="1" id="23" />
+		<CheckBox left="249" top="70" image="复选框.png:2" text="添加快速启动" color="#313131" check="1" id="24" />
+	</View>
+	<View top="142" id="中部">
+		<Button left="308" top="0" image="快速安装.png:3" id="安装" />
+		<Button left="528" top="134" image="自定义安装.png:3" id="自定义" />
+		<CheckBox left="24" top="140" image="协议选框.png:2" text="同意" color="#9090a3" check="1" id="check1" />
+		<ButtonEx left="70" top="140" text="悟空游戏宝盒用户协议" color="#8cbde7" underline="1" cursor="hand" />
+	</View>
+	<View top="142" id="中部2" visible="0">
+		<Progress top="71" image="进度条.png:2" width="440" id="进度条" />
+	</View>
+</RootView>

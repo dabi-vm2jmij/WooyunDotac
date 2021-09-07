@@ -23,8 +23,6 @@ void CMainFrame::OnLoadedUI(const IUILoadAttrs &loaded)
 	m_imagexBg = UILib::GetImage(loaded.GetStr(L"背景上"));
 	m_imagexBg2 = UILib::GetImage(loaded.GetStr(L"背景下"));
 
-	m_rootView.OnDrawBg([this](CUIDC &dc, LPCRECT lpRect){ DrawBg(dc, lpRect); });
-
 	m_pViews[0] = loaded[L"底部"];
 	m_pViews[0]->SetHeight(m_imagexBg2.Rect().Height());
 	m_pViews[1] = loaded[L"中部"];
@@ -84,7 +82,7 @@ LRESULT CMainFrame::OnThreadResult(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 	return 0;
 }
 
-void CMainFrame::DrawBg(CUIDC &dc, LPCRECT lpRect)
+void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
 {
 	m_imagexBg.BitBlt(dc, lpRect->left, lpRect->top);
 
