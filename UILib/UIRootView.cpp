@@ -18,7 +18,7 @@ CUIRootView::~CUIRootView()
 	m_vecChilds.clear();
 }
 
-BOOL CUIRootView::OnWndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
+BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
 {
 	lResult = 0;
 

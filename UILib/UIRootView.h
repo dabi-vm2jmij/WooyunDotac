@@ -19,7 +19,7 @@ public:
 	CUIRootView(IUIWindow *pWindow);
 	virtual ~CUIRootView();
 
-	BOOL OnWndMsg(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
+	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
 	HWND GetHwnd() const;
 	void SetWndAlpha(BYTE nWndAlpha);
 	void RaiseMouseMove();

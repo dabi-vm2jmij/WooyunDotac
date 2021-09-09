@@ -19,6 +19,12 @@ bool FreeSkin(UINT nSkinId, bool bUpdate)
 // 加载图片，格式为“xxx.png:n”，n 为帧数
 CImagex GetImage(LPCWSTR lpFileName)
 {
+	if (lpFileName == NULL || *lpFileName == 0)
+	{
+		ATLASSERT(0);
+		return nullptr;
+	}
+
 	wchar_t szFileName[MAX_PATH];
 	int nCount = 1;
 
@@ -42,6 +48,12 @@ CImagex GetImage(LPCWSTR lpFileName)
 
 CUIStream *GetStream(LPCWSTR lpFileName)
 {
+	if (lpFileName == NULL || *lpFileName == 0)
+	{
+		ATLASSERT(0);
+		return nullptr;
+	}
+
 	return CUIResource::Get().GetStream(lpFileName);
 }
 

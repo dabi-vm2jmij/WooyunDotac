@@ -82,7 +82,7 @@ inline BOOL CUIWindow::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam,
 
 	lResult = 0;
 
-	if (m_rootView.OnWndMsg(uMsg, wParam, lParam, lResult))
+	if (m_rootView.ProcessWindowMessage(hWnd, uMsg, wParam, lParam, lResult))
 		return TRUE;
 
 	switch (uMsg)

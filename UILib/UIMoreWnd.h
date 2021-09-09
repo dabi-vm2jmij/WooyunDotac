@@ -16,6 +16,7 @@ public:
 	void OnFinalMessage(HWND hWnd) override;
 
 	BEGIN_MSG_MAP(CUIMoreWnd)
+		CHAIN_MSG_MAP_MEMBER(m_rootView)
 		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
 	END_MSG_MAP()
 

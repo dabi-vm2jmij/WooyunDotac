@@ -41,7 +41,7 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 		for (auto pItem : m_vecMoreItems)
 		{
 			FRIEND(pItem)->m_pParent = this;
-			AddChild(pItem);
+			m_vecChilds.push_back(pItem);
 		}
 
 		m_vecMoreItems.clear();
