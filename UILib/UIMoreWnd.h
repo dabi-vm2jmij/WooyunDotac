@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIRootView2.h"
+#include "UIMoreView.h"
 
 // 工具栏按钮折叠后，通过点击“更多按钮”展开的窗口
 
@@ -28,6 +28,6 @@ private:
 
 	LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 
-	CUIRootView2 m_rootView;
+	CUIMoreView m_rootView;
 	CImagex m_imagexBg;
 };

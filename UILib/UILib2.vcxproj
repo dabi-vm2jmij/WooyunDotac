@@ -95,6 +95,7 @@
     <ClInclude Include="UIMenu.h" />
     <ClInclude Include="UIMenuButton.h" />
     <ClInclude Include="UIMenuWnd.h" />
+    <ClInclude Include="UIMoreView.h" />
     <ClInclude Include="UIMoreWnd.h" />
     <ClInclude Include="UINotice.h" />
     <ClInclude Include="UIPageView.h" />
@@ -105,7 +106,6 @@
     <ClInclude Include="UIResource.h" />
     <ClInclude Include="UIResPath.h" />
     <ClInclude Include="UIRootView.h" />
-    <ClInclude Include="UIRootView2.h" />
     <ClInclude Include="UIScrollView.h" />
     <ClInclude Include="UISkin.h" />
     <ClInclude Include="UISlider.h" />
@@ -148,6 +148,7 @@
     <ClCompile Include="UIMenu.cpp" />
     <ClCompile Include="UIMenuButton.cpp" />
     <ClCompile Include="UIMenuWnd.cpp" />
+    <ClCompile Include="UIMoreView.cpp" />
     <ClCompile Include="UIMoreWnd.cpp" />
     <ClCompile Include="UINotice.cpp" />
     <ClCompile Include="UIPageView.cpp" />
@@ -157,7 +158,6 @@
     <ClCompile Include="UIResource.cpp" />
     <ClCompile Include="UIResPath.cpp" />
     <ClCompile Include="UIRootView.cpp" />
-    <ClCompile Include="UIRootView2.cpp" />
     <ClCompile Include="UIScrollView.cpp" />
     <ClCompile Include="UISkin.cpp" />
     <ClCompile Include="UISlider.cpp" />

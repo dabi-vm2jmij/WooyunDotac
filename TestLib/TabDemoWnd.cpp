@@ -16,11 +16,6 @@ CTabDemoWnd::~CTabDemoWnd()
 {
 }
 
-void CTabDemoWnd::OnFinalMessage(HWND hWnd)
-{
-	delete this;
-}
-
 int CTabDemoWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (__super::OnCreate(lpCreateStruct) == -1)
@@ -88,10 +83,22 @@ void CTabDemoWnd::InitUI()
 	m_pWebTabBar->ActivateTab(pWebTab);
 
 	////////////////////////////////////////////////////////////////////////////////
-	// 滑块例子
+	// 工具栏例子
 	pView = m_rootView.AddView();
 	pView->SetTop(0, true);
 	pView->SetHeight(34);
+
+	pView->AddBlank()->SetLeft(50, true);
+	pView->AddBlank()->SetRight(50, true);
+
+	CUIToolBar *pToolBar = pView->AddToolBar(L"\\主菜单.png:3");
+	UILib::LoadFromXml(L"工具栏.xml", pToolBar);
+
+	////////////////////////////////////////////////////////////////////////////////
+	// 滑块例子
+	pView = m_rootView.AddView();
+	pView->SetTop(10, true);
+	pView->SetHeight(30);
 
 	pView->AddBlank()->SetLeft(300, true);
 	pView->AddBlank()->SetRight(300, true);
@@ -106,7 +113,7 @@ void CTabDemoWnd::InitUI()
 	pView = m_rootView.AddView();
 	pView->AddBlank()->SetLeft(80, true);
 	pView->AddBlank()->SetRight(30, true);
-	pView->AddBlank()->SetTop(50, true);
+	pView->AddBlank()->SetTop(20, true);
 	pView->AddBlank()->SetBottom(50, true);
 
 	CUIButtonEx *pBtnDel = pView->AddButtonEx(L"\\按钮.png:3");

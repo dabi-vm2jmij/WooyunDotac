@@ -108,13 +108,13 @@
     <ClInclude Include="UIScrollView.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="UIMoreView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="UIMoreWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="UIToolBar.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UIRootView2.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="UIPageView.h">
@@ -254,13 +254,13 @@
     <ClCompile Include="UIScrollView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="UIMoreView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="UIMoreWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIToolBar.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UIRootView2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIPageView.cpp">

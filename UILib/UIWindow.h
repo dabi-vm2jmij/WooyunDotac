@@ -8,6 +8,7 @@ public:
 	CUIWindow() : m_rootView(this), m_hWndParent(NULL), m_nBorderSize(0), m_nCaptionHeight(0), m_pBtnMax(NULL) {}
 	virtual ~CUIWindow() = default;
 
+	CUIRootView &GetRootView() { return m_rootView; }
 	bool CreateFromXml(LPCWSTR lpXmlName, HWND hParent = NULL);
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0) override;
 
@@ -17,6 +18,7 @@ protected:
 	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override {}
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 
+	virtual void OnFinalMessage(HWND hWnd) override { delete this; }
 	virtual void OnClose() { DefWindowProc(); }
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) { return DefWindowProc(); }
 	virtual void OnDestroy() { DefWindowProc(); }

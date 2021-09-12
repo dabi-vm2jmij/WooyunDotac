@@ -10,7 +10,6 @@ public:
 	void OnInitUI(std::function<void(const IUILoadAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
 
 private:
-	void OnFinalMessage(HWND hWnd) override { delete this; }
 	void OnLoadedUI(const IUILoadAttrs &attrs) override;
 	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	void OnWindowPosChanging(WINDOWPOS *lpWndPos) override;

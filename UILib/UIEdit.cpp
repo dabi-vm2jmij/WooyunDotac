@@ -93,12 +93,6 @@ void CUIEdit::SetSel(int iStart, int iEnd)
 
 void CUIEdit::SetFocus()
 {
-	if (m_rect.IsRectEmpty())
-	{
-		ATLASSERT(0);
-		return;
-	}
-
 	GetRootView()->SetFocus(this);
 }
 

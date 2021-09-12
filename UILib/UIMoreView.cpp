@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "UIRootView2.h"
+#include "UIMoreView.h"
 
-CUIRootView2::CUIRootView2(IUIWindow *pWindow) : CUIRootView(pWindow)
+CUIMoreView::CUIMoreView(IUIWindow *pWindow) : CUIRootView(pWindow)
 {
 }
 
-void CUIRootView2::InitItems(const std::vector<CUIBase *> &pItems)
+void CUIMoreView::InitItems(const std::vector<CUIBase *> &pItems)
 {
 	for (auto pItem : pItems)
 	{
@@ -17,7 +17,7 @@ void CUIRootView2::InitItems(const std::vector<CUIBase *> &pItems)
 	}
 }
 
-void CUIRootView2::ClearItems()
+void CUIMoreView::ClearItems()
 {
 	for (auto pItem : m_vecEnterItems)
 	{
@@ -37,7 +37,7 @@ void CUIRootView2::ClearItems()
 	m_vecChilds.clear();
 }
 
-void CUIRootView2::RecalcLayout(LPRECT lpClipRect)
+void CUIMoreView::RecalcLayout(LPRECT lpClipRect)
 {
 	CRect rect(m_rect);
 	rect.DeflateRect(1, 1);
@@ -68,7 +68,7 @@ void CUIRootView2::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIRootView2::GetSize(LPSIZE lpSize) const
+void CUIMoreView::GetSize(LPSIZE lpSize) const
 {
 	int nWidth = 0, nHeight = 0;
 

@@ -17,9 +17,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	UILib::LoadSkin(MAKEINTRESOURCEW(IDR_SKIN1));
 #endif
 
-	CMainFrame *pWnd = new CMainFrame;
-	pWnd->CreateFromXml(L"Main.xml");
-	pWnd->ShowWindow(SW_SHOW);
+	CMainFrame mainFrm;
+	mainFrm.CreateFromXml(L"Main.xml");
+	mainFrm.ShowWindow(SW_SHOW);
 
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))

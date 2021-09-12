@@ -14,7 +14,6 @@ CMainFrame::~CMainFrame()
 
 void CMainFrame::OnFinalMessage(HWND hWnd)
 {
-	delete this;
 	PostQuitMessage(0);
 }
 

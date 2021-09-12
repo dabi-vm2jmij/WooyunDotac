@@ -6,8 +6,6 @@ public:
 	CTabDemoWnd();
 	~CTabDemoWnd();
 
-	void OnFinalMessage(HWND hWnd) override;
-
 private:
 	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	void OnSize(UINT nType, CSize size) override;

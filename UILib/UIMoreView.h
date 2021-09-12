@@ -4,10 +4,10 @@
 
 // 给 CUIMoreWnd 定制的 CUIRootView
 
-class CUIRootView2 : public CUIRootView
+class CUIMoreView : public CUIRootView
 {
 public:
-	CUIRootView2(IUIWindow *pWindow);
+	CUIMoreView(IUIWindow *pWindow);
 
 	void InitItems(const std::vector<CUIBase *> &pItems);
 	void ClearItems();

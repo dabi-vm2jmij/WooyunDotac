@@ -469,6 +469,9 @@ void CUIRootView::SetFocus(CUIControl *pCtrl)
 	CUIControl *pOldFocus = m_pCurFocus;
 	m_pCurFocus = pCtrl;
 
+	if (m_rect.IsRectEmpty())
+		return;
+
 	if (pOldFocus)
 		pOldFocus->OnKillFocus();
 	else
