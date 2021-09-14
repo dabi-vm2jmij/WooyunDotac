@@ -95,9 +95,3 @@ private:
 	CUIBase(const CUIBase &) = delete;
 	CUIBase &operator=(const CUIBase &) = delete;
 };
-
-class UILIB_API CUIBlank : public CUIBase
-{
-public:
-	CUIBlank(CUIView *pParent) : CUIBase(pParent) {}
-};

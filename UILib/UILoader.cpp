@@ -182,12 +182,6 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 		return true;
 	}
 
-	if (_stricmp(lpName, "Blank") == 0)
-	{
-		pParent->AddBlank()->OnLoaded(attrs);
-		return true;
-	}
-
 	CUIView *pView = NULL;
 	LPCWSTR lpFileName = attrs.GetStr(L"image");
 

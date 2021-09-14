@@ -10,13 +10,13 @@ CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
 		if (imagexBg.GetFrameCount() < 2)
 		{
 			CUIImage *pImage = AddImage(lpFileNameBg);
-			pImage->SetWidth(-1);
+			pImage->SetWidth(0);
 			pImage->SetStretch(true);
 		}
 		else
 		{
 			m_pProgress = AddProgress(lpFileNameBg);
-			m_pProgress->SetWidth(-1);
+			m_pProgress->SetWidth(0);
 		}
 	}
 

@@ -100,12 +100,20 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 	{
 		rcReal = rect = *(CRect *)lpRect;
 
-		// 左右
+		// 左右方向
 		if (m_offset.left != MAXINT16)
 		{
 			rect.left += (short)m_offset.left;
 
-			if (m_size.cx >= 0)
+			if (m_offset.right != MAXINT16)
+			{
+				// 同时指定左右
+				rect.right -= (short)m_offset.right;
+
+				if (m_offset.right >> 16)
+					lpRect->right = rect.left;
+			}
+			else if (m_size.cx > 0)
 				rect.right = rect.left + m_size.cx;
 
 			if (m_offset.left >> 16)
@@ -115,7 +123,7 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 		{
 			rect.right -= (short)m_offset.right;
 
-			if (m_size.cx >= 0)
+			if (m_size.cx > 0)
 				rect.left = rect.right - m_size.cx;
 
 			if (m_offset.right >> 16)
@@ -127,12 +135,20 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 			rect.right = rect.left + m_size.cx;
 		}
 
-		// 上下
+		// 上下方向
 		if (m_offset.top != MAXINT16)
 		{
 			rect.top += (short)m_offset.top;
 
-			if (m_size.cy >= 0)
+			if (m_offset.bottom != MAXINT16)
+			{
+				// 同时指定上下
+				rect.bottom -= (short)m_offset.bottom;
+
+				if (m_offset.bottom >> 16)
+					lpRect->bottom = rect.top;
+			}
+			else if (m_size.cy > 0)
 				rect.bottom = rect.top + m_size.cy;
 
 			if (m_offset.top >> 16)
@@ -142,7 +158,7 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 		{
 			rect.bottom -= (short)m_offset.bottom;
 
-			if (m_size.cy >= 0)
+			if (m_size.cy > 0)
 				rect.top = rect.bottom - m_size.cy;
 
 			if (m_offset.bottom >> 16)
@@ -338,15 +354,18 @@ void CUIBase::OnLoaded(const IUILoadAttrs &attrs)
 	if (lpStr = attrs.GetStr(L"bottom"))
 		m_offset.bottom = Str2Offset(lpStr);
 
-	ATLASSERT(m_offset.left == MAXINT16 || m_offset.right == MAXINT16);
-	ATLASSERT(m_offset.top == MAXINT16 || m_offset.bottom == MAXINT16);
-
 	int nValue;
 	if (attrs.GetInt(L"width", &nValue))
+	{
 		m_size.cx = nValue;
+		ATLASSERT(m_offset.left == MAXINT16 || m_offset.right == MAXINT16);
+	}
 
 	if (attrs.GetInt(L"height", &nValue))
+	{
 		m_size.cy = nValue;
+		ATLASSERT(m_offset.top == MAXINT16 || m_offset.bottom == MAXINT16);
+	}
 
 	if (attrs.GetInt(L"enabled", &nValue))
 		SetEnabled(nValue != 0);

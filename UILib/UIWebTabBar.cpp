@@ -53,7 +53,7 @@ CUIWebTab *CUIWebTabBar::AddWebTab(CUIWebTab *pWebTab)
 	}
 
 	pWebTab->SetBottom(0);
-	pWebTab->SetWidth(-1);
+	pWebTab->SetWidth(0);
 	AddChild(pWebTab);
 
 	return pWebTab;

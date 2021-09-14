@@ -3,7 +3,6 @@
 
 CUIView::CUIView(CUIView *pParent) : CUIBase(pParent), m_bNeedLayout(false)
 {
-	m_size.SetSize(-1, -1);	// ×ÔÊÊÓ¦
 }
 
 CUIView::~CUIView()
@@ -176,13 +175,6 @@ CUIBase *CUIView::AddChild(CUIBase *pItem)
 {
 	ATLASSERT(pItem->m_pParent == NULL || pItem->m_pParent == this);
 	pItem->m_pParent = this;
-	PushBackChild(pItem);
-	return pItem;
-}
-
-CUIBlank *CUIView::AddBlank()
-{
-	CUIBlank *pItem = new CUIBlank(this);
 	PushBackChild(pItem);
 	return pItem;
 }

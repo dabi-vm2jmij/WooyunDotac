@@ -40,7 +40,6 @@ public:
 	CUIBase *GetChild(UINT nIndex) const;
 	CUIBase *AddChild(CUIBase *pItem);
 
-	CUIBlank *AddBlank();
 	CUIView *AddView();
 	CUIButton *AddButton(LPCWSTR lpFileName);
 	CUIButtonEx *AddButtonEx(LPCWSTR lpFileName);

@@ -84,24 +84,16 @@ void CTabDemoWnd::InitUI()
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 工具栏例子
-	pView = m_rootView.AddView();
-	pView->SetTop(0, true);
-	pView->SetHeight(34);
-
-	pView->AddBlank()->SetLeft(50, true);
-	pView->AddBlank()->SetRight(50, true);
-
-	CUIToolBar *pToolBar = pView->AddToolBar(L"\\主菜单.png:3");
+	CUIToolBar *pToolBar = m_rootView.AddToolBar(L"\\主菜单.png:3");
 	UILib::LoadFromXml(L"工具栏.xml", pToolBar);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 滑块例子
 	pView = m_rootView.AddView();
+	pView->SetLeft(300);
+	pView->SetRight(300);
 	pView->SetTop(10, true);
 	pView->SetHeight(30);
-
-	pView->AddBlank()->SetLeft(300, true);
-	pView->AddBlank()->SetRight(300, true);
 
 	CUISlider *pSlider = pView->AddSlider(L"滑块.png:3", L"滑块bg.png:2");
 	pSlider->SetMaxPos(200);
@@ -111,10 +103,10 @@ void CTabDemoWnd::InitUI()
 	////////////////////////////////////////////////////////////////////////////////
 	// 滚动条例子
 	pView = m_rootView.AddView();
-	pView->AddBlank()->SetLeft(80, true);
-	pView->AddBlank()->SetRight(30, true);
-	pView->AddBlank()->SetTop(20, true);
-	pView->AddBlank()->SetBottom(50, true);
+	pView->SetLeft(80);
+	pView->SetRight(30);
+	pView->SetTop(20);
+	pView->SetBottom(50);
 
 	CUIButtonEx *pBtnDel = pView->AddButtonEx(L"\\按钮.png:3");
 	pBtnDel->SetRight(0, true);

@@ -6,7 +6,7 @@ CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameB
 	if (lpFileNameBg)
 	{
 		CUIImage *pImage = AddImage(lpFileNameBg);
-		pImage->SetHeight(-1);
+		pImage->SetHeight(0);
 		pImage->SetStretch(true);
 	}
 
