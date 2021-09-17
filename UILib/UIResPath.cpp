@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "UIResPath.h"
-#include "UIResource.h"
+#include "UILibApp.h"
 
 CUIResPath::CUIResPath(LPCWSTR lpCurPath) : m_pNext(GetResPath())
 {
@@ -83,10 +83,10 @@ void CUIResPath::CombinePath(LPWSTR lpDstPath, LPCWSTR lpSrcPath, LPUINT pnSubCn
 
 CUIResPath *CUIResPath::GetResPath() const
 {
-	return CUIResource::Get().GetResPath();
+	return g_theApp.GetResource().GetResPath();
 }
 
 void CUIResPath::SetResPath(CUIResPath *pResPath) const
 {
-	CUIResource::Get().SetResPath(pResPath);
+	g_theApp.GetResource().SetResPath(pResPath);
 }

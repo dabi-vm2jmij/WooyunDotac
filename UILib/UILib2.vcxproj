@@ -90,6 +90,7 @@
     <ClInclude Include="UIImage.h" />
     <ClInclude Include="UILabel.h" />
     <ClInclude Include="UILib.h" />
+    <ClInclude Include="UILibApp.h" />
     <ClInclude Include="UILine.h" />
     <ClInclude Include="UILoader.h" />
     <ClInclude Include="UIMenu.h" />

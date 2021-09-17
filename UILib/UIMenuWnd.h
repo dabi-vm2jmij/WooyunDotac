@@ -10,6 +10,7 @@ public:
 
 	UINT Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostMsg);
 
+private:
 	BEGIN_MSG_MAP(CUIMenuWnd)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		MESSAGE_HANDLER(WM_PAINT, OnPaint)
@@ -23,7 +24,6 @@ public:
 		MESSAGE_HANDLER(WM_LBUTTONUP, OnLButtonUp)
 	END_MSG_MAP()
 
-private:
 	LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 	LRESULT OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 	LRESULT OnTimer(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);

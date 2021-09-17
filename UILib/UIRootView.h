@@ -5,9 +5,9 @@
 class IUIWindow
 {
 public:
-	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) = 0;
-	virtual void OnLoadedUI(const IUILoadAttrs &attrs) = 0;
-	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) = 0;
+	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) { return NULL; }
+	virtual void OnLoadedUI(const IUILoadAttrs &attrs) {}
+	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) {}
 	virtual HWND GetHwnd() const = 0;
 };
 
@@ -58,6 +58,4 @@ protected:
 	CUIControl *m_pCurFocus;
 	std::vector<CUIEdit *> m_vecEdits;
 	std::vector<CUIBase *> m_vecEnterItems;
-
-	static UINT m_nLayoutMsgId;
 };

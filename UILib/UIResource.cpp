@@ -16,12 +16,6 @@ CUIResource::~CUIResource()
 	DeleteCriticalSection(&m_critSect);
 }
 
-CUIResource &CUIResource::Get()
-{
-	static CUIResource s_resource;
-	return s_resource;
-}
-
 CUIResPath *CUIResource::GetResPath() const
 {
 	return (CUIResPath *)TlsGetValue(m_dwTlsIndex);

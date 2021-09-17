@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "UIRootView.h"
-#include "UIToolTip.h"
-
-UINT CUIRootView::m_nLayoutMsgId = RegisterWindowMessage(_T("UILibLayout"));
+#include "UILibApp.h"
 
 CUIRootView::CUIRootView(IUIWindow *pWindow) : CUIView(NULL), m_pWindow(pWindow), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_bPostLayout(false), m_hImc(NULL), m_hCursor(NULL)
 	, m_pCapture(NULL), m_pCurFocus(NULL)
@@ -22,7 +20,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 {
 	lResult = 0;
 
-	if (uMsg == m_nLayoutMsgId)
+	if (g_theApp.GetLayoutMsg() == uMsg)
 	{
 		m_bPostLayout = false;
 
@@ -83,7 +81,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_MOUSELEAVE:
 		m_bMouseEnter = false;
 		CheckMouseLeave(UIHitTest());
-		CUIToolTip::ShowTip(GetHwnd(), L"");
+		g_theApp.ShowTip(GetHwnd(), L"");
 		return TRUE;
 
 	case WM_MOUSEMOVE:
@@ -314,9 +312,9 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (uMsg == WM_MOUSEMOVE)
-			CUIToolTip::ShowTip(GetHwnd(), lpToolTip);
+			g_theApp.ShowTip(GetHwnd(), lpToolTip);
 		else
-			CUIToolTip::ShowTip(GetHwnd(), NULL);
+			g_theApp.ShowTip(GetHwnd(), NULL);
 
 		for (auto hit : hitTest)
 		{
@@ -447,7 +445,7 @@ void CUIRootView::DoInvalidateLayout()
 
 	// 延迟布局所有需要重新布局的控件
 	m_bPostLayout = true;
-	PostMessage(GetHwnd(), m_nLayoutMsgId, 0, 0);
+	PostMessage(GetHwnd(), g_theApp.GetLayoutMsg(), 0, 0);
 }
 
 void CUIRootView::SetCapture(CUIControl *pCtrl)

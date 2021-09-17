@@ -19,10 +19,10 @@ CUIFontMgr::FontKey::FontKey(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE b
 	ParseName(lpszName);
 }
 
-static BOOL IsWindowsVersionOrGreater(DWORD dwMajorVersion)
+static BOOL IsWindowsVistaOrGreater()
 {
-	OSVERSIONINFOEXW osvi = { sizeof(osvi), dwMajorVersion };
-	return VerifyVersionInfoW(&osvi, VER_MAJORVERSION, VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL));
+	OSVERSIONINFOEX osvi = { sizeof(osvi), HIBYTE(_WIN32_WINNT_VISTA) };
+	return VerifyVersionInfo(&osvi, VER_MAJORVERSION, VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL));
 }
 
 // 格式为“字体W7:高度W7|字体XP:高度XP”
@@ -31,13 +31,15 @@ void CUIFontMgr::FontKey::ParseName(LPCWSTR lpszName)
 	wchar_t szName[64];
 
 	if (lpszName == NULL)
-		lpszName = L"";
+	{
+		m_szFaceName[0] = 0;
+		m_nHeight = 0;
+		return;
+	}
 
 	if (LPCWSTR lpFind = wcschr(lpszName, '|'))
 	{
-		static BOOL s_bVista = IsWindowsVersionOrGreater(6);
-
-		if (s_bVista)
+		if (IsWindowsVistaOrGreater())
 		{
 			wcsncpy_s(szName, lpszName, lpFind - lpszName);
 			lpszName = szName;
@@ -78,12 +80,6 @@ CUIFontMgr::~CUIFontMgr()
 	}
 
 	DeleteCriticalSection(&m_critSect);
-}
-
-CUIFontMgr &CUIFontMgr::Get()
-{
-	static CUIFontMgr s_fontMgr;
-	return s_fontMgr;
 }
 
 void CUIFontMgr::SetFont(LPCWSTR lpszName)

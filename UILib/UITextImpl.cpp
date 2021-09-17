@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "UITextImpl.h"
-#include "UIFontMgr.h"
+#include "UILibApp.h"
 
 CUITextImpl::CUITextImpl() : m_bTextEx(false), m_hFont(GetDefaultFont()), m_color(0)
 {
@@ -76,7 +76,7 @@ struct DrawInfo
 
 void MyDrawText(const DrawInfo &drawInfo, CUIDC &dc, LPCWSTR lpText, int nSize, LPRECT lpRect, LPSIZE lpSize)
 {
-	dc.SelectFont(CUIFontMgr::Get().GetFont(CUIFontMgr::FontKey(drawInfo.m_fontKey)));
+	dc.SelectFont(g_theApp.GetFontMgr().GetFont(CUIFontMgr::FontKey(drawInfo.m_fontKey)));
 
 	CRect rect;
 	DrawTextW(dc, lpText, nSize, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);

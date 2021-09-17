@@ -92,13 +92,3 @@ void CUIToolTip::ShowWnd()
 	Invalidate();
 	SetWindowPos(HWND_TOPMOST, point.x, point.y, nWidth, nHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
 }
-
-void CUIToolTip::ShowTip(HWND hParent, LPCWSTR lpText)
-{
-	static CUIToolTip s_toolTip;
-
-	if (lpText)
-		s_toolTip.Show(hParent, lpText);
-	else
-		s_toolTip.Hide();
-}

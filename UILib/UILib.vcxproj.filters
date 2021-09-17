@@ -30,6 +30,9 @@
     <ClInclude Include="UILib.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="UILibApp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="UIBase.h">
       <Filter>头文件</Filter>
     </ClInclude>

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "UIButtonEx.h"
-#include "UIFontMgr.h"
+#include "UILibApp.h"
 
 CUIButtonEx::CUIButtonEx(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName), m_nIconLeft(0), m_nTextLeft(MAXINT16), m_bUnderline(false)
 {
@@ -76,7 +76,7 @@ void CUIButtonEx::OnMouseEnter()
 	{
 		CUIFontMgr::FontKey fontKey(m_hFont);
 		fontKey.m_bUnderline = true;
-		m_hFont = CUIFontMgr::Get().GetFont(fontKey);
+		m_hFont = g_theApp.GetFontMgr().GetFont(fontKey);
 		InvalidateRect(NULL);
 	}
 }
@@ -87,7 +87,7 @@ void CUIButtonEx::OnMouseLeave()
 	{
 		CUIFontMgr::FontKey fontKey(m_hFont);
 		fontKey.m_bUnderline = false;
-		m_hFont = CUIFontMgr::Get().GetFont(fontKey);
+		m_hFont = g_theApp.GetFontMgr().GetFont(fontKey);
 		InvalidateRect(NULL);
 	}
 

@@ -6,11 +6,9 @@ class CUISkin;
 
 class CUIResource
 {
+public:
 	CUIResource();
 	~CUIResource();
-
-public:
-	static CUIResource &Get();
 
 	CUIResPath *GetResPath() const;
 	void SetResPath(CUIResPath *pResPath) const;

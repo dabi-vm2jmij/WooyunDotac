@@ -1,19 +1,18 @@
 #include "stdafx.h"
 #include "UIUtility.h"
-#include "UIFontMgr.h"
-#include "UIResource.h"
+#include "UILibApp.h"
 
 namespace UILib
 {
 
 UINT LoadSkin(LPCWSTR lpSkinName, bool bUpdate)
 {
-	return CUIResource::Get().LoadSkin(lpSkinName, bUpdate);
+	return g_theApp.GetResource().LoadSkin(lpSkinName, bUpdate);
 }
 
 bool FreeSkin(UINT nSkinId, bool bUpdate)
 {
-	return CUIResource::Get().FreeSkin(nSkinId, bUpdate);
+	return g_theApp.GetResource().FreeSkin(nSkinId, bUpdate);
 }
 
 // 加载图片，格式为“xxx.png:n”，n 为帧数
@@ -35,7 +34,7 @@ CImagex GetImage(LPCWSTR lpFileName)
 		nCount = _wtoi(lpFind + 1);
 	}
 
-	auto spImage = CUIResource::Get().GetImage(lpFileName);
+	auto spImage = g_theApp.GetResource().GetImage(lpFileName);
 	ATLASSERT(nCount > 0 && spImage->GetWidth() % nCount == 0);
 
 	if (!spImage || spImage->GetWidth() < nCount || nCount <= 1)
@@ -54,7 +53,7 @@ CUIStream *GetStream(LPCWSTR lpFileName)
 		return nullptr;
 	}
 
-	return CUIResource::Get().GetStream(lpFileName);
+	return g_theApp.GetResource().GetStream(lpFileName);
 }
 
 bool HasAlphaChannel(const CImage &image)
@@ -212,18 +211,17 @@ void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc,
 
 void SetDefaultFont(LPCWSTR lpszName)
 {
-	CUIFontMgr::Get().SetFont(lpszName);
+	g_theApp.GetFontMgr().SetFont(lpszName);
 }
 
 HFONT GetDefaultFont()
 {
-	static HFONT s_hFont = GetFont(NULL);
-	return s_hFont;
+	return GetFont(NULL);
 }
 
 HFONT GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline)
 {
-	return CUIFontMgr::Get().GetFont(lpszName, nWeight, bItalic, bUnderline);
+	return g_theApp.GetFontMgr().GetFont(lpszName, nWeight, bItalic, bUnderline);
 }
 
 void DrawImage3D(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int dy, int alpha)

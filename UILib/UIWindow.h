@@ -13,12 +13,9 @@ public:
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0) override;
 
 protected:
-	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) override { return NULL; }
-	virtual void OnLoadedUI(const IUILoadAttrs &attrs) override;
-	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override {}
-	virtual HWND GetHwnd() const override { return m_hWnd; }
-
 	virtual void OnFinalMessage(HWND hWnd) override { delete this; }
+	virtual void OnLoadedUI(const IUILoadAttrs &attrs) override;
+	virtual HWND GetHwnd() const override { return m_hWnd; }
 	virtual void OnClose() { DefWindowProc(); }
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) { return DefWindowProc(); }
 	virtual void OnDestroy() { DefWindowProc(); }

@@ -4,6 +4,7 @@
 
 namespace UILib
 {
+
 UILIB_API UINT LoadSkin(LPCWSTR lpSkinName, bool bUpdate = false);
 UILIB_API bool FreeSkin(UINT nSkinId, bool bUpdate = false);
 UILIB_API CImagex GetImage(LPCWSTR lpFileName);
@@ -25,4 +26,5 @@ UILIB_API void ScaleImage(const CImage &imgSrc, CImage &imgDst, int nWidth, int 
 UILIB_API void FormatPath(LPWSTR lpDstPath, LPCWSTR lpSrcPath);
 UILIB_API bool IsStrColor(LPCWSTR lpStr, COLORREF *pColor);
 UILIB_API DWORD BswapRGB(DWORD color);
+
 }

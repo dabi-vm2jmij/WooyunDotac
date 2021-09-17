@@ -2,10 +2,10 @@
 
 class CUIFontMgr
 {
+public:
 	CUIFontMgr();
 	~CUIFontMgr();
 
-public:
 	struct FontKey
 	{
 		int     m_nHeight;
@@ -19,8 +19,6 @@ public:
 		void ParseName(LPCWSTR lpszName);
 		bool operator<(const FontKey &_Right) const;
 	};
-
-	static CUIFontMgr &Get();
 
 	void  SetFont(LPCWSTR lpszName);
 	HFONT GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline);

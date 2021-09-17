@@ -9,8 +9,7 @@ public:
 	CMainFrame();
 	~CMainFrame();
 
-	void OnFinalMessage(HWND hWnd) override;
-
+private:
 	BEGIN_MSG_MAP(CMainFrame)
 		CHAIN_MSG_MAP(CUIWindow)
 		COMMAND_ID_HANDLER(ID_TEST_ABOUT, OnShowAbout)
@@ -18,7 +17,7 @@ public:
 		MESSAGE_HANDLER(WM_USER + 1000, OnThreadResult)
 	END_MSG_MAP()
 
-private:
+	void OnFinalMessage(HWND hWnd) override;
 	void OnLoadedUI(const IUILoadAttrs &loaded) override;
 	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	void OnClose() override;

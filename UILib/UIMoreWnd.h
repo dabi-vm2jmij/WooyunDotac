@@ -13,16 +13,14 @@ public:
 	~CUIMoreWnd();
 
 	HWND Init(HWND hParent, CPoint point, const std::vector<CUIBase *> &vecItems);
-	void OnFinalMessage(HWND hWnd) override;
 
+private:
 	BEGIN_MSG_MAP(CUIMoreWnd)
 		CHAIN_MSG_MAP_MEMBER(m_rootView)
 		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
 	END_MSG_MAP()
 
-private:
-	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) override { return NULL; }
-	void OnLoadedUI(const IUILoadAttrs &attrs) override {}
+	void OnFinalMessage(HWND hWnd) override;
 	void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override;
 	HWND GetHwnd() const override { return m_hWnd; }
 
