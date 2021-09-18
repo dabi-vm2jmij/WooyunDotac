@@ -74,7 +74,7 @@ protected:
 	virtual void OnPaint(CUIDC &dc) const override;
 	virtual void OnEnabled(bool bEnabled) override;
 	virtual void OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect) override;
-	virtual void IsNeedLayout(LPRECT lpClipRect) override;
+	virtual void OnNeedLayout(LPRECT lpClipRect) override;
 	virtual void RecalcLayout(LPRECT lpClipRect);
 	virtual void OnChildMoving(CUIControl *pCtrl, CPoint point) {}
 	virtual void OnChildMoved(CUIControl *pCtrl, CPoint point) {}

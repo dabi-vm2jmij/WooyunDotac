@@ -96,7 +96,7 @@ void CUIView::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 }
 
 // 检查所有需要重新布局的控件
-void CUIView::IsNeedLayout(LPRECT lpClipRect)
+void CUIView::OnNeedLayout(LPRECT lpClipRect)
 {
 	if (m_bNeedLayout)
 	{
@@ -109,7 +109,7 @@ void CUIView::IsNeedLayout(LPRECT lpClipRect)
 
 	for (auto pItem : m_vecChilds)
 	{
-		pItem->IsNeedLayout(lpClipRect);
+		pItem->OnNeedLayout(lpClipRect);
 	}
 }
 

@@ -71,7 +71,7 @@ protected:
 	virtual void OnPaint(CUIDC &dc) const;
 	virtual void OnEnabled(bool bEnabled) {}
 	virtual void OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect) {}
-	virtual void IsNeedLayout(LPRECT lpClipRect) {}
+	virtual void OnNeedLayout(LPRECT lpClipRect) {}
 	virtual void CalcRect(LPRECT lpRect, LPRECT lpClipRect);
 	virtual void OnMouseEnter() {}
 	virtual void OnMouseLeave() {}

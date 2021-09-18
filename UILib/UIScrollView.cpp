@@ -44,12 +44,12 @@ void CUIScrollView::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 	__super::OnRectChanged(lpOldRect, lpClipRect);
 }
 
-void CUIScrollView::IsNeedLayout(LPRECT lpClipRect)
+void CUIScrollView::OnNeedLayout(LPRECT lpClipRect)
 {
 	if (m_bNeedLayout)
 		CheckVScroll();
 
-	__super::IsNeedLayout(lpClipRect);
+	__super::OnNeedLayout(lpClipRect);
 }
 
 void CUIScrollView::RecalcLayout(LPRECT lpClipRect)

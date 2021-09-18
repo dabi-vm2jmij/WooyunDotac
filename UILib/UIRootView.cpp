@@ -26,7 +26,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 		// 重新布局所有延迟布局的控件
 		CRect rect;
-		IsNeedLayout(rect);
+		OnNeedLayout(rect);
 
 		if (!rect.IsRectEmpty())
 			InvalidateRect(rect);
