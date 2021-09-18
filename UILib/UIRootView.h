@@ -26,7 +26,6 @@ public:
 	void DoMouseEnter(CUIBase *pItem);
 	void SetCapture(CUIControl *pCtrl);
 	void SetFocus(CUIControl *pCtrl);
-	void EnableImm(bool bEnabled);
 	void PrintWindow(CImage &image);
 	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
 
@@ -41,6 +40,7 @@ protected:
 	void CheckMouseLeave(const UIHitTest &hitTest);
 	void DoInvalidateRect(LPCRECT lpRect);
 	void DoInvalidateLayout();
+	void EnableImm(bool bEnabled);
 	void AddTabsEdit(CUIEdit *pEdit);
 	void DelTabsEdit(CUIEdit *pEdit);
 	void NextTabsEdit();

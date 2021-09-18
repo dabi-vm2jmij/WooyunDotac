@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "UIEdit.h"
 
-#pragma comment(lib, "imm32.lib")
-
 #ifndef ID_EDIT_COPY
 #define ID_EDIT_DELETE			0xE120
 #define ID_EDIT_COPY			0xE122
