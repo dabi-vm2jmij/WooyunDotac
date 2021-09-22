@@ -12,6 +12,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLib", "TestLib\TestLib.
 		{1E367F20-5B9B-4282-BC25-8B712681EFC5} = {1E367F20-5B9B-4282-BC25-8B712681EFC5}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestMFC", "TestMFC\TestMFC.vcxproj", "{59117AB7-4D5F-4E31-A11C-D2710B963D6C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1E367F20-5B9B-4282-BC25-8B712681EFC5} = {1E367F20-5B9B-4282-BC25-8B712681EFC5}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -30,6 +35,10 @@ Global
 		{BBDE13F6-CAB2-49CC-B389-3EE14B59CA2E}.Debug|Win32.Build.0 = Debug|Win32
 		{BBDE13F6-CAB2-49CC-B389-3EE14B59CA2E}.Release|Win32.ActiveCfg = Release|Win32
 		{BBDE13F6-CAB2-49CC-B389-3EE14B59CA2E}.Release|Win32.Build.0 = Release|Win32
+		{59117AB7-4D5F-4E31-A11C-D2710B963D6C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{59117AB7-4D5F-4E31-A11C-D2710B963D6C}.Debug|Win32.Build.0 = Debug|Win32
+		{59117AB7-4D5F-4E31-A11C-D2710B963D6C}.Release|Win32.ActiveCfg = Release|Win32
+		{59117AB7-4D5F-4E31-A11C-D2710B963D6C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
