@@ -181,168 +181,168 @@ CUIBase *CUIView::AddChild(CUIBase *pItem)
 
 CUIView *CUIView::AddView()
 {
-	CUIView *pItem = new CUIView(this);
+	auto pItem = new CUIView(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIButton *CUIView::AddButton(LPCWSTR lpFileName)
 {
-	CUIButton *pItem = new CUIButton(this, lpFileName);
+	auto pItem = new CUIButton(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIButtonEx *CUIView::AddButtonEx(LPCWSTR lpFileName)
 {
-	CUIButtonEx *pItem = new CUIButtonEx(this, lpFileName);
+	auto pItem = new CUIButtonEx(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIMenuButton *CUIView::AddMenuButton(LPCWSTR lpFileName)
 {
-	CUIMenuButton *pItem = new CUIMenuButton(this, lpFileName);
+	auto pItem = new CUIMenuButton(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUICheckButton *CUIView::AddCheckButton(LPCWSTR lpFileName)
 {
-	CUICheckButton *pItem = new CUICheckButton(this, lpFileName);
+	auto pItem = new CUICheckButton(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIRadioButton *CUIView::AddRadioButton(LPCWSTR lpFileName)
 {
-	CUIRadioButton *pItem = new CUIRadioButton(this, lpFileName);
+	auto pItem = new CUIRadioButton(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIComboButton *CUIView::AddComboButton()
 {
-	CUIComboButton *pItem = new CUIComboButton(this);
+	auto pItem = new CUIComboButton(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIStateButton *CUIView::AddStateButton()
 {
-	CUIStateButton *pItem = new CUIStateButton(this);
+	auto pItem = new CUIStateButton(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUICheckBox *CUIView::AddCheckBox(LPCWSTR lpFileName)
 {
-	CUICheckBox *pItem = new CUICheckBox(this, lpFileName);
+	auto pItem = new CUICheckBox(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIRadioBox *CUIView::AddRadioBox(LPCWSTR lpFileName)
 {
-	CUIRadioBox *pItem = new CUIRadioBox(this, lpFileName);
+	auto pItem = new CUIRadioBox(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIAnimation *CUIView::AddAnimation(LPCWSTR lpFileName)
 {
-	CUIAnimation *pItem = new CUIAnimation(this, lpFileName);
+	auto pItem = new CUIAnimation(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIEdit *CUIView::AddEdit()
 {
-	CUIEdit *pItem = new CUIEdit(this);
+	auto pItem = new CUIEdit(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIGif *CUIView::AddGif(LPCWSTR lpFileName)
 {
-	CUIGif *pItem = new CUIGif(this, lpFileName);
+	auto pItem = new CUIGif(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIImage *CUIView::AddImage(LPCWSTR lpFileName)
 {
-	CUIImage *pItem = new CUIImage(this, lpFileName);
+	auto pItem = new CUIImage(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUILabel *CUIView::AddLabel()
 {
-	CUILabel *pItem = new CUILabel(this);
+	auto pItem = new CUILabel(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUILine *CUIView::AddLine()
 {
-	CUILine *pItem = new CUILine(this);
+	auto pItem = new CUILine(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUINotice *CUIView::AddNotice()
 {
-	CUINotice *pItem = new CUINotice(this);
+	auto pItem = new CUINotice(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIProgress *CUIView::AddProgress(LPCWSTR lpFileName)
 {
-	CUIProgress *pItem = new CUIProgress(this, lpFileName);
+	auto pItem = new CUIProgress(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIPageView *CUIView::AddPageView(LPCWSTR lpFileName)
 {
-	CUIPageView *pItem = new CUIPageView(this, lpFileName);
+	auto pItem = new CUIPageView(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIScrollView *CUIView::AddScrollView()
 {
-	CUIScrollView *pItem = new CUIScrollView(this);
+	auto pItem = new CUIScrollView(this);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUISlider *CUIView::AddSlider(LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
 {
-	CUISlider *pItem = new CUISlider(this, lpFileName, lpFileNameBg);
+	auto pItem = new CUISlider(this, lpFileName, lpFileNameBg);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIToolBar *CUIView::AddToolBar(LPCWSTR lpFileName)
 {
-	CUIToolBar *pItem = new CUIToolBar(this, lpFileName);
+	auto pItem = new CUIToolBar(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIVScroll *CUIView::AddVScroll(LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
 {
-	CUIVScroll *pItem = new CUIVScroll(this, lpFileName, lpFileNameBg);
+	auto pItem = new CUIVScroll(this, lpFileName, lpFileNameBg);
 	PushBackChild(pItem);
 	return pItem;
 }
 
 CUIWebTabBar *CUIView::AddWebTabBar(LPCWSTR lpFileName)
 {
-	CUIWebTabBar *pItem = new CUIWebTabBar(this, lpFileName);
+	auto pItem = new CUIWebTabBar(this, lpFileName);
 	PushBackChild(pItem);
 	return pItem;
 }

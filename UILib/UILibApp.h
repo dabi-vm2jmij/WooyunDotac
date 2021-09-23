@@ -4,21 +4,34 @@
 #include "UIFontMgr.h"
 #include "UIToolTip.h"
 
-class CUILibApp
+#define WM_NEEDLAYOUT	WM_USER + 1000
+
+class CUILibApp : public CWindowImpl<CUILibApp>
 {
 public:
-	CUILibApp();
+	DECLARE_WND_CLASS_EX(NULL, 0, -1)
 
-	UINT GetLayoutMsg() const { return m_nLayoutMsg; }
+	CUILibApp();
+	~CUILibApp();
+
 	CUIResource &GetResource() { return m_resource; }
 	CUIFontMgr &GetFontMgr() { return m_fontMgr; }
 	void ShowTip(HWND hParent, LPCWSTR lpText);
+	void RemoveLayout(CUIRootView *pRootView);
+	void DelayLayout(CUIRootView *pRootView);
 
 private:
-	UINT        m_nLayoutMsg;
+	BEGIN_MSG_MAP(CUILibApp)
+		MESSAGE_HANDLER(WM_NEEDLAYOUT, OnNeedLayout)
+	END_MSG_MAP()
+
+	LRESULT OnNeedLayout(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+
 	CUIResource m_resource;
 	CUIFontMgr  m_fontMgr;
 	CUIToolTip  m_toolTip;
+	bool        m_bPostMsg;
+	std::deque<CUIRootView *> m_deqRootViews;
 };
 
 extern CUILibApp g_theApp;

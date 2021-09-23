@@ -2,7 +2,7 @@
 #include "UIRootView.h"
 #include "UILibApp.h"
 
-CUIRootView::CUIRootView(IUIWindow *pWindow) : CUIView(NULL), m_pWindow(pWindow), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_bPostLayout(false), m_hImc(NULL), m_hCursor(NULL)
+CUIRootView::CUIRootView(IUIWindow *pWindow) : CUIView(NULL), m_pWindow(pWindow), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_hImc(NULL), m_hCursor(NULL)
 	, m_pCapture(NULL), m_pCurFocus(NULL)
 {
 	m_vecEnterItems.reserve(8);
@@ -14,31 +14,29 @@ CUIRootView::~CUIRootView()
 		delete pItem;
 
 	m_vecChilds.clear();
+	g_theApp.RemoveLayout(this);
 }
 
 BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
 {
 	lResult = 0;
 
-	if (g_theApp.GetLayoutMsg() == uMsg)
-	{
-		m_bPostLayout = false;
-
-		// 重新布局所有延迟布局的控件
-		CRect rect;
-		OnNeedLayout(rect);
-
-		if (!rect.IsRectEmpty())
-			InvalidateRect(rect);
-
-		if (m_pCapture == NULL)
-			RaiseMouseMove();
-
-		return TRUE;
-	}
-
 	switch (uMsg)
 	{
+	case WM_NEEDLAYOUT:
+		{
+			// 重新布局所有延迟布局的控件
+			CRect rect;
+			OnNeedLayout(rect);
+
+			if (!rect.IsRectEmpty())
+				InvalidateRect(rect);
+
+			if (m_pCapture == NULL)
+				RaiseMouseMove();
+		}
+		return TRUE;
+
 	case WM_CREATE:
 		if (GetWindowLong(GetHwnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
 			m_bLayered = true;
@@ -107,7 +105,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_CONTEXTMENU:
 		{
 			CPoint point(lParam);
-			ScreenToClient(GetHwnd(), &point);
+			ScreenToClient(&point);
 			OnMessage(uMsg, wParam, MAKELPARAM(point.x, point.y));
 		}
 		return TRUE;
@@ -202,11 +200,21 @@ void CUIRootView::PrintWindow(CImage &image)
 	DoPaint(CImageDC(image), NULL);
 }
 
+BOOL CUIRootView::ClientToScreen(LPPOINT lpPoint)
+{
+	return ::ClientToScreen(GetHwnd(), lpPoint);
+}
+
+BOOL CUIRootView::ScreenToClient(LPPOINT lpPoint)
+{
+	return ::ScreenToClient(GetHwnd(), lpPoint);
+}
+
 bool CUIRootView::OnNcHitTest(CPoint point)
 {
 	UIHitTest hitTest;
 	hitTest.point = point;
-	ScreenToClient(GetHwnd(), &hitTest.point);
+	ScreenToClient(&hitTest.point);
 	OnHitTest(hitTest);
 
 	m_hCursor = NULL;	// 用于 WM_SETCURSOR
@@ -347,7 +355,7 @@ void CUIRootView::RaiseMouseMove()
 
 	if (WindowFromPoint(hitTest.point) == GetHwnd())
 	{
-		ScreenToClient(GetHwnd(), &hitTest.point);
+		ScreenToClient(&hitTest.point);
 		OnHitTest(hitTest);
 	}
 
@@ -440,12 +448,8 @@ void CUIRootView::DoInvalidateRect(LPCRECT lpRect)
 
 void CUIRootView::DoInvalidateLayout()
 {
-	if (m_bPostLayout)
-		return;
-
 	// 延迟布局所有需要重新布局的控件
-	m_bPostLayout = true;
-	PostMessage(GetHwnd(), g_theApp.GetLayoutMsg(), 0, 0);
+	g_theApp.DelayLayout(this);
 }
 
 void CUIRootView::SetCapture(CUIControl *pCtrl)

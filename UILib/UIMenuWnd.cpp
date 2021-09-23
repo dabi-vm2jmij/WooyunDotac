@@ -209,7 +209,7 @@ LRESULT CUIMenuWnd::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandl
 	{
 		m_pChild->OnChar(uMsg, wParam, lParam, bHandled);
 	}
-	else if (GetAsyncKeyState(VK_LBUTTON) >= 0)
+	else if (GetKeyState(VK_LBUTTON) >= 0)
 	{
 		if (isgraph(wParam))
 		{
@@ -250,7 +250,7 @@ LRESULT CUIMenuWnd::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 	{
 		m_pChild->OnKeyDown(uMsg, wParam, lParam, bHandled);
 	}
-	else if (GetAsyncKeyState(VK_LBUTTON) >= 0)
+	else if (GetKeyState(VK_LBUTTON) >= 0)
 	{
 		switch (wParam)
 		{
@@ -359,9 +359,11 @@ LRESULT CUIMenuWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL 
 
 LRESULT CUIMenuWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
-	if (m_nCurSel != -1 && m_pUIMenu->m_vecItems[m_nCurSel].GetSubMenu() == NULL)
+	UINT nCurSel = Point2Sel(lParam);
+
+	if (nCurSel != -1 && m_pUIMenu->m_vecItems[nCurSel].GetSubMenu() == NULL)
 	{
-		PostMessage(WM_SELECT, m_pUIMenu->m_vecItems[m_nCurSel].m_nId);
+		PostMessage(WM_SELECT, m_pUIMenu->m_vecItems[nCurSel].m_nId);
 	}
 
 	return 0;

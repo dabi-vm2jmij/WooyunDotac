@@ -117,7 +117,7 @@ void CUIControl::OnLostCapture()
 	{
 		CPoint point;
 		GetCursorPos(&point);
-		ScreenToClient(GetRootView()->GetHwnd(), &point);
+		GetRootView()->ScreenToClient(&point);
 
 		FRIEND(GetParent())->OnChildMoved(this, point - m_ptClick);
 		m_ptClick = CSize(MAXINT16, MAXINT16);

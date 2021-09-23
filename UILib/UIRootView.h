@@ -27,6 +27,8 @@ public:
 	void SetCapture(CUIControl *pCtrl);
 	void SetFocus(CUIControl *pCtrl);
 	void PrintWindow(CImage &image);
+	BOOL ClientToScreen(LPPOINT lpPoint);
+	BOOL ScreenToClient(LPPOINT lpPoint);
 	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
 
 protected:
@@ -51,7 +53,6 @@ protected:
 	BYTE        m_nWndAlpha;	// Í¸Ã÷¶È£º0~255
 	bool        m_bLayered;
 	bool        m_bMouseEnter;
-	bool        m_bPostLayout;
 	HIMC        m_hImc;
 	HCURSOR     m_hCursor;
 	CUIControl *m_pCapture;

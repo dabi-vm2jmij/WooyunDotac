@@ -259,9 +259,9 @@ void CUIBase::GetWindowRect(LPRECT lpRect) const
 {
 	*lpRect = m_rect;
 
-	HWND hWnd = GetRootView()->GetHwnd();
-	ClientToScreen(hWnd, (LPPOINT)lpRect);
-	ClientToScreen(hWnd, (LPPOINT)lpRect + 1);
+	CUIRootView *pRootView = GetRootView();
+	pRootView->ClientToScreen((LPPOINT)lpRect);
+	pRootView->ClientToScreen((LPPOINT)lpRect + 1);
 }
 
 void CUIBase::SetEnabled(bool bEnabled)
