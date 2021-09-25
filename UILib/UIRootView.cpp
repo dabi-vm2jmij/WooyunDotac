@@ -44,7 +44,12 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 	case WM_SIZE:
 		if (wParam != SIZE_MINIMIZED)
+		{
 			OnSize(lParam);
+
+			if (m_bLayered)
+				OnPaintLayered(CUIClientDC(GetHwnd()));
+		}
 		break;
 
 	case WM_PAINT:
@@ -247,9 +252,6 @@ void CUIRootView::OnSize(CSize size)
 
 		m_imageWnd.Destroy();
 	}
-
-	if (m_bLayered)
-		OnPaintLayered(CUIClientDC(GetHwnd()));
 }
 
 void CUIRootView::OnPaint()
@@ -289,6 +291,11 @@ void CUIRootView::DoPaint(HDC hDC, LPCRECT lpClipRect)
 {
 	CUIDC dc(hDC, lpClipRect, m_bLayered);
 	SetBkMode(dc, TRANSPARENT);
+
+	// Ìî³ä±³¾°É«
+	if (m_colorBg != -1)
+		dc.FillSolidRect(m_rect, m_colorBg);
+
 	m_pWindow->OnDrawBg(dc, m_rect);
 	__super::OnPaint(dc);
 }

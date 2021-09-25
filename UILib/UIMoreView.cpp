@@ -68,7 +68,7 @@ void CUIMoreView::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIMoreView::GetSize(LPSIZE lpSize) const
+void CUIMoreView::CalcSize(LPSIZE lpSize) const
 {
 	int nWidth = 0, nHeight = 0;
 

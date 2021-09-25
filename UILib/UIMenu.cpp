@@ -141,6 +141,9 @@ void CUIMenu::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
 			rect.left = rect.right - 20;
 			DrawTextW(dc, L"¡ú", -1, rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 		}
+
+		// DrawText ºóÌî³ä alpha
+		dc.FillAlpha(lpRect, 255);
 	}
 	else
 	{

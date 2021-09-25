@@ -50,6 +50,7 @@ public:
 	HFONT    SelectFont(HFONT hFont);
 	COLORREF SetTextColor(COLORREF color);
 	void     FillSolidRect(LPCRECT lpRect, COLORREF color);
+	void     FillAlpha(LPCRECT lpRect, BYTE nAlpha);
 
 private:
 	HDC      m_hDC;
@@ -58,6 +59,7 @@ private:
 	HFONT    m_hOldFont;
 	HFONT    m_hCurFont;
 	COLORREF m_curColor;
+	CImage   m_image;	// 1 * 1 µÄÑÕÉ«Í¼Æ¬
 };
 
 class CUIPaintDC

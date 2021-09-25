@@ -40,7 +40,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	HICON hIcon = LoadIcon(_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDR_MAINFRAME));
+	HICON hIcon = AfxGetApp()->LoadIcon(MAKEINTRESOURCE(IDR_MAINFRAME));
 	SetIcon(hIcon, TRUE);
 	SetIcon(hIcon, FALSE);
 
@@ -154,7 +154,7 @@ void CMainFrame::OnLoadedUI(const IUILoadAttrs &loaded)
 	{
 		if (m_uiMenu.GetCount() == 0)
 		{
-			HMENU hMenu = LoadMenu(_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDR_MAINFRAME));
+			HMENU hMenu = LoadMenu(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
 			m_uiMenu.CreateFromMenu(GetSubMenu(hMenu, 0));
 			DestroyMenu(hMenu);
 		}

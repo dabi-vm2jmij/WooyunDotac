@@ -13,10 +13,3 @@ void CUIMenu2::DrawBg(CUIDC &dc, LPCRECT lpRect)
 
 	m_imagexBg.StretchDraw(dc, *lpRect, false);
 }
-
-void CUIMenu2::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
-{
-	__super::DrawItem(dc, lpRect, nIndex, bSelected);
-
-	UILib::FillAlpha(dc, lpRect, 255);
-}

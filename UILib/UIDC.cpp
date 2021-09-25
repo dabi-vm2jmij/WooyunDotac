@@ -226,11 +226,60 @@ COLORREF CUIDC::SetTextColor(COLORREF color)
 
 void CUIDC::FillSolidRect(LPCRECT lpRect, COLORREF color)
 {
-	COLORREF oldColor = SetBkColor(m_hDC, color);
+	if (IsRectEmpty(lpRect))
+		return;
 
-	if (oldColor != CLR_INVALID)
+	CRect rect;
+
+	if (m_lpClipRect)
 	{
-		ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, lpRect, NULL, 0, NULL);
-		SetBkColor(m_hDC, oldColor);
+		if (!rect.IntersectRect(lpRect, m_lpClipRect))
+			return;
+
+		lpRect = rect;
 	}
+
+	if (IsLayered())
+	{
+		if (m_image.IsNull())
+			m_image.Create(1, 1, 32, CImage::createAlphaChannel);
+
+		*(int *)m_image.GetPixelAddress(0, 0) = BswapRGB(color) | 0xff000000;
+		m_image.StretchBlt(m_hDC, *lpRect);
+	}
+	else
+	{
+		COLORREF oldColor = SetBkColor(m_hDC, color);
+
+		if (oldColor != CLR_INVALID)
+		{
+			ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, lpRect, NULL, 0, NULL);
+			SetBkColor(m_hDC, oldColor);
+		}
+	}
+}
+
+void CUIDC::FillAlpha(LPCRECT lpRect, BYTE nAlpha)
+{
+	if (!IsLayered())
+		return;
+
+	CRect rect;
+	GetClipBox(m_hDC, rect);
+
+	if (!rect.IntersectRect(rect, lpRect) || !GetRealRect(rect))
+		return;
+
+	CImage image;
+	image.Attach((HBITMAP)GetCurrentObject(m_hDC, OBJ_BITMAP));
+
+	for (int x = rect.left; x < rect.right; x++)
+	{
+		for (int y = rect.top; y < rect.bottom; y++)
+		{
+			LPBYTE(image.GetPixelAddress(x, y))[3] = nAlpha;
+		}
+	}
+
+	image.Detach();
 }

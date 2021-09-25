@@ -88,45 +88,6 @@ void AlphaPng(CImage &image)
 	}
 }
 
-void FillAlpha(CImage &image, BYTE nAlpha)
-{
-	if (image.GetBPP() != 32)
-		return;
-
-	for (int x = 0; x != image.GetWidth(); x++)
-	{
-		for (int y = 0; y != image.GetHeight(); y++)
-		{
-			LPBYTE(image.GetPixelAddress(x, y))[3] = nAlpha;
-		}
-	}
-}
-
-void FillAlpha(CUIDC &dc, LPCRECT lpRect, BYTE nAlpha)
-{
-	if (!dc.IsLayered())
-		return;
-
-	CRect rect;
-	GetClipBox(dc, rect);
-
-	if (!rect.IntersectRect(rect, lpRect) || !dc.GetRealRect(rect))
-		return;
-
-	CImage image;
-	image.Attach((HBITMAP)GetCurrentObject(dc, OBJ_BITMAP));
-
-	for (int x = rect.left; x < rect.right; x++)
-	{
-		for (int y = rect.top; y < rect.bottom; y++)
-		{
-			LPBYTE(image.GetPixelAddress(x, y))[3] = nAlpha;
-		}
-	}
-
-	image.Detach();
-}
-
 UINT SplitImage(LPCWSTR lpFileName, CImagex imagexs[], UINT nCount)
 {
 	if (nCount == 0)
@@ -224,28 +185,6 @@ HFONT GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline)
 	return g_theApp.GetFontMgr().GetFont(lpszName, nWeight, bItalic, bUnderline);
 }
 
-void DrawImage3D(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int dy, int alpha)
-{
-	int nSavedDC = SaveDC(hdcDst);
-
-	SetGraphicsMode(hdcDst, GM_ADVANCED);
-	SetWindowOrgEx(hdcDst, -(x + cx / 2), -(y + cy / 2), NULL);
-
-	XFORM xForm = {1, 0, 0, 1, 0, 0};
-	xForm.eM11 = (float)abs(cos(alpha * 3.1415926535897932 / 180));
-	double tmp = 4 * dy * (1 - xForm.eM11) / (cx * cy);
-
-	for (int i = 0; i != cx; i++)
-	{
-		x = i - cx / 2;
-		xForm.eM22 = (float)(1 - x * tmp);
-		SetWorldTransform(hdcDst, &xForm);
-		BitBlt(hdcDst, x, -cy / 2, 1, cy, hdcSrc, i, 0, SRCCOPY);
-	}
-
-	RestoreDC(hdcDst, nSavedDC);
-}
-
 void ScaleImage(const CImage &imgSrc, CImage &imgDst, int nWidth, int nHeight)
 {
 	Gdiplus::PixelFormat pixelFormat;
@@ -289,20 +228,18 @@ void FormatPath(LPWSTR lpDstPath, LPCWSTR lpSrcPath)
 	*lpDstPath = 0;
 }
 
-bool IsStrColor(LPCWSTR lpStr, COLORREF *pColor)
+bool StrToColor(LPCWSTR lpStr, COLORREF &color)
 {
 	if (lpStr == NULL || *lpStr != '#')
 		return false;
 
 	LPWSTR lpEnd = NULL;
-	DWORD color = wcstoul(lpStr + 1, &lpEnd, 16);
+	DWORD value = wcstoul(++lpStr, &lpEnd, 16);
 
-	if (lpStr + 7 != lpEnd || *lpEnd)
+	if (lpStr + 6 != lpEnd || *lpEnd)
 		return false;
 
-	if (pColor)
-		*pColor = BswapRGB(color);
-
+	color = BswapRGB(value);
 	return true;
 }
 

@@ -2,7 +2,7 @@
 #include "UIToolBar.h"
 #include "UIMoreWnd.h"
 
-CUIToolBar::CUIToolBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent), m_hMoreWnd(NULL)
+CUIToolBar::CUIToolBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent), m_moreBg(0x767676), m_hMoreWnd(NULL)
 {
 	CUIButton *pButton = AddButton(lpFileName);
 	pButton->SetRight(0, true);
@@ -14,11 +14,6 @@ CUIToolBar::~CUIToolBar()
 {
 	for (auto pItem : m_vecMoreItems)
 		delete pItem;
-}
-
-void CUIToolBar::SetMoreBg(LPCWSTR lpFileName)
-{
-	m_strImageBg = lpFileName;
 }
 
 void CUIToolBar::CloseMoreWnd()
@@ -80,6 +75,15 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
+void CUIToolBar::OnMoreBtn()
+{
+	CRect rect;
+	m_vecChilds[0]->GetWindowRect(rect);
+
+	CUIMoreWnd *pWnd = new CUIMoreWnd(m_moreBg);
+	m_hMoreWnd = pWnd->Init(GetRootView()->GetHwnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
+}
+
 int CUIToolBar::GetMoreIndex() const
 {
 	CSize sizeBtn;
@@ -112,20 +116,15 @@ int CUIToolBar::GetMoreIndex() const
 	return 0;
 }
 
-void CUIToolBar::OnMoreBtn()
-{
-	CRect rect;
-	m_vecChilds[0]->GetWindowRect(rect);
-
-	CUIMoreWnd *pWnd = new CUIMoreWnd(m_strImageBg.c_str());
-	m_hMoreWnd = pWnd->Init(GetRootView()->GetHwnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
-}
-
 void CUIToolBar::OnLoaded(const IUILoadAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 
 	LPCWSTR lpStr;
-	if (lpStr = attrs.GetStr(L"imageBg"))
-		SetMoreBg(lpStr);
+	if (lpStr = attrs.GetStr(L"moreBg"))
+	{
+		COLORREF color = 0;
+		ATLVERIFY(StrToColor(lpStr, color));
+		SetMoreBg(color);
+	}
 }

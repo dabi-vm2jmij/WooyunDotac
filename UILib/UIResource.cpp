@@ -80,15 +80,7 @@ static UINT &SkinIdOfStream(CUIStream *pStream)
 CImagePtr CUIResource::GetImage(LPCWSTR lpFileName)
 {
 	wchar_t szFileName[MAX_PATH];
-	COLORREF color = -1;
-
-	if (IsStrColor(lpFileName, &color))
-	{
-		wcscpy_s(szFileName, lpFileName);
-		CharLowerW(szFileName);
-	}
-	else
-		GetResPath()->CombinePath(szFileName, lpFileName);
+	GetResPath()->CombinePath(szFileName, lpFileName);
 
 	EnterCriticalSection(&m_critSect);
 	auto &imgInfo = m_mapImages[szFileName];
@@ -99,12 +91,7 @@ CImagePtr CUIResource::GetImage(LPCWSTR lpFileName)
 		imgInfo.nSkinId = 0;
 		spImage = std::make_shared<CImage>();
 
-		if (color != -1)
-		{
-			if (spImage->Create(1, 1, 32))
-				*(int *)spImage->GetPixelAddress(0, 0) = BswapRGB(color) | 0xff000000;
-		}
-		else if (auto pStream = FindStream(szFileName))
+		if (auto pStream = FindStream(szFileName))
 		{
 			if (spImage->Load(pStream) == S_OK)
 			{
@@ -127,9 +114,6 @@ void CUIResource::UpdateImages()
 {
 	for (auto &it : m_mapImages)
 	{
-		if (IsStrColor(it.first.c_str(), NULL))
-			continue;
-
 		auto &imgInfo = it.second;
 		auto  spImage = imgInfo.wpImage.lock();
 

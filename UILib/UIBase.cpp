@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIBase.h"
 
-CUIBase::CUIBase(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0), m_dbgColor(-1)
+CUIBase::CUIBase(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0), m_colorBg(-1)
 	, m_bEnabled(true), m_bVisible(true), m_bControl(false), m_bKeepEnter(false), m_ppEnter(NULL)
 {
 }
@@ -187,7 +187,7 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 
 	if (rcOld != rect || m_rcReal != rcReal)
 	{
-		if (lpClipRect && (IsControl() || m_dbgColor != -1))
+		if (lpClipRect && (IsControl() || m_colorBg != -1))
 		{
 			UnionRect(lpClipRect, lpClipRect, m_rcReal);
 			UnionRect(lpClipRect, lpClipRect, rcReal);
@@ -201,32 +201,24 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 
 void CUIBase::DoPaint(CUIDC &dc) const
 {
-	CRect rcReal(m_rcReal);
+	CRect rect(m_rcReal);
 
-	if (dc.GetRealRect(rcReal))
+	if (dc.GetRealRect(rect))
 	{
+		// 填充背景色
+		if (m_colorBg != -1)
+			dc.FillSolidRect(m_rcReal, m_colorBg);
+
 		if (m_rect != m_rcReal || dynamic_cast<const CUIEdit *>(this))
 		{
 			// 剪裁超出的区域
-			SelectClipRgn(dc, CUIRgn(CreateRectRgnIndirect(rcReal)));
+			SelectClipRgn(dc, CUIRgn(CreateRectRgnIndirect(rect)));
 			OnPaint(dc);
 			SelectClipRgn(dc, NULL);
 		}
 		else
 			OnPaint(dc);
 	}
-}
-
-// 只为调试使用，标识控件区域
-void CUIBase::OnPaint(CUIDC &dc) const
-{
-	if (m_dbgColor == -1)
-		return;
-
-	dc.FillSolidRect(m_rcReal, m_dbgColor);
-
-	if (dc.IsLayered())
-		FillAlpha(dc, m_rcReal, 255);
 }
 
 CUIView *CUIBase::GetParent() const
@@ -373,12 +365,10 @@ void CUIBase::OnLoaded(const IUILoadAttrs &attrs)
 	if (attrs.GetInt(L"visible", &nValue))
 		SetVisible(nValue != 0);
 
-#ifdef _DEBUG
-	if (lpStr = attrs.GetStr(L"dbgColor"))
+	if (lpStr = attrs.GetStr(L"colorBg"))
 	{
 		COLORREF color = 0;
-		ATLVERIFY(IsStrColor(lpStr, &color));
-		SetDbgColor(color);
+		ATLVERIFY(StrToColor(lpStr, color));
+		SetBgColor(color);
 	}
-#endif
 }

@@ -14,6 +14,6 @@ protected:
 	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
 	virtual void MyPaint(CUIDC &dc) const override;
 
-	CImagex m_imagex;
-	int     m_nStyle;
+	COLORREF m_color;
+	int      m_nStyle;
 };

@@ -11,7 +11,7 @@ public:
 
 	void InitItems(const std::vector<CUIBase *> &pItems);
 	void ClearItems();
-	void GetSize(LPSIZE lpSize) const;
+	void CalcSize(LPSIZE lpSize) const;
 
 protected:
 	virtual void RecalcLayout(LPRECT lpClipRect) override;

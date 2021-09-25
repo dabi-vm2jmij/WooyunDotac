@@ -12,8 +12,6 @@ UILIB_API CUIStream *GetStream(LPCWSTR lpFileName);
 UILIB_API bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView);
 UILIB_API bool HasAlphaChannel(const CImage &image);
 UILIB_API void AlphaPng(CImage &image);
-UILIB_API void FillAlpha(CImage &image, BYTE nAlpha);
-UILIB_API void FillAlpha(CUIDC &dc, LPCRECT lpRect, BYTE nAlpha);
 UILIB_API UINT SplitImage(LPCWSTR lpFileName, CImagex imagexs[], UINT nCount);
 template<size_t nCount>
 inline UINT SplitImage(LPCWSTR lpFileName, CImagex (&imagexs)[nCount]) { return SplitImage(lpFileName, imagexs, nCount); }
@@ -21,10 +19,9 @@ UILIB_API void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRe
 UILIB_API void SetDefaultFont(LPCWSTR lpszName);
 UILIB_API HFONT GetDefaultFont();
 UILIB_API HFONT GetFont(LPCWSTR lpszName, int nWeight = FW_NORMAL, BYTE bItalic = FALSE, BYTE bUnderline = FALSE);
-UILIB_API void DrawImage3D(HDC hdcDst, int x, int y, int cx, int cy, HDC hdcSrc, int dy, int alpha);
 UILIB_API void ScaleImage(const CImage &imgSrc, CImage &imgDst, int nWidth, int nHeight);
 UILIB_API void FormatPath(LPWSTR lpDstPath, LPCWSTR lpSrcPath);
-UILIB_API bool IsStrColor(LPCWSTR lpStr, COLORREF *pColor);
+UILIB_API bool StrToColor(LPCWSTR lpStr, COLORREF &color);
 UILIB_API DWORD BswapRGB(DWORD color);
 
 }

@@ -176,8 +176,8 @@ void CUIEdit::MyPaint(CUIDC &dc) const
 		SetROP2(dc, nOldRop);
 	}
 
-	if (dc.IsLayered())
-		FillAlpha(dc, m_rect, 255);
+	// DrawText ºóÌî³ä alpha
+	dc.FillAlpha(m_rect, 255);
 }
 
 void CUIEdit::OnEnabled(bool bEnabled)
@@ -900,7 +900,7 @@ void CUIEdit::OnLoaded(const IUILoadAttrs &attrs)
 	if (lpStr = attrs.GetStr(L"color"))
 	{
 		COLORREF color = 0;
-		ATLVERIFY(IsStrColor(lpStr, &color));
+		ATLVERIFY(StrToColor(lpStr, color));
 		SetTextColor(color);
 	}
 

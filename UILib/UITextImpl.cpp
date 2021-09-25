@@ -48,8 +48,8 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
 		DrawTextW(dc, m_strText.c_str(), -1, lpRect, nFormat | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
 	}
 
-	if (dc.IsLayered())
-		FillAlpha(dc, lpRect, 255);
+	// DrawText 后填充 alpha
+	dc.FillAlpha(lpRect, 255);
 }
 
 /*	格式说明
@@ -225,7 +225,7 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 			if (CountNumber(szText + 1, true) == 6)
 			{
 				vecDrawInfos.push_back(drawInfo);
-				nSize = IsStrColor(szText, &drawInfo.m_color);
+				nSize = StrToColor(szText, drawInfo.m_color);
 			}
 			break;
 
@@ -346,7 +346,7 @@ void CUITextImpl::OnLoadedText(const IUILoadAttrs &attrs)
 	if (lpStr = attrs.GetStr(L"color"))
 	{
 		COLORREF color = 0;
-		ATLVERIFY(IsStrColor(lpStr, &color));
+		ATLVERIFY(StrToColor(lpStr, color));
 		SetTextColor(color);
 	}
 

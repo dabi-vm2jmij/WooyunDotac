@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "UIMoreWnd.h"
 
-CUIMoreWnd::CUIMoreWnd(LPCWSTR lpFileName) : m_rootView(this)
+CUIMoreWnd::CUIMoreWnd(COLORREF color) : m_rootView(this)
 {
-	m_imagexBg = GetImage(*lpFileName ? lpFileName : L"#ffffff");
+	m_rootView.SetBgColor(color);
 }
 
 CUIMoreWnd::~CUIMoreWnd()
@@ -16,7 +16,7 @@ HWND CUIMoreWnd::Init(HWND hParent, CPoint point, const std::vector<CUIBase *> &
 	m_rootView.InitItems(vecItems);
 
 	CSize size;
-	m_rootView.GetSize(&size);
+	m_rootView.CalcSize(&size);
 
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromPoint(point, MONITOR_DEFAULTTONEAREST), &mi);
@@ -27,12 +27,7 @@ HWND CUIMoreWnd::Init(HWND hParent, CPoint point, const std::vector<CUIBase *> &
 	if (point.y + size.cy > mi.rcMonitor.bottom)
 		point.y -= size.cy;
 
-	return Create(hParent, CRect(point, size), NULL, WS_POPUP | WS_VISIBLE, WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
-}
-
-void CUIMoreWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
-{
-	m_imagexBg.Draw(dc, lpRect);
+	return Create(hParent, CRect(point, size), NULL, WS_POPUP | WS_VISIBLE);
 }
 
 void CUIMoreWnd::OnFinalMessage(HWND hWnd)

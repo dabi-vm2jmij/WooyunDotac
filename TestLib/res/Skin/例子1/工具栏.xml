@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="gb2312" ?>
-<ToolBar left="50" right="50" top="0*" height="34" imageBg="#0000ff">
+<ToolBar left="50" right="50" top="0*" height="34" moreBg="#3c7bd4">
 	<ButtonEx left="25*" image="\按钮.png:3" text="按钮1" />
 	<ButtonEx left="25*" image="\按钮.png:3" text="按钮2" />
 	<ButtonEx left="25*" image="\按钮.png:3" text="按钮3" />
