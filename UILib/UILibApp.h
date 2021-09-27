@@ -2,7 +2,6 @@
 
 #include "UIResource.h"
 #include "UIFontMgr.h"
-#include "UIToolTip.h"
 
 #define WM_NEEDLAYOUT	WM_USER + 1000
 
@@ -16,7 +15,6 @@ public:
 
 	CUIResource &GetResource() { return m_resource; }
 	CUIFontMgr &GetFontMgr() { return m_fontMgr; }
-	void ShowTip(HWND hParent, LPCWSTR lpText);
 	void RemoveLayout(CUIRootView *pRootView);
 	void DelayLayout(CUIRootView *pRootView);
 
@@ -29,7 +27,6 @@ private:
 
 	CUIResource m_resource;
 	CUIFontMgr  m_fontMgr;
-	CUIToolTip  m_toolTip;
 	bool        m_bPostMsg;
 	std::deque<CUIRootView *> m_deqRootViews;
 };

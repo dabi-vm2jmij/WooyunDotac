@@ -3,7 +3,7 @@
 #include "UILibApp.h"
 
 CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_hImc(NULL), m_hCursor(NULL)
-	, m_pCapture(NULL), m_pCurFocus(NULL)
+	, m_hToolTip(NULL), m_pCapture(NULL), m_pCurFocus(NULL)
 {
 	m_vecEnterItems.reserve(8);
 }
@@ -84,7 +84,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_MOUSELEAVE:
 		m_bMouseEnter = false;
 		CheckMouseLeave(UIHitTest());
-		g_theApp.ShowTip(GetOwnerWnd(), L"");
+		ShowToolTip(L"");
 		return TRUE;
 
 	case WM_MOUSEMOVE:
@@ -106,6 +106,16 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
 	case WM_RBUTTONDBLCLK:
+		if (m_hToolTip)
+		{
+			MSG msg;
+			msg.hwnd = GetOwnerWnd();
+			msg.message = uMsg;
+			msg.wParam = wParam;
+			msg.lParam = lParam;
+			SendMessage(m_hToolTip, TTM_RELAYEVENT, 0, (LPARAM)&msg);
+		}
+
 		OnMouseMessage(uMsg, wParam, lParam);
 		return TRUE;
 
@@ -311,9 +321,9 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 
 		if (uMsg == WM_MOUSEMOVE)
-			g_theApp.ShowTip(GetOwnerWnd(), lpToolTip);
+			ShowToolTip(lpToolTip);
 		else
-			g_theApp.ShowTip(GetOwnerWnd(), NULL);
+			ShowToolTip(NULL);
 
 		for (auto hit : hitTest)
 		{
@@ -549,6 +559,43 @@ void CUIRootView::NextTabsEdit()
 			SetFocus(m_vecEdits[i]);
 			break;
 		}
+	}
+}
+
+void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
+{
+	if (m_strTipText == (lpTipText ? lpTipText : L""))
+		return;
+
+	if (lpTipText)
+		m_strTipText = lpTipText;
+
+	if (lpTipText && *lpTipText)
+	{
+		HWND hWnd = GetOwnerWnd();
+
+		TOOLINFO ti = { sizeof(ti) };
+		ti.uFlags   = TTF_IDISHWND;
+		ti.hwnd     = ::GetParent(hWnd);
+		ti.uId      = (UINT_PTR)hWnd;
+		ti.hinst    = _AtlBaseModule.GetResourceInstance();
+		ti.lpszText = (LPTSTR)m_strTipText.c_str();
+
+		if (m_hToolTip)
+		{
+			SendMessage(m_hToolTip, TTM_UPDATETIPTEXT, 0, (LPARAM)&ti);
+			SendMessage(m_hToolTip, TTM_ACTIVATE, TRUE, 0);
+		}
+		else
+		{
+			m_hToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWnd, NULL, _AtlBaseModule.GetModuleInstance(), NULL);
+			SendMessage(m_hToolTip, TTM_SETMAXTIPWIDTH, 0, 960);
+			SendMessage(m_hToolTip, TTM_ADDTOOL, 0, (LPARAM)&ti);
+		}
+	}
+	else if (m_hToolTip)
+	{
+		SendMessage(m_hToolTip, TTM_ACTIVATE, FALSE, 0);
 	}
 }
 

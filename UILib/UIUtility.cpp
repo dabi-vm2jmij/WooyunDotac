@@ -37,7 +37,7 @@ CImagex GetImage(LPCWSTR lpFileName)
 	auto spImage = g_theApp.GetResource().GetImage(lpFileName);
 	ATLASSERT(nCount > 0 && spImage->GetWidth() % nCount == 0);
 
-	if (!spImage || spImage->GetWidth() < nCount || nCount <= 1)
+	if (!spImage || spImage->IsNull() || nCount <= 1)
 		return spImage;
 
 	CImagex imagex;

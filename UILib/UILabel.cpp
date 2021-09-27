@@ -22,7 +22,7 @@ void CUILabel::OnTextSize(CSize size)
 
 void CUILabel::OnLoaded(const IUILoadAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
-
 	OnLoadedText(attrs);
+
+	__super::OnLoaded(attrs);
 }

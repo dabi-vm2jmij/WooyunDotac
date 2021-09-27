@@ -69,9 +69,6 @@
     <ClInclude Include="UIStream.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIToolTip.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="UITextImpl.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -213,9 +210,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIStream.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UIToolTip.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UITextImpl.cpp">

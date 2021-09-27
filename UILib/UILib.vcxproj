@@ -121,7 +121,6 @@
     <ClInclude Include="UITextImpl.h" />
     <ClInclude Include="UITimer.h" />
     <ClInclude Include="UIToolBar.h" />
-    <ClInclude Include="UIToolTip.h" />
     <ClInclude Include="UIUtility.h" />
     <ClInclude Include="UIView.h" />
     <ClInclude Include="UIVScroll.h" />
@@ -173,7 +172,6 @@
     <ClCompile Include="UITextImpl.cpp" />
     <ClCompile Include="UITimer.cpp" />
     <ClCompile Include="UIToolBar.cpp" />
-    <ClCompile Include="UIToolTip.cpp" />
     <ClCompile Include="UIUtility.cpp" />
     <ClCompile Include="UIView.cpp" />
     <ClCompile Include="UIVScroll.cpp" />

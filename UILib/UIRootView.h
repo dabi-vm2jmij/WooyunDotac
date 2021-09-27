@@ -33,6 +33,7 @@ public:
 	CUIControl *GetCapture() const { return m_pCapture; }
 
 protected:
+	virtual void ShowToolTip(LPCWSTR lpTipText);
 	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
 	bool OnNcHitTest(CPoint point);
 	void OnSize(CSize size);
@@ -53,6 +54,8 @@ protected:
 	bool        m_bMouseEnter;
 	HIMC        m_hImc;
 	HCURSOR     m_hCursor;
+	HWND        m_hToolTip;
+	wstring     m_strTipText;
 	CUIControl *m_pCapture;
 	CUIControl *m_pCurFocus;
 	std::vector<CUIEdit *> m_vecEdits;

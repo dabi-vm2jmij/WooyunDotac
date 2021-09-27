@@ -37,3 +37,10 @@ public:
 		return GetView(lpszId);
 	}
 };
+
+namespace UILib
+{
+
+UILIB_API bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView);
+
+}

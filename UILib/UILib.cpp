@@ -35,14 +35,6 @@ CUILibApp::~CUILibApp()
 		DestroyWindow();
 }
 
-void CUILibApp::ShowTip(HWND hParent, LPCWSTR lpText)
-{
-	if (lpText)
-		m_toolTip.Show(hParent, lpText);
-	else
-		m_toolTip.Hide();
-}
-
 void CUILibApp::RemoveLayout(CUIRootView *pRootView)
 {
 	for (auto it = m_deqRootViews.begin(); it != m_deqRootViews.end(); ++it)
