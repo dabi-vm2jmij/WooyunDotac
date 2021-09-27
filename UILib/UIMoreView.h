@@ -7,7 +7,7 @@
 class CUIMoreView : public CUIRootView
 {
 public:
-	CUIMoreView(IUIWindow *pWindow);
+	CUIMoreView(IUIWindow *pOwner);
 
 	void InitItems(const std::vector<CUIBase *> &pItems);
 	void ClearItems();

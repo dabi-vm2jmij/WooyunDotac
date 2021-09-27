@@ -81,7 +81,7 @@ void CUIToolBar::OnMoreBtn()
 	m_vecChilds[0]->GetWindowRect(rect);
 
 	CUIMoreWnd *pWnd = new CUIMoreWnd(m_moreBg);
-	m_hMoreWnd = pWnd->Init(GetRootView()->GetHwnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
+	m_hMoreWnd = pWnd->Init(GetRootView()->GetOwnerWnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
 }
 
 int CUIToolBar::GetMoreIndex() const

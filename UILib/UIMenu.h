@@ -28,7 +28,7 @@ public:
 	void CreateFromMenu(HMENU hMenu);
 	Item *GetItem(UINT nId = -1);
 	UINT GetCount() const { return m_vecItems.size(); }
-	UINT Popup(HWND hParent, int x1, int y1, int x2 = MAXINT16, int y2 = MAXINT16, bool bPostMsg = true);		// x2、y2：菜单超出屏幕后，新的右、下边界
+	UINT Popup(HWND hParent, int x1, int y1, int x2 = MAXINT16, int y2 = MAXINT16, bool bPostMsg = false);		// x2、y2：菜单超出屏幕后，新的右、下边界
 
 protected:
 	virtual CUIMenu *NewUIMenu() const { return new CUIMenu; }

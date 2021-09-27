@@ -293,7 +293,7 @@ void CUIEdit::OnRButtonUp(CPoint point)
 
 	// 弹出菜单时光标暂停
 	m_uiTimer.Kill();
-	UINT nCmdId = pUIMenu->Popup(GetRootView()->GetHwnd(), point.x, point.y, MAXINT16, point.y, false);
+	UINT nCmdId = pUIMenu->Popup(GetRootView()->GetOwnerWnd(), point.x, point.y, MAXINT16, point.y);
 	delete pUIMenu;
 	m_uiTimer.Set(GetCaretBlinkTime());
 
@@ -348,7 +348,7 @@ void CUIEdit::OnKillFocus()
 
 void CUIEdit::OnInputLangChange(UINT nLocaleId)
 {
-	HWND hWnd = GetRootView()->GetHwnd();
+	HWND hWnd = GetRootView()->GetOwnerWnd();
 	HIMC hImc = ImmGetContext(hWnd);
 
 	if (hImc)
@@ -741,7 +741,7 @@ void CUIEdit::Insert(LPWSTR lpText)
 
 void CUIEdit::MyCreateCaret()
 {
-	HWND hWnd = GetRootView()->GetHwnd();
+	HWND hWnd = GetRootView()->GetOwnerWnd();
 	HIMC hImc = ImmGetContext(hWnd);
 
 	if (hImc)
@@ -834,7 +834,7 @@ void CUIEdit::MySetCaretPos()
 	m_ptCaret = point;
 	OnUITimer();
 
-	HWND hWnd = GetRootView()->GetHwnd();
+	HWND hWnd = GetRootView()->GetOwnerWnd();
 	HIMC hImc = ImmGetContext(hWnd);
 
 	if (hImc)

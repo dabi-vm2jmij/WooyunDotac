@@ -20,7 +20,7 @@ protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual void OnLoadedUI(const IUILoadAttrs &loaded) override;
-	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override;
+	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const override;
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg BOOL OnNcActivate(BOOL bActive);

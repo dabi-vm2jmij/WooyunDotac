@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UIView.h"
+#include "UILibApp.h"
 
 CUIView::CUIView(CUIView *pParent) : CUIBase(pParent), m_bNeedLayout(false)
 {
@@ -65,7 +66,7 @@ bool CUIView::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CUIView::OnPaint(CUIDC &dc) const
 {
-	CUIBase *pCapture = GetRootView()->m_pCapture;
+	CUIBase *pCapture = GetRootView()->GetCapture();
 	bool bFound = false;
 
 	for (auto pItem : m_vecChilds)
@@ -134,7 +135,7 @@ void CUIView::InvalidateRect(LPCRECT lpRect)
 	if (rect.IsRectEmpty())
 		return;
 
-	GetRootView()->DoInvalidateRect(rect);
+	GetRootView()->InvalidateRect(rect);
 }
 
 void CUIView::InvalidateLayout()
@@ -142,8 +143,9 @@ void CUIView::InvalidateLayout()
 	if (m_bNeedLayout || m_rect.IsRectEmpty())
 		return;
 
+	// ÀûÓÃ PostMessage À´ÑÓ³Ù RecalcLayout
 	m_bNeedLayout = true;
-	GetRootView()->DoInvalidateLayout();
+	g_theApp.DelayLayout(GetRootView());
 }
 
 void CUIView::RemoveChild(CUIBase *pItem)

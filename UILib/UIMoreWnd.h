@@ -20,8 +20,8 @@ private:
 		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
 	END_MSG_MAP()
 
-	void OnFinalMessage(HWND hWnd) override;
-	HWND GetHwnd() const override { return m_hWnd; }
+	virtual void OnFinalMessage(HWND hWnd) override;
+	virtual HWND GetHwnd() const override { return m_hWnd; }
 	LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 
 	CUIMoreView m_rootView;

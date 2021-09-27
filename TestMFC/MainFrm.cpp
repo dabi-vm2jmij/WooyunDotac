@@ -178,7 +178,7 @@ void CMainFrame::OnLoadedUI(const IUILoadAttrs &loaded)
 	m_pProgress = loaded[L"½ø¶ÈÌõ"];
 }
 
-void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
+void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
 {
 	m_imagexBg.BitBlt(dc, lpRect->left, lpRect->top);
 

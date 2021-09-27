@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIMoreView.h"
 
-CUIMoreView::CUIMoreView(IUIWindow *pWindow) : CUIRootView(pWindow)
+CUIMoreView::CUIMoreView(IUIWindow *pOwner) : CUIRootView(pOwner)
 {
 }
 

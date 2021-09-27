@@ -157,7 +157,7 @@ void CTabDemoWnd::InitUI()
 	});
 }
 
-void CTabDemoWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
+void CTabDemoWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
 {
 	CRect rect(lpRect);
 	m_imagexBg.StretchBlt(dc, rect);

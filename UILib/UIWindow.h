@@ -10,7 +10,7 @@ public:
 
 	CUIRootView &GetRootView() { return m_rootView; }
 	bool CreateFromXml(LPCWSTR lpXmlName, HWND hParent = NULL);
-	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0) override;
+	virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0) override;
 
 protected:
 	virtual void OnFinalMessage(HWND hWnd) override { delete this; }

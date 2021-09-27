@@ -81,7 +81,7 @@ LRESULT CMainFrame::OnThreadResult(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 	return 0;
 }
 
-void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect)
+void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
 {
 	m_imagexBg.BitBlt(dc, lpRect->left, lpRect->top);
 

@@ -10,11 +10,11 @@ public:
 	void OnInitUI(std::function<void(const IUILoadAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
 
 private:
-	void OnLoadedUI(const IUILoadAttrs &attrs) override;
-	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
-	void OnWindowPosChanging(WINDOWPOS *lpWndPos) override;
-	BOOL OnNcActivate(BOOL bActive) override { return TRUE; }
-	void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) override {}
+	virtual void OnLoadedUI(const IUILoadAttrs &attrs) override;
+	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
+	virtual void OnWindowPosChanging(WINDOWPOS *lpWndPos) override;
+	virtual BOOL OnNcActivate(BOOL bActive) override { return TRUE; }
+	virtual void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) override {}
 
 	bool m_bModal;
 	std::function<void(const IUILoadAttrs &)> m_fnInitUI;

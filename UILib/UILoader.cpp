@@ -23,10 +23,10 @@ class CUILoadAttrs : public IUILoadAttrs
 public:
 	CUILoadAttrs(const CUILoadData &loadData, tinyxml2::XMLElement *pElem);
 
-	LPCWSTR  GetStr(LPCWSTR lpName) const override;
-	bool     GetInt(LPCWSTR lpName, int *pnValue) const override;
-	HFONT    GetFont(LPCWSTR lpszId) const override;
-	CUIView *GetView(LPCWSTR lpszId) const override;
+	virtual LPCWSTR  GetStr(LPCWSTR lpName) const override;
+	virtual bool     GetInt(LPCWSTR lpName, int *pnValue) const override;
+	virtual HFONT    GetFont(LPCWSTR lpszId) const override;
+	virtual CUIView *GetView(LPCWSTR lpszId) const override;
 
 private:
 	const CUILoadData &m_loadData;

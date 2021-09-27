@@ -14,7 +14,7 @@ private:
 	void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) override;
 
 	void InitUI();
-	void OnDrawBg(CUIDC &dc, LPCRECT lpRect) override;
+	void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const override;
 
 	CImagex       m_imagexBg;
 	CImagex       m_imagexBg2;
