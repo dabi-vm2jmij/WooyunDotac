@@ -574,23 +574,23 @@ void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
 	{
 		HWND hWnd = GetOwnerWnd();
 
-		TOOLINFO ti = { sizeof(ti) };
-		ti.uFlags   = TTF_IDISHWND;
-		ti.hwnd     = ::GetParent(hWnd);
-		ti.uId      = (UINT_PTR)hWnd;
-		ti.hinst    = _AtlBaseModule.GetResourceInstance();
-		ti.lpszText = (LPTSTR)m_strTipText.c_str();
+		TOOLINFOW ti = { sizeof(ti) };
+		ti.uFlags    = TTF_IDISHWND;
+		ti.hwnd      = ::GetParent(hWnd);
+		ti.uId       = (UINT_PTR)hWnd;
+		ti.hinst     = _AtlBaseModule.GetResourceInstance();
+		ti.lpszText  = (LPWSTR)m_strTipText.c_str();
 
 		if (m_hToolTip)
 		{
-			SendMessage(m_hToolTip, TTM_UPDATETIPTEXT, 0, (LPARAM)&ti);
+			SendMessage(m_hToolTip, TTM_UPDATETIPTEXTW, 0, (LPARAM)&ti);
 			SendMessage(m_hToolTip, TTM_ACTIVATE, TRUE, 0);
 		}
 		else
 		{
 			m_hToolTip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hWnd, NULL, _AtlBaseModule.GetModuleInstance(), NULL);
 			SendMessage(m_hToolTip, TTM_SETMAXTIPWIDTH, 0, 960);
-			SendMessage(m_hToolTip, TTM_ADDTOOL, 0, (LPARAM)&ti);
+			SendMessage(m_hToolTip, TTM_ADDTOOLW, 0, (LPARAM)&ti);
 		}
 	}
 	else if (m_hToolTip)

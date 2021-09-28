@@ -8,6 +8,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 {
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
 
+	INITCOMMONCONTROLSEX iccx = { sizeof(INITCOMMONCONTROLSEX), ICC_BAR_CLASSES };
+	InitCommonControlsEx(&iccx);
+
 #ifdef _DEBUG
 	wchar_t szSkinPath[MAX_PATH];
 	GetCurrentDirectoryW(MAX_PATH, szSkinPath);
