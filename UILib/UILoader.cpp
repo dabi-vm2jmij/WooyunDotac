@@ -66,7 +66,7 @@ CUILoadAttrs::CUILoadAttrs(const CUILoadData &loadData, tinyxml2::XMLElement *pE
 {
 	for (const tinyxml2::XMLAttribute *pAttr = pElem->FirstAttribute(); pAttr; pAttr = pAttr->Next())
 	{
-		m_mapAttrs.emplace(CharLowerW((CA2W)pAttr->Name()), (LPCWSTR)(CA2W)pAttr->Value());
+		m_mapAttrs.emplace(CharLowerW(CA2W(pAttr->Name(), CP_UTF8)), (LPCWSTR)CA2W(pAttr->Value(), CP_UTF8));
 	}
 }
 
@@ -283,7 +283,7 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	}
 	else
 	{
-		if ((pView = pParent->GetRootView()->OnCustomUI((CA2W)lpName, pParent)) == NULL)
+		if ((pView = pParent->GetRootView()->OnCustomUI(CA2W(lpName, CP_UTF8), pParent)) == NULL)
 		{
 			ATLASSERT(0);
 			return false;
@@ -335,5 +335,3 @@ bool UILib::LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 
 	return bRet;
 }
-
-#include "tinyxml2.cpp"

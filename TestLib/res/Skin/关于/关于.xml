@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="gb2312" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <RootView style="0x90c00000" exStyle="0x80000" width="360" height="240" caption="31">
-	<Image image="背景.png" width="0" height="0" stretch="1" />
+	<Image image="鑳屾櫙.png" width="0" height="0" stretch="1" />
 	<View top="0" height="31">
-		<Label left="10" textex="关于{s 6}{b}{#ff0000}悟空{f :-16}{i}{s 10}游戏{///}{#0000ff}{s 10}宝盒{//}" color="#ffffff" />
-		<Button right="8" image="关闭.png:4" tooltip="关闭" id="关闭" />
+		<Label left="10" textex="鍏充簬{s 6}{b}{#ff0000}鎮熺┖{f :-16}{i}{s 10}娓告垙{///}{#0000ff}{s 10}瀹濈洅{//}" color="#ffffff" />
+		<Button right="8" image="鍏抽棴.png:4" tooltip="鍏抽棴" id="鍏抽棴" />
 	</View>
 </RootView>

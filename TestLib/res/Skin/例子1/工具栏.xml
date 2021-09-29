@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="gb2312" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ToolBar left="50" right="50" top="0*" height="34" moreBg="#3c7bd4">
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮1" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮2" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮3" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮4" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮5" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮6" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮7" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮8" />
-	<ButtonEx left="25*" image="\按钮.png:3" text="按钮9" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳1" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳2" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳3" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳4" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳5" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳6" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳7" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳8" />
+	<ButtonEx left="25*" image="\鎸夐挳.png:3" text="鎸夐挳9" />
 </ToolBar>

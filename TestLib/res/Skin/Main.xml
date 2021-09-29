@@ -1,23 +1,23 @@
-<?xml version="1.0" encoding="gb2312" ?>
-<RootView style="0x80ca0000" exStyle="0x80000" width="632" height="370" caption="-1" title="Hello, world!" ±³¾°ÉÏ="±³¾°.png" ±³¾°ÏÂ="×Ô¶¨Òå.png">
+<?xml version="1.0" encoding="utf-8" ?>
+<RootView style="0x80ca0000" exStyle="0x80000" width="632" height="370" caption="-1" title="Hello, world!" èƒŒæ™¯ä¸Š="èƒŒæ™¯.png" èƒŒæ™¯ä¸‹="è‡ªå®šä¹‰.png">
 	<View top="0*" height="46">
-		<Button right="21*" bottom="0" image="¹Ø±Õ.png:3" tooltip="¹Ø±Õ" id="¹Ø±Õ" />
-		<MenuButton right="10*" bottom="0" image="Ö÷²Ëµ¥.png:3" id="Ö÷²Ëµ¥" />
-		<Label right="2" bottom="0" textex="²Ëµ¥ÀïÓÐ{#ff0000}²âÊÔ{/}¹¦ÄÜ¡ú" color="#cccccc" />
+		<Button right="21*" bottom="0" image="å…³é—­.png:3" tooltip="å…³é—­" id="å…³é—­" />
+		<MenuButton right="10*" bottom="0" image="ä¸»èœå•.png:3" id="ä¸»èœå•" />
+		<Label right="2" bottom="0" textex="èœå•é‡Œæœ‰{#ff0000}æµ‹è¯•{/}åŠŸèƒ½â†’" color="#cccccc" />
 	</View>
-	<View bottom="0*" id="µ×²¿" visible="0">
+	<View bottom="0*" id="åº•éƒ¨" visible="0">
 		<Edit left="123" top="27" width="376" height="20" id="21" />
-		<Button left="514" top="24" image="¸ü¸Ä.png:3" id="22" />
-		<CheckBox left="117" top="70" image="¸´Ñ¡¿ò.png:2" text="×ÀÃæ¿ì½Ý·½Ê½" color="#313131" check="1" id="23" />
-		<CheckBox left="249" top="70" image="¸´Ñ¡¿ò.png:2" text="Ìí¼Ó¿ìËÙÆô¶¯" color="#313131" check="1" id="24" />
+		<Button left="514" top="24" image="æ›´æ”¹.png:3" id="22" />
+		<CheckBox left="117" top="70" image="å¤é€‰æ¡†.png:2" text="æ¡Œé¢å¿«æ·æ–¹å¼" color="#313131" check="1" id="23" />
+		<CheckBox left="249" top="70" image="å¤é€‰æ¡†.png:2" text="æ·»åŠ å¿«é€Ÿå¯åŠ¨" color="#313131" check="1" id="24" />
 	</View>
-	<View top="142" id="ÖÐ²¿">
-		<Button left="308" top="0" image="¿ìËÙ°²×°.png:3" id="°²×°" />
-		<Button left="528" top="134" image="×Ô¶¨Òå°²×°.png:3" id="×Ô¶¨Òå" />
-		<CheckBox left="24" top="140" image="Ð­ÒéÑ¡¿ò.png:2" text="Í¬Òâ" color="#9090a3" check="1" id="check1" />
-		<ButtonEx left="70" top="140" text="Îò¿ÕÓÎÏ·±¦ºÐÓÃ»§Ð­Òé" color="#8cbde7" underline="1" cursor="hand" />
+	<View top="142" id="ä¸­éƒ¨">
+		<Button left="308" top="0" image="å¿«é€Ÿå®‰è£….png:3" id="å®‰è£…" />
+		<Button left="528" top="134" image="è‡ªå®šä¹‰å®‰è£….png:3" id="è‡ªå®šä¹‰" />
+		<CheckBox left="24" top="140" image="åè®®é€‰æ¡†.png:2" text="åŒæ„" color="#9090a3" check="1" id="check1" />
+		<ButtonEx left="70" top="140" text="æ‚Ÿç©ºæ¸¸æˆå®ç›’ç”¨æˆ·åè®®" color="#8cbde7" underline="1" cursor="hand" />
 	</View>
-	<View top="142" id="ÖÐ²¿2" visible="0">
-		<Progress top="71" image="½ø¶ÈÌõ.png:2" width="440" id="½ø¶ÈÌõ" />
+	<View top="142" id="ä¸­éƒ¨2" visible="0">
+		<Progress top="71" image="è¿›åº¦æ¡.png:2" width="440" id="è¿›åº¦æ¡" />
 	</View>
 </RootView>
