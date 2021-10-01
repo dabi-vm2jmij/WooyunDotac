@@ -2,7 +2,10 @@
 #include "UITextImpl.h"
 #include "UILibApp.h"
 
-CUITextImpl::CUITextImpl() : m_bTextEx(false), m_hFont(GetDefaultFont()), m_color(0)
+#define BRACE_L		2
+#define BRACE_R		3
+
+CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0)
 {
 }
 
@@ -15,14 +18,13 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
 	if (m_strText.empty() || IsRectEmpty(lpRect))
 		return;
 
-	if (m_bTextEx)
+	if (wcschr(m_strText.c_str(), BRACE_L))
 	{
 		CRect rect(lpRect);
 
 		if (nFormat & DT_CENTER)
 		{
 			rect.left = (rect.left + rect.right - m_sizeText.cx) / 2;
-			rect.right = rect.left + m_sizeText.cx;
 		}
 		else if (nFormat & DT_RIGHT)
 		{
@@ -31,8 +33,7 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
 
 		if (nFormat & DT_VCENTER)
 		{
-			rect.top = (rect.top + rect.bottom - m_sizeText.cy) / 2;
-			rect.bottom = rect.top + m_sizeText.cy;
+			rect.bottom = (rect.top + rect.bottom + m_sizeText.cy) / 2;
 		}
 		else if ((nFormat & DT_BOTTOM) == 0)	// DT_TOP
 		{
@@ -54,13 +55,13 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
 
 /*	格式说明
 	Font：      {f 宋体:12}text{/}  可省略为：{f 宋体}、{f :12}
-	Weight：    {w n}text{/}        n（1～9）：4=Normal, 7=Bold
+	Weight：    {w N}text{/}        N（1～9）：4=Normal, 7=Bold
 	Bold：      {b}text{/}          等于：{w 7}
 	Italic：    {i}text{/}
 	Underline： {u}text{/}
 	Color：     {#xxxxxx}text{/}
-	Space：     {s n}text           n（1～9999）
-	可嵌套为：  {f 宋体:12}{w 7}{i}{u}{c 121212}text{/////}
+	Space：     {N}text             N（1～999）
+	可嵌套为：  {f 宋体:12}{b}{i}{u}{#121212}text{/////}
 */
 
 namespace
@@ -76,7 +77,7 @@ struct DrawInfo
 
 void MyDrawText(const DrawInfo &drawInfo, CUIDC &dc, LPCWSTR lpText, int nSize, LPRECT lpRect, LPSIZE lpSize)
 {
-	dc.SelectFont(g_theApp.GetFontMgr().GetFont(CUIFontMgr::FontKey(drawInfo.m_fontKey)));
+	dc.SelectFont(g_theApp.GetFontMgr().GetFont(drawInfo.m_fontKey));
 
 	CRect rect;
 	DrawTextW(dc, lpText, nSize, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
@@ -124,6 +125,81 @@ UINT CountSlash(LPCWSTR lpStr)
 	return nCount - 1;
 }
 
+bool Transcode(LPCWSTR lpSrc, LPWSTR lpDst)
+{
+	LPCWSTR lpExt = NULL;
+	int  nSteps = 0;
+	bool bFound = false;
+
+	for (wchar_t ch; ch = *lpSrc; lpSrc++)
+	{
+		if (lpExt == NULL)
+		{
+			if (ch == '\\')
+			{
+				ch = *++lpSrc;
+
+				if (ch != '\\' && ch != '{' && ch != '}')	// 转义字符只能这几个
+					return false;
+			}
+			else if (ch == '{')
+			{
+				ch = BRACE_L;
+				lpExt = lpSrc + 1;
+			}
+			else if (ch == '}')
+			{
+				return false;	// 没有左花括号配对
+			}
+		}
+		else
+		{
+			if (ch == '\\' || ch == '{')	// 花括号内不能有特殊字符
+				return false;
+
+			if (ch == '}')
+			{
+				int nCount = lpSrc - lpExt;
+				if (nCount == 0 || nCount >= 64)
+					return false;
+
+				// 括号内 '/' 个数
+				int nSlash = 0;
+
+				for (LPCWSTR lp = lpExt; lp != lpSrc; lp++)
+				{
+					if (*lp == '/')
+						nSlash++;
+				}
+
+				if (nSlash == 0)	// 没有 '/'
+				{
+					if (*lpExt < '0' || *lpExt > '9')
+						nSteps++;
+
+					bFound = true;
+				}
+				else if (nSlash == nCount)	// 全是 '/'
+				{
+					if ((nSteps -= nCount) < 0)
+						return false;
+				}
+				else
+					return false;
+
+				ch = BRACE_R;
+				lpExt = NULL;
+			}
+		}
+
+		*lpDst++ = ch;
+	}
+
+	*lpDst = 0;
+
+	return lpExt == NULL && nSteps == 0 && bFound;
+}
+
 }	// namespace
 
 void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
@@ -137,17 +213,11 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 		if (lpSize == NULL && IsRectEmpty(lpRect))
 			break;
 
-		if ((lpTail = wcschr(lpHead, '{')) == NULL)
+		if ((lpTail = wcschr(lpHead, BRACE_L)) == NULL)
 		{
 			ATLASSERT(vecDrawInfos.empty());
 			MyDrawText(drawInfo, dc, lpHead, -1, lpRect, lpSize);
 			break;
-		}
-
-		if (lpTail[1] == '{')
-		{
-			MyDrawText(drawInfo, dc, lpHead, ++lpTail - lpHead, lpRect, lpSize);
-			continue;
 		}
 
 		if (lpHead != lpTail)
@@ -156,7 +226,7 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 			lpHead = lpTail;
 		}
 
-		if ((lpTail = wcschr(lpHead, '}')) == NULL)
+		if ((lpTail = wcschr(lpHead, BRACE_R)) == NULL)
 		{
 			ATLASSERT(0);
 			break;
@@ -229,18 +299,6 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 			}
 			break;
 
-		case 's':
-			if (szText[1] == ' ' && CountNumber(szText + 2, false) <= 4)
-			{
-				nSize = _wtoi(szText + 2);
-
-				if (lpSize)
-					lpSize->cx += nSize;
-				else
-					lpRect->left += nSize;
-			}
-			break;
-
 		case '/':
 			if (nSize = CountSlash(szText))
 			{
@@ -255,6 +313,18 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 				vecDrawInfos.erase(it, vecDrawInfos.end());
 			}
 			break;
+
+		default:
+			if (CountNumber(szText, false) <= 3)
+			{
+				nSize = _wtoi(szText);
+
+				if (lpSize)
+					lpSize->cx += nSize;
+				else
+					lpRect->left += nSize;
+			}
+			break;
 		}
 
 		ATLASSERT(nSize);
@@ -263,24 +333,21 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 
 void CUITextImpl::SetText(LPCWSTR lpText)
 {
-	DoSetText(lpText, false);
-}
-
-void CUITextImpl::SetTextEx(LPCWSTR lpText)
-{
-	DoSetText(lpText, true);
-}
-
-void CUITextImpl::DoSetText(LPCWSTR lpText, bool bTextEx)
-{
 	if (lpText == NULL)
 		lpText = L"";
 
-	if (m_strText == lpText && m_bTextEx == bTextEx)
+	if (wcschr(lpText, '{'))
+	{
+		LPWSTR szText = (LPWSTR)alloca((wcslen(lpText) + 1) * 2);
+
+		if (Transcode(lpText, szText))
+			lpText = szText;
+	}
+
+	if (m_strText == lpText)
 		return;
 
 	m_strText = lpText;
-	m_bTextEx = bTextEx;
 	RecalcSize();
 	Invalidate();
 }
@@ -321,7 +388,7 @@ void CUITextImpl::RecalcSize()
 
 	if (m_strText.size())
 	{
-		if (m_bTextEx)
+		if (wcschr(m_strText.c_str(), BRACE_L))
 		{
 			OnDrawTextEx(CUIDC(CUIComDC(NULL), NULL, false), NULL, &size);
 		}
@@ -350,8 +417,6 @@ void CUITextImpl::OnLoadedText(const IUILoadAttrs &attrs)
 		SetTextColor(color);
 	}
 
-	if (lpStr = attrs.GetStr(L"textEx"))
-		SetTextEx(lpStr);
-	else if (lpStr = attrs.GetStr(L"text"))
+	if (lpStr = attrs.GetStr(L"text"))
 		SetText(lpStr);
 }

@@ -3,7 +3,7 @@
 	<View top="0*" height="46">
 		<Button right="21*" bottom="0" image="关闭.png:3" tooltip="关闭" id="关闭" />
 		<MenuButton right="10*" bottom="0" image="主菜单.png:3" id="主菜单" />
-		<Label right="2" bottom="0" textex="菜单里有{#ff0000}测试{/}功能→" color="#cccccc" />
+		<Label right="2" bottom="0" text="菜单里有{#ff0000}测试{/}功能→" color="#cccccc" />
 	</View>
 	<View bottom="0*" id="底部" visible="0">
 		<Edit left="123" top="27" width="376" height="20" id="21" />

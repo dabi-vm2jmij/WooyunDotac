@@ -93,13 +93,15 @@ HFONT CUIFontMgr::GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnd
 	return GetFont(FontKey(lpszName, nWeight, bItalic, bUnderline));
 }
 
-HFONT CUIFontMgr::GetFont(FontKey &fontKey)
+HFONT CUIFontMgr::GetFont(const FontKey &fontKey)
 {
-	if (*fontKey.m_szFaceName == 0)
-		wcscpy_s(fontKey.m_szFaceName, m_fontKey.m_szFaceName);
+	auto lpszFaceName = fontKey.m_szFaceName;
+	if (*lpszFaceName == 0)
+		lpszFaceName = m_fontKey.m_szFaceName;
 
-	if (fontKey.m_nHeight == 0)
-		fontKey.m_nHeight = m_fontKey.m_nHeight;
+	int nHeight = fontKey.m_nHeight;
+	if (nHeight == 0)
+		nHeight = m_fontKey.m_nHeight;
 
 	EnterCriticalSection(&m_critSect);
 	HFONT hFont = m_mapFonts[fontKey];
@@ -107,7 +109,7 @@ HFONT CUIFontMgr::GetFont(FontKey &fontKey)
 	if (hFont == NULL)
 	{
 		hFont = CreateFontW(
-			fontKey.m_nHeight,			// nHeight
+			nHeight,					// nHeight
 			0,							// nWidth
 			0,							// nEscapement
 			0,							// nOrientation
@@ -120,7 +122,7 @@ HFONT CUIFontMgr::GetFont(FontKey &fontKey)
 			CLIP_DEFAULT_PRECIS,		// nClipPrecision
 			DEFAULT_QUALITY,			// nQuality
 			DEFAULT_PITCH | FF_DONTCARE,// nPitchAndFamily
-			fontKey.m_szFaceName		// lpszFacename
+			lpszFaceName				// lpszFacename
 		);
 
 		m_mapFonts[fontKey] = hFont;

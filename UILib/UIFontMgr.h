@@ -22,7 +22,7 @@ public:
 
 	void  SetFont(LPCWSTR lpszName);
 	HFONT GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline);
-	HFONT GetFont(FontKey &fontKey);
+	HFONT GetFont(const FontKey &fontKey);
 
 private:
 	FontKey m_fontKey;
