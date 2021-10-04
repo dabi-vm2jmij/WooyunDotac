@@ -17,17 +17,17 @@ void CMainFrame::OnFinalMessage(HWND hWnd)
 	PostQuitMessage(0);
 }
 
-void CMainFrame::OnLoadedUI(const IUILoadAttrs &loaded)
+void CMainFrame::OnLoadedUI(const IUIXmlAttrs &attrs)
 {
-	m_imagexBg = UILib::GetImage(loaded.GetStr(L"背景上"));
-	m_imagexBg2 = UILib::GetImage(loaded.GetStr(L"背景下"));
+	m_imagexBg = UILib::GetImage(attrs.GetStr(L"背景上"));
+	m_imagexBg2 = UILib::GetImage(attrs.GetStr(L"背景下"));
 
-	m_pViews[0] = loaded[L"底部"];
+	m_pViews[0] = m_rootView.SearchCast(L"底部");
 	m_pViews[0]->SetHeight(m_imagexBg2.Rect().Height());
-	m_pViews[1] = loaded[L"中部"];
-	m_pViews[2] = loaded[L"中部2"];
+	m_pViews[1] = m_rootView.SearchCast(L"中部");
+	m_pViews[2] = m_rootView.SearchCast(L"中部2");
 
-	CUIMenuButton *pMenuBtn = loaded[L"主菜单"];
+	CUIMenuButton *pMenuBtn = m_rootView.SearchCast(L"主菜单");
 	pMenuBtn->OnGetUIMenu([this]
 	{
 		if (m_uiMenu.GetCount() == 0)
@@ -40,18 +40,18 @@ void CMainFrame::OnLoadedUI(const IUILoadAttrs &loaded)
 		return &m_uiMenu;
 	});
 
-	CUIButton *pButton = loaded[L"安装"];
+	CUIButton *pButton = m_rootView.SearchCast(L"安装");
 	pButton->OnClick([this]{ DoSetup(); });
 
-	CUICheckBox *pChkBox = loaded[L"check1"];
+	CUICheckBox *pChkBox = m_rootView.SearchCast(L"check1");
 	pChkBox->OnClick([pButton](bool bCheck){ pButton->SetEnabled(bCheck); });
 
-	pButton = loaded[L"自定义"];
+	pButton = m_rootView.SearchCast(L"自定义");
 	pButton->OnClick([this, pButton]{ pButton->SetVisible(false); ShowBottom(true); });
 
-	m_pProgress = loaded[L"进度条"];
+	m_pProgress = m_rootView.SearchCast(L"进度条");
 
-	__super::OnLoadedUI(loaded);
+	__super::OnLoadedUI(attrs);
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -106,7 +106,7 @@ LRESULT CMainFrame::OnShowAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &
 {
 	CUIResPath resPath(L"关于");
 
-	CUIPopupWnd *pWnd = new CUIPopupWnd(true);
+	CUISimpleWnd *pWnd = new CUISimpleWnd(true);
 	pWnd->CreateFromXml(L"关于.xml", m_hWnd);
 
 	return 0;

@@ -53,8 +53,7 @@ void CUIComboButton::EndAddChild()
 			return;
 		}
 
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		if (nAlign <= 2)
 		{
@@ -117,7 +116,7 @@ void CUIComboButton::OnChildLeave(CUIButton *pChild)
 	m_bInNotify = false;
 }
 
-void CUIComboButton::OnLoaded(const IUILoadAttrs &attrs)
+void CUIComboButton::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

@@ -1,35 +1,37 @@
 #include "stdafx.h"
 #include "UILoader.h"
+#include "UILibApp.h"
 #include "tinyxml2.h"
+
+class CUILoader
+{
+public:
+	bool Load(CUIStream *pStream, CUIView *pView);
+	bool Load(tinyxml2::XMLElement *pElem, CUIView *pView);
+	HFONT GetFont(LPCWSTR lpIdOrName) const;
+
+private:
+	bool LoadView(tinyxml2::XMLElement *pElem, CUIView *pParent);
+	bool AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent);
+	void InitFont(const IUIXmlAttrs &attrs);
+
+	std::map<wstring, CUIFontMgr::FontKey> m_mapFonts;
+};
 
 namespace
 {
 
-class CUILoadData
+class CUIXmlAttrs : public IUIXmlAttrs
 {
 public:
-	void     SetFont(LPCWSTR lpszId, HFONT hFont);
-	void     SetView(LPCWSTR lpszId, CUIView *pView);
-	HFONT    GetFont(LPCWSTR lpszId) const;
-	CUIView *GetView(LPCWSTR lpszId) const;
+	CUIXmlAttrs(const CUILoader &loader, tinyxml2::XMLElement *pElem);
+
+	virtual LPCWSTR GetStr(LPCWSTR lpKey) const override;
+	virtual bool    GetInt(LPCWSTR lpKey, int *pnValue) const override;
+	virtual HFONT   GetFont(LPCWSTR lpIdOrName) const override;
 
 private:
-	std::map<wstring, HFONT>     m_mapFonts;
-	std::map<wstring, CUIView *> m_mapViews;
-};
-
-class CUILoadAttrs : public IUILoadAttrs
-{
-public:
-	CUILoadAttrs(const CUILoadData &loadData, tinyxml2::XMLElement *pElem);
-
-	virtual LPCWSTR  GetStr(LPCWSTR lpName) const override;
-	virtual bool     GetInt(LPCWSTR lpName, int *pnValue) const override;
-	virtual HFONT    GetFont(LPCWSTR lpszId) const override;
-	virtual CUIView *GetView(LPCWSTR lpszId) const override;
-
-private:
-	const CUILoadData &m_loadData;
+	const CUILoader &m_loader;
 	std::map<wstring, wstring> m_mapAttrs;
 };
 
@@ -40,29 +42,7 @@ wstring StrLower(LPCWSTR lpStr)
 	return strRet;
 }
 
-void CUILoadData::SetFont(LPCWSTR lpszId, HFONT hFont)
-{
-	ATLVERIFY(m_mapFonts.emplace(StrLower(lpszId), hFont).second);
-}
-
-void CUILoadData::SetView(LPCWSTR lpszId, CUIView *pView)
-{
-	ATLVERIFY(m_mapViews.emplace(StrLower(lpszId), pView).second);
-}
-
-HFONT CUILoadData::GetFont(LPCWSTR lpszId) const
-{
-	auto it = m_mapFonts.find(StrLower(lpszId));
-	return it != m_mapFonts.end() ? it->second : NULL;
-}
-
-CUIView *CUILoadData::GetView(LPCWSTR lpszId) const
-{
-	auto it = m_mapViews.find(StrLower(lpszId));
-	return it != m_mapViews.end() ? it->second : NULL;
-}
-
-CUILoadAttrs::CUILoadAttrs(const CUILoadData &loadData, tinyxml2::XMLElement *pElem) : m_loadData(loadData)
+CUIXmlAttrs::CUIXmlAttrs(const CUILoader &loader, tinyxml2::XMLElement *pElem) : m_loader(loader)
 {
 	for (const tinyxml2::XMLAttribute *pAttr = pElem->FirstAttribute(); pAttr; pAttr = pAttr->Next())
 	{
@@ -70,15 +50,15 @@ CUILoadAttrs::CUILoadAttrs(const CUILoadData &loadData, tinyxml2::XMLElement *pE
 	}
 }
 
-LPCWSTR CUILoadAttrs::GetStr(LPCWSTR lpName) const
+LPCWSTR CUIXmlAttrs::GetStr(LPCWSTR lpKey) const
 {
-	auto it = m_mapAttrs.find(StrLower(lpName));
+	auto it = m_mapAttrs.find(StrLower(lpKey));
 	return it != m_mapAttrs.end() ? it->second.c_str() : NULL;
 }
 
-bool CUILoadAttrs::GetInt(LPCWSTR lpName, int *pnValue) const
+bool CUIXmlAttrs::GetInt(LPCWSTR lpKey, int *pnValue) const
 {
-	LPCWSTR lpStr = GetStr(lpName);
+	LPCWSTR lpStr = GetStr(lpKey);
 	if (lpStr == NULL)
 		return false;
 
@@ -95,34 +75,12 @@ bool CUILoadAttrs::GetInt(LPCWSTR lpName, int *pnValue) const
 	return true;
 }
 
-HFONT CUILoadAttrs::GetFont(LPCWSTR lpszId) const
+HFONT CUIXmlAttrs::GetFont(LPCWSTR lpIdOrName) const
 {
-	return m_loadData.GetFont(lpszId);
+	return m_loader.GetFont(lpIdOrName);
 }
 
-CUIView *CUILoadAttrs::GetView(LPCWSTR lpszId) const
-{
-	return m_loadData.GetView(lpszId);
-}
-
-}	// namespace
-
-////////////////////////////////////////////////////////////////////////////////
-
-class CUILoader
-{
-public:
-	bool Load(CUIStream *pStream, CUIView *pView);
-
-private:
-	bool LoadView(tinyxml2::XMLElement *pElem, CUIView *pParent);
-	bool AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent);
-	void InitFont(const IUILoadAttrs &attrs);
-
-	CUILoadData m_loadData;
-};
-
-static bool IsNameClass(LPCSTR lpName, LPCVOID pView)
+bool IsNameClass(LPCSTR lpName, LPCVOID pView)
 {
 	if (lpName == NULL)
 		return false;
@@ -135,6 +93,10 @@ static bool IsNameClass(LPCSTR lpName, LPCVOID pView)
 	return true;
 #endif
 }
+
+}	// namespace
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool CUILoader::Load(CUIStream *pStream, CUIView *pView)
 {
@@ -153,10 +115,15 @@ bool CUILoader::Load(CUIStream *pStream, CUIView *pView)
 	}
 
 	// 解析 xml
+	return Load(pElem, pView);
+}
+
+bool CUILoader::Load(tinyxml2::XMLElement *pElem, CUIView *pView)
+{
 	if (!LoadView(pElem, pView))
 		return false;
 
-	pView->OnLoaded(CUILoadAttrs(m_loadData, pElem));
+	pView->OnLoaded(CUIXmlAttrs(*this, pElem));
 	return true;
 }
 
@@ -174,7 +141,7 @@ bool CUILoader::LoadView(tinyxml2::XMLElement *pElem, CUIView *pParent)
 bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 {
 	LPCSTR lpName = pElem->Value();
-	CUILoadAttrs attrs(m_loadData, pElem);
+	CUIXmlAttrs attrs(*this, pElem);
 
 	if (_stricmp(lpName, "Font") == 0)
 	{
@@ -281,19 +248,21 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddWebTabBar(lpFileName);
 	}
+	else if (auto pItem = pParent->GetRootView()->OnCustomUI(CA2W(lpName, CP_UTF8), pParent))
+	{
+		pParent->AddChild(pItem);
+
+		if ((pView = dynamic_cast<CUIView *>(pItem)) == NULL)
+		{
+			pItem->OnLoaded(attrs);
+			return true;
+		}
+	}
 	else
 	{
-		if ((pView = pParent->GetRootView()->OnCustomUI(CA2W(lpName, CP_UTF8), pParent)) == NULL)
-		{
-			ATLASSERT(0);
-			return false;
-		}
-
-		pParent->AddChild(pView);
+		ATLASSERT(0);
+		return false;
 	}
-
-	if (LPCWSTR lpszId = attrs.GetStr(L"id"))
-		m_loadData.SetView(lpszId, pView);
 
 	if (!LoadView(pElem, pView))
 		return false;
@@ -302,7 +271,7 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	return true;
 }
 
-void CUILoader::InitFont(const IUILoadAttrs &attrs)
+void CUILoader::InitFont(const IUIXmlAttrs &attrs)
 {
 	LPCWSTR lpszId = attrs.GetStr(L"id");
 
@@ -316,13 +285,27 @@ void CUILoader::InitFont(const IUILoadAttrs &attrs)
 		else
 			nWeight = FW_NORMAL;
 
-		HFONT hFont = GetFont(attrs.GetStr(L"name"), nWeight, attrs.GetInt(L"italic"), attrs.GetInt(L"underline"));
-		ATLASSERT(hFont);
-		m_loadData.SetFont(lpszId, hFont);
+		auto lpszName = attrs.GetStr(L"name");
+		auto bItalic = attrs.GetInt(L"italic"), bUnderline = attrs.GetInt(L"underline");
+		ATLVERIFY(m_mapFonts.emplace(std::piecewise_construct, std::forward_as_tuple(StrLower(lpszId)), std::forward_as_tuple(lpszName, nWeight, bItalic, bUnderline)).second);
 	}
 }
 
-bool UILib::LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
+HFONT CUILoader::GetFont(LPCWSTR lpIdOrName) const
+{
+	// 字体名
+	if (wcschr(lpIdOrName, ':'))
+		return GetCachedFont(lpIdOrName);
+
+	// 字体 id
+	auto it = m_mapFonts.find(StrLower(lpIdOrName));
+	return it != m_mapFonts.end() ? g_theApp.GetFontMgr().GetCachedFont(it->second) : NULL;
+}
+
+namespace UILib
+{
+
+bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 {
 	bool bRet = false;
 
@@ -334,4 +317,6 @@ bool UILib::LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 	}
 
 	return bRet;
+}
+
 }

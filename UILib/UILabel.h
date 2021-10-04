@@ -10,7 +10,7 @@ public:
 	virtual ~CUILabel();
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void MyPaint(CUIDC &dc) const override;
 	virtual void OnTextSize(CSize size) override;
 };

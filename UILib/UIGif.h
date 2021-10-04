@@ -17,7 +17,7 @@ protected:
 	void OnUITimer();
 
 	Gdiplus::Image *m_pImage;
-	std::vector<UINT> m_vecElapses;
+	vector<UINT> m_vecElapses;
 	bool     m_bLoop;
 	UINT     m_nFrameIdx;
 	CUITimer m_uiTimer;

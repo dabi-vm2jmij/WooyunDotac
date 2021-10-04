@@ -9,7 +9,7 @@ class CUIMoreView : public CUIRootView
 public:
 	CUIMoreView(IUIWindow *pOwner);
 
-	void InitItems(const std::vector<CUIBase *> &pItems);
+	void InitItems(const vector<CUIBase *> &pItems);
 	void ClearItems();
 	void CalcSize(LPSIZE lpSize) const;
 

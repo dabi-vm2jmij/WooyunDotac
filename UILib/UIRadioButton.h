@@ -14,7 +14,7 @@ public:
 	bool IsChecked() const { return m_bKeepEnter; }
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void OnLButtonUp(CPoint point) override;
 	virtual void OnCheck();
 };

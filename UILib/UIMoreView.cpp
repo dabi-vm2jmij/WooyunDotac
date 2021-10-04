@@ -5,7 +5,7 @@ CUIMoreView::CUIMoreView(IUIWindow *pOwner) : CUIRootView(pOwner)
 {
 }
 
-void CUIMoreView::InitItems(const std::vector<CUIBase *> &pItems)
+void CUIMoreView::InitItems(const vector<CUIBase *> &pItems)
 {
 	for (auto pItem : pItems)
 	{
@@ -44,8 +44,7 @@ void CUIMoreView::RecalcLayout(LPRECT lpClipRect)
 
 	for (auto pItem : m_vecChilds)
 	{
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		CRect rcItem(rect);
 		rcItem.right = rect.left + size.cx;
@@ -74,8 +73,7 @@ void CUIMoreView::CalcSize(LPSIZE lpSize) const
 
 	for (auto pItem : m_vecChilds)
 	{
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		if (nWidth < size.cx)
 			nWidth = size.cx;

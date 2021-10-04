@@ -17,7 +17,7 @@ void CUIMenuButton::OnLButtonDown(CPoint point)
 	GetPopupPos(rect);
 
 	m_bKeepEnter = true;
-	m_fnGetUIMenu()->Popup(GetRootView()->GetOwnerWnd(), rect.left, rect.top, rect.right, rect.bottom, true);
+	m_fnGetUIMenu()->Popup(GetRootView()->GetHwnd(), rect.left, rect.top, rect.right, rect.bottom, true);
 	m_bKeepEnter = false;
 
 	if (GetAsyncKeyState(VK_LBUTTON) >= 0)	// 通过键盘关闭菜单
@@ -31,8 +31,7 @@ void CUIMenuButton::OnLButtonDown(CPoint point)
 
 void CUIMenuButton::GetPopupPos(LPRECT lpRect)
 {
-	CRect rect;
-	GetWindowRect(rect);
+	CRect rect = GetWindowRect();
 
 	lpRect->left = rect.left;
 	lpRect->top = rect.bottom;

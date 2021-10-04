@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UITimer.h"
 
-CUITimer::CUITimer(std::function<void()> &&fnOnTimer) : m_fnOnTimer(std::move(fnOnTimer)), m_pThunk(NULL), m_nTimerId(0)
+CUITimer::CUITimer(function<void()> &&fnOnTimer) : m_fnOnTimer(std::move(fnOnTimer)), m_pThunk(NULL), m_nTimerId(0)
 {
 }
 
@@ -13,10 +13,10 @@ CUITimer::CUITimer(CUITimer &&_Right) : m_pThunk(_Right.m_pThunk), m_nTimerId(_R
 
 CUITimer::~CUITimer()
 {
-	Kill();
+	Stop();
 }
 
-bool CUITimer::Set(UINT nElapse)
+bool CUITimer::Start(UINT nElapse)
 {
 	if (m_pThunk == NULL && (m_pThunk = new _stdcallthunk) == NULL)
 		return false;
@@ -27,11 +27,11 @@ bool CUITimer::Set(UINT nElapse)
 	if (m_nTimerId = SetTimer(NULL, m_nTimerId, nElapse, (TIMERPROC)m_pThunk->GetCodeAddress()))
 		return true;
 
-	Kill();
+	Stop();
 	return false;
 }
 
-void CUITimer::Kill()
+void CUITimer::Stop()
 {
 	if (m_nTimerId)
 	{

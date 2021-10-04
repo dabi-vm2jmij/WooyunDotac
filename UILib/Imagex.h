@@ -1,6 +1,6 @@
 #pragma once
 
-typedef std::shared_ptr<CImage> CImagePtr;
+using CImagePtr = std::shared_ptr<CImage>;
 
 /*
 封装线程安全的 CImage，并记录每个图片所在的区域，比如4态 button 对应的图片为：

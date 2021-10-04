@@ -14,12 +14,12 @@ public:
 	void CloseMoreWnd();
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual void OnMoreBtn();
 	int  GetMoreIndex() const;
 
 	COLORREF m_moreBg;
 	HWND     m_hMoreWnd;
-	std::vector<CUIBase *> m_vecMoreItems;
+	vector<CUIBase *> m_vecMoreItems;
 };

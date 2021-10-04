@@ -60,7 +60,7 @@ void CUICheckBox::OnCheckChanged()
 	InvalidateRect(NULL);
 }
 
-void CUICheckBox::OnLoaded(const IUILoadAttrs &attrs)
+void CUICheckBox::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

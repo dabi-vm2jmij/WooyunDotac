@@ -21,11 +21,11 @@ public:
 	void SetReadonly(bool bReadonly) { m_bReadonly = bReadonly; }
 	void SetMaxBytes(WORD nMaxLen) { m_nMaxLen = nMaxLen | 0x10000; }
 	void SetMaxChars(WORD nMaxLen) { m_nMaxLen = nMaxLen; }
-	void SetFilter(std::function<void(LPWSTR)> &&fnFilter) { m_fnFilter = std::move(fnFilter); }
-	void OnKeyReturn(std::function<void()> &&fnOnReturn) { m_fnOnReturn = std::move(fnOnReturn); }
+	void SetFilter(function<void(LPWSTR)> &&fnFilter) { m_fnFilter = std::move(fnFilter); }
+	void OnKeyReturn(function<void()> &&fnOnReturn) { m_fnOnReturn = std::move(fnOnReturn); }
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void MyPaint(CUIDC &dc) const override;
 	virtual void OnEnabled(bool bEnabled) override;
@@ -72,8 +72,8 @@ protected:
 	COLORREF m_color;
 	CPoint   m_ptCaret;
 	CUITimer m_uiTimer;
-	std::function<void(LPWSTR)> m_fnFilter;
-	std::function<void()> m_fnOnReturn;
+	function<void(LPWSTR)> m_fnFilter;
+	function<void()> m_fnOnReturn;
 
 	struct
 	{
@@ -93,4 +93,5 @@ private:
 	void MyDestroyCaret();
 	void MySetCaretPos();
 	void OnUITimer();
+	CPoint GetBasePoint() const;	// rootView 相对于 hWnd 的坐标
 };

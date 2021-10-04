@@ -133,7 +133,7 @@ void CUIControl::SetCurImage(const CImagex &imagex)
 	}
 }
 
-void CUIControl::OnLoaded(const IUILoadAttrs &attrs)
+void CUIControl::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

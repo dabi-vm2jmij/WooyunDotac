@@ -29,8 +29,7 @@ CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
 
 	for (auto pItem : m_vecChilds)
 	{
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		if (nMaxHeight < size.cy)
 			nMaxHeight = size.cy;
@@ -92,8 +91,7 @@ void CUISlider::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 void CUISlider::OnLButtonDown(CPoint point)
 {
 	// 移动滑块中心到点击处
-	CSize size;
-	m_pButton->GetSize(&size);
+	CSize size = m_pButton->GetSize();
 	ResetOffset(point.x - m_rect.left - size.cx / 2, true);
 
 	// 立即重新布局滑块
@@ -116,8 +114,7 @@ void CUISlider::OnChildMoving(CUIControl *, CPoint point)
 
 void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 {
-	CSize size;
-	m_pButton->GetSize(&size);
+	CSize size = m_pButton->GetSize();
 
 	int nWidth = m_rect.Width() - size.cx;
 	if (nWidth <= 0)
@@ -145,7 +142,7 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 		m_fnOnChanged(GetCurPos());
 }
 
-void CUISlider::OnLoaded(const IUILoadAttrs &attrs)
+void CUISlider::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

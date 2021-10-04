@@ -40,7 +40,7 @@ void CUICheckButton::OnLButtonUp(CPoint point)
 		m_fnOnClick(m_bKeepEnter);
 }
 
-void CUICheckButton::OnLoaded(const IUILoadAttrs &attrs)
+void CUICheckButton::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

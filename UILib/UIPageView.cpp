@@ -87,8 +87,7 @@ void CUIPageView::RecalcLayout(LPRECT lpClipRect)
 	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
 		return;
 
-	CSize size;
-	m_vecChilds[0]->GetSize(&size);
+	CSize size = m_vecChilds[0]->GetSize();
 
 	CRect rect(m_rect);
 	rect.left += (int)(m_rect.Width() - (size.cx + m_nSpace) * m_vecChilds.size() + m_nSpace) / 2;
@@ -101,7 +100,7 @@ void CUIPageView::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIPageView::OnLoaded(const IUILoadAttrs &attrs)
+void CUIPageView::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

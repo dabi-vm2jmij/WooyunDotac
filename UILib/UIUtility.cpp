@@ -172,17 +172,17 @@ void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc,
 
 void SetDefaultFont(LPCWSTR lpszName)
 {
-	g_theApp.GetFontMgr().SetFont(lpszName);
+	g_theApp.GetFontMgr().SetDefaultFont(lpszName);
 }
 
 HFONT GetDefaultFont()
 {
-	return GetFont(NULL);
+	return GetCachedFont(NULL);
 }
 
-HFONT GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline)
+HFONT GetCachedFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline)
 {
-	return g_theApp.GetFontMgr().GetFont(lpszName, nWeight, bItalic, bUnderline);
+	return g_theApp.GetFontMgr().GetCachedFont(lpszName, nWeight, bItalic, bUnderline);
 }
 
 void ScaleImage(const CImage &imgSrc, CImage &imgDst, int nWidth, int nHeight)

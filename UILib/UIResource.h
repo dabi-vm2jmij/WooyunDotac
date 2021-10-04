@@ -25,7 +25,7 @@ private:
 
 	DWORD m_dwTlsIndex;
 	CRITICAL_SECTION m_critSect;
-	std::vector<CUISkin *> m_vecSkins;
+	vector<CUISkin *> m_vecSkins;
 
 	struct ImgInfo
 	{

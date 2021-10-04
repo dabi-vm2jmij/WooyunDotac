@@ -74,8 +74,7 @@ int CUIScrollView::CalcHeight() const
 
 	for (auto pItem : m_vecChilds)
 	{
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		if (FRIEND(pItem)->m_offset.top >> 16)
 		{

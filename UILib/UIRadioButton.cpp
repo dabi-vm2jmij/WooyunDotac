@@ -41,10 +41,17 @@ void CUIRadioButton::OnLButtonUp(CPoint point)
 
 void CUIRadioButton::OnCheck()
 {
-	GetParent()->OnRadioCheck(this);
+	for (auto pItem : GetParent()->GetChilds())
+	{
+		if (CUIRadioButton *pRadio = dynamic_cast<CUIRadioButton *>(pItem))
+		{
+			if (pRadio != this)
+				pRadio->SetCheck(false);
+		}
+	}
 }
 
-void CUIRadioButton::OnLoaded(const IUILoadAttrs &attrs)
+void CUIRadioButton::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

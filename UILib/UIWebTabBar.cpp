@@ -101,8 +101,7 @@ void CUIWebTabBar::RecalcLayout(LPRECT lpClipRect)
 
 void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
 {
-	CRect rect;
-	pCtrl->GetClientRect(rect);
+	CRect rect = pCtrl->GetClientRect();
 
 	if (point.x < m_rect.left)
 		point.x = m_rect.left;
@@ -126,9 +125,7 @@ void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
 			continue;
 		}
 
-		m_vecChilds[i]->GetClientRect(rect);
-		int nCenter = (rect.left + rect.right) / 2;
-
+		int nCenter = m_vecChilds[i]->GetClientRect().CenterPoint().x;
 		if (nCenter > point.x && nCenter <= nRight)
 			nNewIndex = i;
 	}
@@ -155,7 +152,7 @@ void CUIWebTabBar::OnChildMoved(CUIControl *pCtrl, CPoint point)
 	pCtrl->SetLeft(MAXINT16);
 }
 
-void CUIWebTabBar::OnLoaded(const IUILoadAttrs &attrs)
+void CUIWebTabBar::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

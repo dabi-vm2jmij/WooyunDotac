@@ -16,7 +16,7 @@ public:
 	void Reset();
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	void OnUITimer();
 
 	UINT     m_nElapse;

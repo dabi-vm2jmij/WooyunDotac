@@ -38,7 +38,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		return TRUE;
 
 	case WM_CREATE:
-		if (GetWindowLong(GetOwnerWnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
+		if (GetWindowLong(GetHwnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
 			m_bLayered = true;
 		break;
 
@@ -48,7 +48,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			OnSize(lParam);
 
 			if (m_bLayered)
-				OnPaintLayered(CUIClientDC(GetOwnerWnd()));
+				OnPaintLayered(CUIClientDC(GetHwnd()));
 		}
 		break;
 
@@ -90,7 +90,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_MOUSEMOVE:
 		if (!m_bMouseEnter)
 		{
-			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, GetOwnerWnd() };
+			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, GetHwnd() };
 			m_bMouseEnter = TrackMouseEvent(&tme) != 0;
 		}
 
@@ -109,7 +109,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		if (m_hToolTip)
 		{
 			MSG msg;
-			msg.hwnd = GetOwnerWnd();
+			msg.hwnd = GetHwnd();
 			msg.message = uMsg;
 			msg.wParam = wParam;
 			msg.lParam = lParam;
@@ -149,7 +149,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		{
 			m_pCurFocus->OnKillFocus();
 
-			if (wParam && ::IsChild(GetOwnerWnd(), (HWND)wParam))
+			if (wParam && ::IsChild(GetHwnd(), (HWND)wParam))
 				m_pCurFocus = NULL;
 		}
 		break;
@@ -193,7 +193,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	return FALSE;
 }
 
-HWND CUIRootView::GetOwnerWnd() const
+HWND CUIRootView::GetHwnd() const
 {
 	return m_pOwner->GetHwnd();
 }
@@ -206,7 +206,7 @@ void CUIRootView::SetWndAlpha(BYTE nWndAlpha)
 	m_nWndAlpha = nWndAlpha;
 
 	if (m_bLayered)
-		OnPaintLayered(CUIClientDC(GetOwnerWnd()));
+		OnPaintLayered(CUIClientDC(GetHwnd()));
 }
 
 bool CUIRootView::OnNcHitTest(CPoint point)
@@ -250,7 +250,7 @@ void CUIRootView::OnSize(CSize size)
 
 void CUIRootView::OnPaint()
 {
-	CUIPaintDC dc(GetOwnerWnd());
+	CUIPaintDC dc(GetHwnd());
 
 	if (m_bLayered)
 		OnPaintLayered(dc);
@@ -277,7 +277,7 @@ void CUIRootView::OnPaintLayered(HDC hDC)
 	}
 
 	BLENDFUNCTION bf = { AC_SRC_OVER, 0, m_nWndAlpha, AC_SRC_ALPHA };
-	UpdateLayeredWindow(GetOwnerWnd(), hDC, NULL, &m_rect.Size(), hImgDC, &CPoint(), 0, &bf, ULW_ALPHA);
+	UpdateLayeredWindow(GetHwnd(), hDC, NULL, &m_rect.Size(), hImgDC, &CPoint(), 0, &bf, ULW_ALPHA);
 	m_imageWnd.ReleaseDC();
 }
 
@@ -354,7 +354,7 @@ void CUIRootView::RaiseMouseMove()
 	UIHitTest hitTest;
 	GetCursorPos(&hitTest.point);
 
-	if (WindowFromPoint(hitTest.point) == GetOwnerWnd())
+	if (WindowFromPoint(hitTest.point) == GetHwnd())
 	{
 		ScreenToClient(&hitTest.point);
 		OnHitTest(hitTest);
@@ -443,18 +443,18 @@ void CUIRootView::InvalidateRect(LPCRECT lpRect)
 	if (rect.IsRectEmpty())
 		return;
 
-	::InvalidateRect(GetOwnerWnd(), rect, TRUE);
+	::InvalidateRect(GetHwnd(), rect, TRUE);
 	m_rectClip |= rect;
 }
 
 BOOL CUIRootView::ClientToScreen(LPPOINT lpPoint)
 {
-	return ::ClientToScreen(GetOwnerWnd(), lpPoint);
+	return ::ClientToScreen(GetHwnd(), lpPoint);
 }
 
 BOOL CUIRootView::ScreenToClient(LPPOINT lpPoint)
 {
-	return ::ScreenToClient(GetOwnerWnd(), lpPoint);
+	return ::ScreenToClient(GetHwnd(), lpPoint);
 }
 
 void CUIRootView::SetCapture(CUIControl *pCtrl)
@@ -463,7 +463,7 @@ void CUIRootView::SetCapture(CUIControl *pCtrl)
 		return;
 
 	if (m_pCapture = pCtrl)
-		::SetCapture(GetOwnerWnd());
+		::SetCapture(GetHwnd());
 	else
 		::ReleaseCapture();
 }
@@ -482,7 +482,7 @@ void CUIRootView::SetFocus(CUIControl *pCtrl)
 	if (pOldFocus)
 		pOldFocus->OnKillFocus();
 	else
-		::SetFocus(GetOwnerWnd());
+		::SetFocus(GetHwnd());
 
 	if (pCtrl)
 		pCtrl->OnSetFocus();
@@ -491,7 +491,7 @@ void CUIRootView::SetFocus(CUIControl *pCtrl)
 void CUIRootView::EnableImm(bool bEnabled)
 {
 	if (!m_hImc == !bEnabled)
-		m_hImc = ImmAssociateContext(GetOwnerWnd(), m_hImc);
+		m_hImc = ImmAssociateContext(GetHwnd(), m_hImc);
 }
 
 void CUIRootView::AddTabsEdit(CUIEdit *pEdit)
@@ -572,7 +572,7 @@ void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
 
 	if (lpTipText && *lpTipText)
 	{
-		HWND hWnd = GetOwnerWnd();
+		HWND hWnd = GetHwnd();
 
 		TOOLINFOW ti = { sizeof(ti) };
 		ti.uFlags    = TTF_IDISHWND;
@@ -599,12 +599,12 @@ void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
 	}
 }
 
-CUIView *CUIRootView::OnCustomUI(LPCWSTR lpName, CUIView *pParent)
+CUIBase *CUIRootView::OnCustomUI(LPCWSTR lpName, CUIView *pParent)
 {
 	return m_pOwner->OnCustomUI(lpName, pParent);
 }
 
-void CUIRootView::OnLoaded(const IUILoadAttrs &attrs)
+void CUIRootView::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

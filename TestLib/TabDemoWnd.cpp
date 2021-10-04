@@ -149,11 +149,11 @@ void CTabDemoWnd::InitUI()
 
 	pBtnDel->OnClick([pView2]
 	{
-		if (pView2->GetCount() == 0)
+		if (pView2->GetChilds().size() == 0)
 			return;
 
-		int nIndex = GetTickCount() % pView2->GetCount();
-		pView2->RemoveChild(pView2->GetChild(nIndex));
+		UINT nIndex = GetTickCount() % pView2->GetChilds().size();
+		pView2->RemoveChild(pView2->GetChilds()[nIndex]);
 	});
 }
 

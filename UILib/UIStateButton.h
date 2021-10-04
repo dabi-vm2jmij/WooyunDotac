@@ -10,15 +10,15 @@ public:
 	CUIStateButton(CUIView *pParent);
 	virtual ~CUIStateButton();
 
-	void OnClick(std::function<void(int)> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
+	void OnClick(function<void(int)> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 	void SetState(int nState);
 	void EndAddChild();
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual void OnChildClick();
 
 	int  m_nState;
-	std::function<void(int)> m_fnOnClick;
+	function<void(int)> m_fnOnClick;
 };

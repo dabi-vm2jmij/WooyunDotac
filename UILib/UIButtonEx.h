@@ -17,7 +17,7 @@ public:
 	void SetUnderline(bool bUnderline) { m_bUnderline = bUnderline; }
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void MyPaint(CUIDC &dc) const override;
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;

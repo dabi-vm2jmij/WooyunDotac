@@ -8,13 +8,13 @@ public:
 	CUIWindow() : m_rootView(this), m_hWndParent(NULL), m_nBorderSize(0), m_nCaptionHeight(0), m_pBtnMax(NULL) {}
 	virtual ~CUIWindow() = default;
 
-	CUIRootView &GetRootView() { return m_rootView; }
+	CUIRootView *GetRootView() { return &m_rootView; }
 	bool CreateFromXml(LPCWSTR lpXmlName, HWND hParent = NULL);
 	virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0) override;
 
 protected:
 	virtual void OnFinalMessage(HWND hWnd) override { delete this; }
-	virtual void OnLoadedUI(const IUILoadAttrs &attrs) override;
+	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 	virtual void OnClose() { DefWindowProc(); }
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) { return DefWindowProc(); }
@@ -43,20 +43,20 @@ inline bool CUIWindow::CreateFromXml(LPCWSTR lpXmlName, HWND hParent)
 	return UILib::LoadFromXml(lpXmlName, &m_rootView);
 }
 
-inline void CUIWindow::OnLoadedUI(const IUILoadAttrs &attrs)
+inline void CUIWindow::OnLoadedUI(const IUIXmlAttrs &attrs)
 {
 	m_nBorderSize = attrs.GetInt(L"border");
 	m_nCaptionHeight = attrs.GetInt(L"caption");
 
-	CUIButton *pButton = dynamic_cast<CUIButton *>(attrs.GetView(L"关闭"));
+	CUIButton *pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"关闭"));
 	if (pButton)
 		pButton->OnClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_CLOSE); });
 
-	pButton = dynamic_cast<CUIButton *>(attrs.GetView(L"最小化"));
+	pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"最小化"));
 	if (pButton)
 		pButton->OnClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
 
-	m_pBtnMax = dynamic_cast<CUIStateButton *>(attrs.GetView(L"最大化"));
+	m_pBtnMax = dynamic_cast<CUIStateButton *>(m_rootView.Search(L"最大化"));
 	if (m_pBtnMax)
 		m_pBtnMax->OnClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
 

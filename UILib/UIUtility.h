@@ -17,7 +17,7 @@ inline UINT SplitImage(LPCWSTR lpFileName, CImagex (&imagexs)[nCount]) { return 
 UILIB_API void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int));
 UILIB_API void SetDefaultFont(LPCWSTR lpszName);
 UILIB_API HFONT GetDefaultFont();
-UILIB_API HFONT GetFont(LPCWSTR lpszName, int nWeight = FW_NORMAL, BYTE bItalic = FALSE, BYTE bUnderline = FALSE);
+UILIB_API HFONT GetCachedFont(LPCWSTR lpszName, int nWeight = FW_NORMAL, BYTE bItalic = FALSE, BYTE bUnderline = FALSE);
 UILIB_API void ScaleImage(const CImage &imgSrc, CImage &imgDst, int nWidth, int nHeight);
 UILIB_API void FormatPath(LPWSTR lpDstPath, LPCWSTR lpSrcPath);
 UILIB_API bool StrToColor(LPCWSTR lpStr, COLORREF &color);

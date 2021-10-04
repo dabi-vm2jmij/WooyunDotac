@@ -37,12 +37,12 @@ void CUIAnimation::Start(bool bLoop)
 		return;
 
 	m_bLoop = bLoop;
-	m_uiTimer.Set(m_nElapse);
+	m_uiTimer.Start(m_nElapse);
 }
 
 void CUIAnimation::Stop()
 {
-	m_uiTimer.Kill();
+	m_uiTimer.Stop();
 }
 
 void CUIAnimation::Reset()
@@ -56,7 +56,7 @@ void CUIAnimation::Reset()
 	Stop();
 }
 
-void CUIAnimation::OnLoaded(const IUILoadAttrs &attrs)
+void CUIAnimation::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

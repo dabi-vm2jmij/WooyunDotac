@@ -1,6 +1,6 @@
 #pragma once
 
-class IUILoadAttrs;
+class IUIXmlAttrs;
 
 class UILIB_API CUIBase
 {
@@ -11,6 +11,9 @@ public:
 	CUIBase(CUIView *pParent);
 	virtual ~CUIBase();
 
+	void SetId(const wstring &strId) { m_strId = strId; }
+	void SetId(wstring &&strId) { m_strId = std::move(strId); }
+	LPCWSTR GetId() const { return m_strId.c_str(); }
 	void SetLeft(int nLeft, bool bClip = false);
 	void SetRight(int nRight, bool bClip = false);
 	void SetTop(int nTop, bool bClip = false);
@@ -18,9 +21,9 @@ public:
 	void SetWidth(int nWidth);
 	void SetHeight(int nHeight);
 	void SetSize(CSize size);
-	void GetSize(LPSIZE lpSize) const;
-	void GetClientRect(LPRECT lpRect) const;
-	void GetWindowRect(LPRECT lpRect) const;
+	CSize GetSize() const { return m_size; }
+	CRect GetClientRect() const { return m_rect; }
+	CRect GetWindowRect() const;
 	void SetBgColor(COLORREF color) { m_colorBg = color; }
 	void SetEnabled(bool bEnabled);
 	void SetVisible(bool bVisible);
@@ -65,7 +68,8 @@ protected:
 		}
 	};
 
-	virtual void OnLoaded(const IUILoadAttrs &attrs);
+	virtual CUIBase *DoSearch(LPCWSTR lpszId, UINT nDepth) const;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs);
 	virtual bool OnHitTest(UIHitTest &hitTest) { return false; }
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
 	virtual void OnPaint(CUIDC &dc) const {}
@@ -82,6 +86,7 @@ protected:
 	CRect     m_offset;		// 对齐和偏移，左右互斥、上下互斥
 	CSize     m_size;		// 宽或高小于零为自适应
 	CRect     m_rect;		// 完整区域，包括不可见部分
+	wstring   m_strId;
 	COLORREF  m_colorBg;
 	bool      m_bEnabled;
 	bool      m_bVisible;

@@ -41,5 +41,5 @@ protected:
 	virtual void DrawBg(CUIDC &dc, LPCRECT lpRect);
 	virtual void DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected);
 
-	std::vector<Item> m_vecItems;
+	vector<Item> m_vecItems;
 };

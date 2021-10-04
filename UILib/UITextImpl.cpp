@@ -77,7 +77,7 @@ struct DrawInfo
 
 void MyDrawText(const DrawInfo &drawInfo, CUIDC &dc, LPCWSTR lpText, int nSize, LPRECT lpRect, LPSIZE lpSize)
 {
-	dc.SelectFont(g_theApp.GetFontMgr().GetFont(drawInfo.m_fontKey));
+	dc.SelectFont(g_theApp.GetFontMgr().GetCachedFont(drawInfo.m_fontKey));
 
 	CRect rect;
 	DrawTextW(dc, lpText, nSize, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
@@ -205,7 +205,7 @@ bool Transcode(LPCWSTR lpSrc, LPWSTR lpDst)
 void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 {
 	dc.SelectFont(m_hFont);
-	std::vector<DrawInfo> vecDrawInfos;
+	vector<DrawInfo> vecDrawInfos;
 	DrawInfo drawInfo((HFONT)GetCurrentObject(dc, OBJ_FONT), m_color);
 
 	for (LPCWSTR lpHead = m_strText.c_str(), lpTail; *lpHead; lpHead = lpTail + 1)
@@ -404,7 +404,7 @@ void CUITextImpl::RecalcSize()
 		OnTextSize(m_sizeText = size);
 }
 
-void CUITextImpl::OnLoadedText(const IUILoadAttrs &attrs)
+void CUITextImpl::OnLoadedText(const IUIXmlAttrs &attrs)
 {
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"font"))

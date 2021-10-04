@@ -16,7 +16,7 @@ public:
 	void SetToolTip(LPCWSTR lpText) { m_strToolTip = lpText ? lpText : L""; }
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void OnPaint(CUIDC &dc) const override;

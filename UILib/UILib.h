@@ -16,6 +16,8 @@
 #include <memory>
 #include <vector>
 
+using std::function;
+using std::vector;
 using std::string;
 using std::wstring;
 
@@ -55,4 +57,4 @@ using std::wstring;
 #include "UIRootView.h"
 #include "UILoader.h"
 #include "UIUtility.h"
-#include "UIPopupWnd.h"
+#include "UISimpleWnd.h"

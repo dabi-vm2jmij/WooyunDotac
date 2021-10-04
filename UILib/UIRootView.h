@@ -5,8 +5,8 @@
 class IUIWindow
 {
 public:
-	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) { return NULL; }
-	virtual void OnLoadedUI(const IUILoadAttrs &attrs) {}
+	virtual CUIBase *OnCustomUI(LPCWSTR lpName, CUIView *pParent) { return NULL; }
+	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) {}
 	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const {}
 	virtual HWND GetHwnd() const = 0;
 };
@@ -19,7 +19,7 @@ public:
 	virtual ~CUIRootView();
 
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
-	HWND GetOwnerWnd() const;
+	HWND GetHwnd() const;
 	void SetWndAlpha(BYTE nWndAlpha);
 	void DoPaint(HDC hDC, LPCRECT lpClipRect) const;
 	void RaiseMouseMove();
@@ -29,12 +29,12 @@ public:
 	virtual void InvalidateRect(LPCRECT lpRect);
 	virtual BOOL ClientToScreen(LPPOINT lpPoint);
 	virtual BOOL ScreenToClient(LPPOINT lpPoint);
-	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
+	CUIBase *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
 	CUIControl *GetCapture() const { return m_pCapture; }
 
 protected:
 	virtual void ShowToolTip(LPCWSTR lpTipText);
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	bool OnNcHitTest(CPoint point);
 	void OnSize(CSize size);
 	void OnPaint();
@@ -58,6 +58,31 @@ protected:
 	wstring     m_strTipText;
 	CUIControl *m_pCapture;
 	CUIControl *m_pCurFocus;
-	std::vector<CUIEdit *> m_vecEdits;
-	std::vector<CUIBase *> m_vecEnterItems;
+	vector<CUIEdit *> m_vecEdits;
+	vector<CUIBase *> m_vecEnterItems;
+
+private:
+	// 自动类型转换
+	class CUICast
+	{
+	public:
+		CUICast(CUIBase *ptr) : m_ptr(ptr) {}
+
+		template<typename T>
+		operator T *() const
+		{
+			T *ptr = dynamic_cast<T *>(m_ptr);
+			ATLASSERT(ptr);
+			return ptr;
+		}
+
+	private:
+		CUIBase *m_ptr;
+	};
+
+public:
+	CUICast SearchCast(LPCWSTR lpszId) const
+	{
+		return Search(lpszId);
+	}
 };

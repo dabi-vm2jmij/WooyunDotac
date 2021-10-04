@@ -165,7 +165,7 @@
     <ClInclude Include="UIWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIPopupWnd.h">
+    <ClInclude Include="UISimpleWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

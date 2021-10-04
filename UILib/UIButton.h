@@ -10,7 +10,7 @@ public:
 	CUIButton(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIButton();
 
-	void OnClick(std::function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
+	void OnClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 
 protected:
 	virtual void OnEnabled(bool bEnabled) override;
@@ -24,5 +24,5 @@ protected:
 
 	CImagex m_imagexs[4];
 	UINT    m_nDrawState;
-	std::function<void()> m_fnOnClick;
+	function<void()> m_fnOnClick;
 };

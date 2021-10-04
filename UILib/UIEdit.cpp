@@ -292,10 +292,10 @@ void CUIEdit::OnRButtonUp(CPoint point)
 	}
 
 	// 弹出菜单时光标暂停
-	m_uiTimer.Kill();
-	UINT nCmdId = pUIMenu->Popup(GetRootView()->GetOwnerWnd(), point.x, point.y, MAXINT16, point.y);
+	m_uiTimer.Stop();
+	UINT nCmdId = pUIMenu->Popup(GetRootView()->GetHwnd(), point.x, point.y, MAXINT16, point.y);
 	delete pUIMenu;
-	m_uiTimer.Set(GetCaretBlinkTime());
+	m_uiTimer.Start(GetCaretBlinkTime());
 
 	switch (nCmdId)
 	{
@@ -348,7 +348,7 @@ void CUIEdit::OnKillFocus()
 
 void CUIEdit::OnInputLangChange(UINT nLocaleId)
 {
-	HWND hWnd = GetRootView()->GetOwnerWnd();
+	HWND hWnd = GetRootView()->GetHwnd();
 	HIMC hImc = ImmGetContext(hWnd);
 
 	if (hImc)
@@ -357,7 +357,7 @@ void CUIEdit::OnInputLangChange(UINT nLocaleId)
 		GetObjectW(m_hFont, sizeof(lf), &lf);
 		ImmSetCompositionFontW(hImc, &lf);
 
-		COMPOSITIONFORM compForm = { CFS_POINT, m_ptCaret };
+		COMPOSITIONFORM compForm = { CFS_POINT, m_ptCaret + GetBasePoint() };
 		ImmSetCompositionWindow(hImc, &compForm);
 		ImmReleaseContext(hWnd, hImc);
 	}
@@ -741,7 +741,7 @@ void CUIEdit::Insert(LPWSTR lpText)
 
 void CUIEdit::MyCreateCaret()
 {
-	HWND hWnd = GetRootView()->GetOwnerWnd();
+	HWND hWnd = GetRootView()->GetHwnd();
 	HIMC hImc = ImmGetContext(hWnd);
 
 	if (hImc)
@@ -761,7 +761,7 @@ void CUIEdit::MyDestroyCaret()
 	if (m_bCaret)
 		OnUITimer();
 
-	m_uiTimer.Kill();
+	m_uiTimer.Stop();
 }
 
 void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
@@ -830,16 +830,16 @@ void CUIEdit::MySetCaretPos()
 	if (m_bCaret)
 		OnUITimer();
 
-	m_uiTimer.Set(GetCaretBlinkTime());
+	m_uiTimer.Start(GetCaretBlinkTime());
 	m_ptCaret = point;
 	OnUITimer();
 
-	HWND hWnd = GetRootView()->GetOwnerWnd();
+	HWND hWnd = GetRootView()->GetHwnd();
 	HIMC hImc = ImmGetContext(hWnd);
 
 	if (hImc)
 	{
-		COMPOSITIONFORM compForm = { CFS_POINT, point };
+		COMPOSITIONFORM compForm = { CFS_POINT, point + GetBasePoint() };
 		ImmSetCompositionWindow(hImc, &compForm);
 		ImmReleaseContext(hWnd, hImc);
 	}
@@ -849,6 +849,15 @@ void CUIEdit::OnUITimer()
 {
 	m_bCaret = !m_bCaret;
 	InvalidateRect(CRect(m_ptCaret, CSize(1, m_nHeight)));
+}
+
+CPoint CUIEdit::GetBasePoint() const
+{
+	CPoint point;
+	auto pRootView = GetRootView();
+	pRootView->ClientToScreen(&point);
+	ScreenToClient(pRootView->GetHwnd(), &point);
+	return point;
 }
 
 void CUIEdit::CheckMaxText(LPCWSTR lpExist, LPWSTR lpText) const
@@ -889,7 +898,7 @@ void CUIEdit::CheckMaxText(LPCWSTR lpExist, LPWSTR lpText) const
 	}
 }
 
-void CUIEdit::OnLoaded(const IUILoadAttrs &attrs)
+void CUIEdit::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

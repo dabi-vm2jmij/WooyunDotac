@@ -20,8 +20,7 @@ CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameB
 
 	for (auto pItem : m_vecChilds)
 	{
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		if (nMaxWidth < size.cx)
 			nMaxWidth = size.cx;
@@ -106,8 +105,7 @@ void CUIVScroll::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 
 void CUIVScroll::OnLButtonDown(CPoint point)
 {
-	CRect rect;
-	m_pButton->GetClientRect(rect);
+	CRect rect = m_pButton->GetClientRect();
 
 	// 滚动一个滑块大小
 	if (point.y < rect.top)
@@ -126,10 +124,7 @@ void CUIVScroll::OnChildMoving(CUIControl *, CPoint point)
 
 void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
 {
-	CSize size;
-	m_pButton->GetSize(&size);
-
-	int nHeight = m_rect.Height() - size.cy;
+	int nHeight = m_rect.Height() - m_pButton->GetSize().cy;
 	if (nHeight <= 0)
 		return;
 
@@ -152,7 +147,7 @@ void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
 		m_fnOnChanged(GetCurPos());
 }
 
-void CUIVScroll::OnLoaded(const IUILoadAttrs &attrs)
+void CUIVScroll::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

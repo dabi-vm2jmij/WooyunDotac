@@ -21,9 +21,9 @@ END_MESSAGE_MAP()
 
 // CUIAboutWnd 消息处理程序
 
-void CUIAboutWnd::OnLoadedUI(const IUILoadAttrs &loaded)
+void CUIAboutWnd::OnLoadedUI(const IUIXmlAttrs &attrs)
 {
 	// TODO:  在此添加专用代码和/或调用基类
 
-	__super::OnLoadedUI(loaded);
+	__super::OnLoadedUI(attrs);
 }

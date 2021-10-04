@@ -15,7 +15,7 @@ public:
 	void EndAddChild();
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void OnChildEnter(CUIButton *pChild);
 	virtual void OnChildLeave(CUIButton *pChild);
 

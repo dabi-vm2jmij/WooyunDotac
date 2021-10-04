@@ -20,9 +20,9 @@ public:
 		bool operator<(const FontKey &_Right) const;
 	};
 
-	void  SetFont(LPCWSTR lpszName);
-	HFONT GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline);
-	HFONT GetFont(const FontKey &fontKey);
+	void  SetDefaultFont(LPCWSTR lpszName);
+	HFONT GetCachedFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline);
+	HFONT GetCachedFont(const FontKey &fontKey);
 
 private:
 	FontKey m_fontKey;

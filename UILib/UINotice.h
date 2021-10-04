@@ -18,7 +18,7 @@ public:
 	void Stop();
 
 protected:
-	virtual void OnLoaded(const IUILoadAttrs &attrs) override;
+	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	void OnUITimer();
 

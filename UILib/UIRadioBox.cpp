@@ -24,5 +24,12 @@ void CUIRadioBox::OnCheckChanged()
 	if (!m_bCheck)
 		return;
 
-	GetParent()->OnRadioCheck(this);
+	for (auto pItem : GetParent()->GetChilds())
+	{
+		if (CUIRadioBox *pRadio = dynamic_cast<CUIRadioBox *>(pItem))
+		{
+			if (pRadio != this)
+				pRadio->SetCheck(false);
+		}
+	}
 }

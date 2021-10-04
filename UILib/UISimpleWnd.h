@@ -2,25 +2,25 @@
 
 #include "UIWindow.h"
 
-class CUIPopupWnd : public CUIWindow
+class CUISimpleWnd : public CUIWindow
 {
 public:
-	CUIPopupWnd(bool bModal = false) : m_bModal(bModal) {}
+	CUISimpleWnd(bool bModal = false) : m_bModal(bModal) {}
 
-	void OnInitUI(std::function<void(const IUILoadAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
+	void OnInitUI(function<void(const IUIXmlAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
 
 private:
-	virtual void OnLoadedUI(const IUILoadAttrs &attrs) override;
+	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	virtual void OnWindowPosChanging(WINDOWPOS *lpWndPos) override;
 	virtual BOOL OnNcActivate(BOOL bActive) override { return TRUE; }
 	virtual void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) override {}
 
 	bool m_bModal;
-	std::function<void(const IUILoadAttrs &)> m_fnInitUI;
+	function<void(const IUIXmlAttrs &)> m_fnInitUI;
 };
 
-inline void CUIPopupWnd::OnLoadedUI(const IUILoadAttrs &attrs)
+inline void CUISimpleWnd::OnLoadedUI(const IUIXmlAttrs &attrs)
 {
 	if (m_fnInitUI)
 		m_fnInitUI(attrs);
@@ -28,7 +28,7 @@ inline void CUIPopupWnd::OnLoadedUI(const IUILoadAttrs &attrs)
 	__super::OnLoadedUI(attrs);
 }
 
-inline int CUIPopupWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
+inline int CUISimpleWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
@@ -38,7 +38,7 @@ inline int CUIPopupWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-inline void CUIPopupWnd::OnWindowPosChanging(WINDOWPOS *lpWndPos)
+inline void CUISimpleWnd::OnWindowPosChanging(WINDOWPOS *lpWndPos)
 {
 	__super::OnWindowPosChanging(lpWndPos);
 

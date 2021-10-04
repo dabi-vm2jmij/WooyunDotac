@@ -33,13 +33,12 @@ public:
 	CUIView(CUIView *pParent);
 	virtual ~CUIView();
 
+	const vector<CUIBase *> &GetChilds() const { return m_vecChilds; }
 	void InvalidateRect(LPCRECT lpRect);
 	void InvalidateLayout();
 	void RemoveChild(CUIBase *pItem);
-	UINT GetCount() const { return m_vecChilds.size(); }
-	CUIBase *GetChild(UINT nIndex) const;
+	CUIBase *Search(LPCWSTR lpszId, UINT nDepth = -1) const;
 	CUIBase *AddChild(CUIBase *pItem);
-
 	CUIView *AddView();
 	CUIButton *AddButton(LPCWSTR lpFileName);
 	CUIButtonEx *AddButtonEx(LPCWSTR lpFileName);
@@ -65,10 +64,8 @@ public:
 	CUIVScroll *AddVScroll(LPCWSTR lpFileName, LPCWSTR lpFileNameBg);
 	CUIWebTabBar *AddWebTabBar(LPCWSTR lpFileName);
 
-	void OnRadioCheck(const CUIRadioBox *pItem);
-	void OnRadioCheck(const CUIRadioButton *pItem);
-
 protected:
+	virtual CUIBase *DoSearch(LPCWSTR lpszId, UINT nDepth) const override;
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void OnPaint(CUIDC &dc) const override;
@@ -81,5 +78,5 @@ protected:
 	void PushBackChild(CUIBase *pItem);
 
 	bool m_bNeedLayout;
-	std::vector<CUIBase *> m_vecChilds;
+	vector<CUIBase *> m_vecChilds;
 };

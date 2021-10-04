@@ -15,7 +15,7 @@ public:
 
 protected:
 	virtual void OnTextSize(CSize size) = 0;
-	void OnLoadedText(const IUILoadAttrs &attrs);
+	void OnLoadedText(const IUIXmlAttrs &attrs);
 	void OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const;
 	void OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const;
 	void Invalidate();

@@ -13,7 +13,10 @@ CUIToolBar::CUIToolBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent),
 CUIToolBar::~CUIToolBar()
 {
 	for (auto pItem : m_vecMoreItems)
+	{
+		FRIEND(pItem)->m_pParent = this;
 		delete pItem;
+	}
 }
 
 void CUIToolBar::CloseMoreWnd()
@@ -77,19 +80,16 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 
 void CUIToolBar::OnMoreBtn()
 {
-	CRect rect;
-	m_vecChilds[0]->GetWindowRect(rect);
+	CRect rect = m_vecChilds[0]->GetWindowRect();
 
 	CUIMoreWnd *pWnd = new CUIMoreWnd(m_moreBg);
-	m_hMoreWnd = pWnd->Init(GetRootView()->GetOwnerWnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
+	m_hMoreWnd = pWnd->Init(GetRootView()->GetHwnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
 }
 
 int CUIToolBar::GetMoreIndex() const
 {
-	CSize sizeBtn;
-	m_vecChilds[0]->GetSize(&sizeBtn);
-
-	int nWidth = 0, nIndex = 0;
+	int nAllWidth = 0, nIndex = 0;
+	int nBtnWidth = m_vecChilds[0]->GetSize().cx;
 
 	for (int i = 1; i != m_vecChilds.size(); i++)
 	{
@@ -98,25 +98,22 @@ int CUIToolBar::GetMoreIndex() const
 		if (!pItem->IsVisible())
 			continue;
 
-		CSize size;
-		pItem->GetSize(&size);
-
 		ATLASSERT(FRIEND(pItem)->m_offset.left >> 16);
-		ATLASSERT(size.cx >= 0);
+		ATLASSERT(pItem->GetSize().cx >= 0);
 
-		nWidth += (short)FRIEND(pItem)->m_offset.left + size.cx;
+		nAllWidth += (short)FRIEND(pItem)->m_offset.left + pItem->GetSize().cx;
 
-		if (nWidth > m_rect.Width())
+		if (nAllWidth > m_rect.Width())
 			return nIndex + 1;
 
-		if (nWidth + sizeBtn.cx <= m_rect.Width())
+		if (nAllWidth + nBtnWidth <= m_rect.Width())
 			nIndex = i;
 	}
 
 	return 0;
 }
 
-void CUIToolBar::OnLoaded(const IUILoadAttrs &attrs)
+void CUIToolBar::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

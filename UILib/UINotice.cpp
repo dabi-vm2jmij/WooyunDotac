@@ -63,11 +63,11 @@ void CUINotice::OnUITimer()
 	InvalidateLayout();
 
 	if (m_nCurPos % 10)
-		m_uiTimer.Set(30);
+		m_uiTimer.Start(30);
 	else if (m_bRunning)
-		m_uiTimer.Set(m_nElapse);
+		m_uiTimer.Start(m_nElapse);
 	else
-		m_uiTimer.Kill();
+		m_uiTimer.Stop();
 }
 
 void CUINotice::Start()
@@ -78,7 +78,7 @@ void CUINotice::Start()
 	m_bRunning = true;
 
 	if (m_nCurPos % 10 == 0)
-		m_uiTimer.Set(m_nElapse);
+		m_uiTimer.Start(m_nElapse);
 }
 
 void CUINotice::Stop()
@@ -86,7 +86,7 @@ void CUINotice::Stop()
 	m_bRunning = false;
 }
 
-void CUINotice::OnLoaded(const IUILoadAttrs &attrs)
+void CUINotice::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

@@ -82,18 +82,18 @@ CUIFontMgr::~CUIFontMgr()
 	DeleteCriticalSection(&m_critSect);
 }
 
-void CUIFontMgr::SetFont(LPCWSTR lpszName)
+void CUIFontMgr::SetDefaultFont(LPCWSTR lpszName)
 {
 	m_fontKey.ParseName(lpszName);
 	ATLASSERT(*m_fontKey.m_szFaceName && m_fontKey.m_nHeight);
 }
 
-HFONT CUIFontMgr::GetFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline)
+HFONT CUIFontMgr::GetCachedFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYTE bUnderline)
 {
-	return GetFont(FontKey(lpszName, nWeight, bItalic, bUnderline));
+	return GetCachedFont(FontKey(lpszName, nWeight, bItalic, bUnderline));
 }
 
-HFONT CUIFontMgr::GetFont(const FontKey &fontKey)
+HFONT CUIFontMgr::GetCachedFont(const FontKey &fontKey)
 {
 	auto lpszFaceName = fontKey.m_szFaceName;
 	if (*lpszFaceName == 0)
@@ -125,6 +125,7 @@ HFONT CUIFontMgr::GetFont(const FontKey &fontKey)
 			lpszFaceName				// lpszFacename
 		);
 
+		ATLASSERT(hFont);
 		m_mapFonts[fontKey] = hFont;
 	}
 

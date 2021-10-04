@@ -66,7 +66,7 @@ bool CUIView::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CUIView::OnPaint(CUIDC &dc) const
 {
-	CUIBase *pCapture = GetRootView()->GetCapture();
+	auto pCapture = GetRootView()->GetCapture();
 	bool bFound = false;
 
 	for (auto pItem : m_vecChilds)
@@ -166,14 +166,35 @@ void CUIView::RemoveChild(CUIBase *pItem)
 	}
 }
 
-CUIBase *CUIView::GetChild(UINT nIndex) const
+CUIBase *CUIView::Search(LPCWSTR lpszId, UINT nDepth) const
 {
-	return nIndex < m_vecChilds.size() ? m_vecChilds[nIndex] : NULL;
+	if (lpszId == NULL || *lpszId == 0)
+	{
+		ATLASSERT(0);
+		return NULL;
+	}
+
+	return DoSearch(lpszId, nDepth);
+}
+
+CUIBase *CUIView::DoSearch(LPCWSTR lpszId, UINT nDepth) const
+{
+	auto pRet = __super::DoSearch(lpszId, 0);
+	if (pRet || nDepth == 0)
+		return pRet;
+
+	for (auto pItem : m_vecChilds)
+	{
+		if (pRet = pItem->DoSearch(lpszId, nDepth - 1))
+			return pRet;
+	}
+
+	return NULL;
 }
 
 CUIBase *CUIView::AddChild(CUIBase *pItem)
 {
-	ATLASSERT(pItem->m_pParent == NULL || pItem->m_pParent == this);
+	ATLASSERT(pItem->m_pParent == this);
 	pItem->m_pParent = this;
 	PushBackChild(pItem);
 	return pItem;
@@ -352,28 +373,4 @@ void CUIView::PushBackChild(CUIBase *pItem)
 	m_vecChilds.reserve(4);
 	m_vecChilds.push_back(pItem);
 	InvalidateLayout();
-}
-
-void CUIView::OnRadioCheck(const CUIRadioBox *pItem)
-{
-	for (auto pIt : m_vecChilds)
-	{
-		if (CUIRadioBox *pRadio = dynamic_cast<CUIRadioBox *>(pIt))
-		{
-			if (pRadio != pItem)
-				pRadio->SetCheck(false);
-		}
-	}
-}
-
-void CUIView::OnRadioCheck(const CUIRadioButton *pItem)
-{
-	for (auto pIt : m_vecChilds)
-	{
-		if (CUIRadioButton *pRadio = dynamic_cast<CUIRadioButton *>(pIt))
-		{
-			if (pRadio != pItem)
-				pRadio->SetCheck(false);
-		}
-	}
 }

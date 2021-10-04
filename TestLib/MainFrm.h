@@ -18,7 +18,7 @@ private:
 	END_MSG_MAP()
 
 	void OnFinalMessage(HWND hWnd) override;
-	void OnLoadedUI(const IUILoadAttrs &loaded) override;
+	void OnLoadedUI(const IUIXmlAttrs &attrs) override;
 	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	void OnClose() override;
 	BOOL OnNcActivate(BOOL bActive) override { return TRUE; }

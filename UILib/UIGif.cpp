@@ -61,7 +61,7 @@ void CUIGif::OnUITimer()
 
 	m_pImage->SelectActiveFrame(&Gdiplus::FrameDimensionTime, m_nFrameIdx);
 	InvalidateRect(NULL);
-	m_uiTimer.Set(m_vecElapses[m_nFrameIdx]);
+	m_uiTimer.Start(m_vecElapses[m_nFrameIdx]);
 }
 
 void CUIGif::Start(bool bLoop)
@@ -70,12 +70,12 @@ void CUIGif::Start(bool bLoop)
 		return;
 
 	m_bLoop = bLoop;
-	m_uiTimer.Set(m_vecElapses[m_nFrameIdx]);
+	m_uiTimer.Start(m_vecElapses[m_nFrameIdx]);
 }
 
 void CUIGif::Stop()
 {
-	m_uiTimer.Kill();
+	m_uiTimer.Stop();
 }
 
 void CUIGif::Reset()

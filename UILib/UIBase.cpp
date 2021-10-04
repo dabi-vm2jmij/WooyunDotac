@@ -237,23 +237,18 @@ CUIRootView *CUIBase::GetRootView() const
 	return pRootView;
 }
 
-void CUIBase::GetSize(LPSIZE lpSize) const
+CUIBase *CUIBase::DoSearch(LPCWSTR lpszId, UINT nDepth) const
 {
-	*lpSize = m_size;
+	return (m_strId.size() && _wcsicmp(m_strId.c_str(), lpszId) == 0) ? const_cast<CUIBase *>(this) : NULL;
 }
 
-void CUIBase::GetClientRect(LPRECT lpRect) const
+CRect CUIBase::GetWindowRect() const
 {
-	*lpRect = m_rect;
-}
-
-void CUIBase::GetWindowRect(LPRECT lpRect) const
-{
-	*lpRect = m_rect;
-
-	CUIRootView *pRootView = GetRootView();
-	pRootView->ClientToScreen((LPPOINT)lpRect);
-	pRootView->ClientToScreen((LPPOINT)lpRect + 1);
+	CRect rect(m_rect);
+	auto pRootView = GetRootView();
+	pRootView->ClientToScreen((LPPOINT)&rect);
+	pRootView->ClientToScreen((LPPOINT)&rect + 1);
+	return rect;
 }
 
 void CUIBase::SetEnabled(bool bEnabled)
@@ -331,9 +326,12 @@ static int Str2Offset(LPCWSTR lpStr)
 	return Int2Offset(nValue, *lpEnd == '*');
 }
 
-void CUIBase::OnLoaded(const IUILoadAttrs &attrs)
+void CUIBase::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	LPCWSTR lpStr;
+	if (lpStr = attrs.GetStr(L"id"))
+		SetId(lpStr);
+
 	if (lpStr = attrs.GetStr(L"left"))
 		m_offset.left = Str2Offset(lpStr);
 

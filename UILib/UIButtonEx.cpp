@@ -76,7 +76,7 @@ void CUIButtonEx::OnMouseEnter()
 	{
 		CUIFontMgr::FontKey fontKey(m_hFont);
 		fontKey.m_bUnderline = true;
-		m_hFont = g_theApp.GetFontMgr().GetFont(fontKey);
+		m_hFont = g_theApp.GetFontMgr().GetCachedFont(fontKey);
 		InvalidateRect(NULL);
 	}
 }
@@ -87,7 +87,7 @@ void CUIButtonEx::OnMouseLeave()
 	{
 		CUIFontMgr::FontKey fontKey(m_hFont);
 		fontKey.m_bUnderline = false;
-		m_hFont = g_theApp.GetFontMgr().GetFont(fontKey);
+		m_hFont = g_theApp.GetFontMgr().GetCachedFont(fontKey);
 		InvalidateRect(NULL);
 	}
 
@@ -125,7 +125,7 @@ void CUIButtonEx::OnDrawState(UINT nState)
 	__super::OnDrawState(nState);
 }
 
-void CUIButtonEx::OnLoaded(const IUILoadAttrs &attrs)
+void CUIButtonEx::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

@@ -101,7 +101,6 @@
     <ClInclude Include="UIMoreWnd.h" />
     <ClInclude Include="UINotice.h" />
     <ClInclude Include="UIPageView.h" />
-    <ClInclude Include="UIPopupWnd.h" />
     <ClInclude Include="UIProgress.h" />
     <ClInclude Include="UIRadioBox.h" />
     <ClInclude Include="UIRadioButton.h" />
@@ -109,6 +108,7 @@
     <ClInclude Include="UIResPath.h" />
     <ClInclude Include="UIRootView.h" />
     <ClInclude Include="UIScrollView.h" />
+    <ClInclude Include="UISimpleWnd.h" />
     <ClInclude Include="UISkin.h" />
     <ClInclude Include="UISlider.h" />
     <ClInclude Include="UIStateButton.h" />

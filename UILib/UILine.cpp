@@ -48,7 +48,7 @@ void CUILine::MyPaint(CUIDC &dc) const
 	}
 }
 
-void CUILine::OnLoaded(const IUILoadAttrs &attrs)
+void CUILine::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 

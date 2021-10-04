@@ -29,8 +29,7 @@ void CUIStateButton::EndAddChild()
 
 		((CUIButton *)pItem)->OnClick([this]{ OnChildClick(); });
 
-		CSize size;
-		pItem->GetSize(&size);
+		CSize size = pItem->GetSize();
 
 		if (nWidth < size.cx)
 			nWidth = size.cx;
@@ -78,7 +77,7 @@ void CUIStateButton::OnChildClick()
 	InvalidateLayout();
 }
 
-void CUIStateButton::OnLoaded(const IUILoadAttrs &attrs)
+void CUIStateButton::OnLoaded(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoaded(attrs);
 
