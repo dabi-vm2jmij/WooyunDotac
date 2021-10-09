@@ -12,7 +12,7 @@ public:
 	CUIMoreWnd(COLORREF color);
 	~CUIMoreWnd();
 
-	HWND Init(HWND hParent, CPoint point, const vector<CUIBase *> &vecItems);
+	HWND Init(HWND hParent, CPoint point, const vector<CUIView *> &vecItems);
 
 private:
 	BEGIN_MSG_MAP(CUIMoreWnd)

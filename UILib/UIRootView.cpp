@@ -599,7 +599,7 @@ void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
 	}
 }
 
-CUIBase *CUIRootView::OnCustomUI(LPCWSTR lpName, CUIView *pParent)
+CUIView *CUIRootView::OnCustomUI(LPCWSTR lpName, CUIView *pParent)
 {
 	return m_pOwner->OnCustomUI(lpName, pParent);
 }

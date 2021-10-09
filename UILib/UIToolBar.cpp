@@ -93,7 +93,7 @@ int CUIToolBar::GetMoreIndex() const
 
 	for (int i = 1; i != m_vecChilds.size(); i++)
 	{
-		CUIBase *pItem = m_vecChilds[i];
+		auto pItem = m_vecChilds[i];
 
 		if (!pItem->IsVisible())
 			continue;

@@ -5,11 +5,11 @@ CUIMoreView::CUIMoreView(IUIWindow *pOwner) : CUIRootView(pOwner)
 {
 }
 
-void CUIMoreView::InitItems(const vector<CUIBase *> &pItems)
+void CUIMoreView::InitItems(const vector<CUIView *> &vecItems)
 {
-	for (auto pItem : pItems)
+	for (auto pItem : vecItems)
 	{
-		if (pItem->IsVisible() && dynamic_cast<CUIView *>(pItem))
+		if (pItem->IsVisible())
 		{
 			FRIEND(pItem)->m_pParent = this;
 			AddChild(pItem);

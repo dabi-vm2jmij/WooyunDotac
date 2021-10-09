@@ -20,7 +20,7 @@ bool CUIView::OnHitTest(UIHitTest &hitTest)
 	// 按照逆序：后画的控件先处理消息
 	for (auto it = m_vecChilds.rbegin(); it != m_vecChilds.rend(); ++it)
 	{
-		CUIBase *pItem = *it;
+		auto pItem = *it;
 
 		if (pItem->m_rcReal.PtInRect(hitTest.point))
 		{
@@ -51,7 +51,7 @@ bool CUIView::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		for (auto it = m_vecChilds.rbegin(); it != m_vecChilds.rend(); ++it)
 		{
-			CUIBase *pItem = *it;
+			auto pItem = *it;
 
 			if (pItem->IsEnabled() && pItem->m_rcReal.PtInRect(point))
 			{
@@ -126,18 +126,6 @@ void CUIView::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIView::InvalidateRect(LPCRECT lpRect)
-{
-	CRect rect(m_rcReal);
-	if (lpRect)
-		rect &= *lpRect;
-
-	if (rect.IsRectEmpty())
-		return;
-
-	GetRootView()->InvalidateRect(rect);
-}
-
 void CUIView::InvalidateLayout()
 {
 	if (m_bNeedLayout || m_rect.IsRectEmpty())
@@ -148,7 +136,7 @@ void CUIView::InvalidateLayout()
 	g_theApp.DelayLayout(GetRootView());
 }
 
-void CUIView::RemoveChild(CUIBase *pItem)
+void CUIView::RemoveChild(CUIView *pItem)
 {
 	for (auto it = m_vecChilds.begin(); it != m_vecChilds.end(); ++it)
 	{
@@ -166,7 +154,7 @@ void CUIView::RemoveChild(CUIBase *pItem)
 	}
 }
 
-CUIBase *CUIView::Search(LPCWSTR lpszId, UINT nDepth) const
+CUIView *CUIView::Search(LPCWSTR lpszId, UINT nDepth) const
 {
 	if (lpszId == NULL || *lpszId == 0)
 	{
@@ -177,22 +165,24 @@ CUIBase *CUIView::Search(LPCWSTR lpszId, UINT nDepth) const
 	return DoSearch(lpszId, nDepth);
 }
 
-CUIBase *CUIView::DoSearch(LPCWSTR lpszId, UINT nDepth) const
+CUIView *CUIView::DoSearch(LPCWSTR lpszId, UINT nDepth) const
 {
-	auto pRet = __super::DoSearch(lpszId, 0);
-	if (pRet || nDepth == 0)
-		return pRet;
+	if (m_strId.size() && _wcsicmp(m_strId.c_str(), lpszId) == 0)
+		return const_cast<CUIView *>(this);
+
+	if (nDepth == 0)
+		return NULL;
 
 	for (auto pItem : m_vecChilds)
 	{
-		if (pRet = pItem->DoSearch(lpszId, nDepth - 1))
+		if (auto pRet = pItem->DoSearch(lpszId, nDepth - 1))
 			return pRet;
 	}
 
 	return NULL;
 }
 
-CUIBase *CUIView::AddChild(CUIBase *pItem)
+CUIView *CUIView::AddChild(CUIView *pItem)
 {
 	ATLASSERT(pItem->m_pParent == this);
 	pItem->m_pParent = this;
@@ -368,7 +358,7 @@ CUIWebTabBar *CUIView::AddWebTabBar(LPCWSTR lpFileName)
 	return pItem;
 }
 
-void CUIView::PushBackChild(CUIBase *pItem)
+void CUIView::PushBackChild(CUIView *pItem)
 {
 	m_vecChilds.reserve(4);
 	m_vecChilds.push_back(pItem);

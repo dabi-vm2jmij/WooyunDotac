@@ -5,7 +5,7 @@
 class IUIWindow
 {
 public:
-	virtual CUIBase *OnCustomUI(LPCWSTR lpName, CUIView *pParent) { return NULL; }
+	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) { return NULL; }
 	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) {}
 	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const {}
 	virtual HWND GetHwnd() const = 0;
@@ -29,7 +29,7 @@ public:
 	virtual void InvalidateRect(LPCRECT lpRect);
 	virtual BOOL ClientToScreen(LPPOINT lpPoint);
 	virtual BOOL ScreenToClient(LPPOINT lpPoint);
-	CUIBase *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
+	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
 	CUIControl *GetCapture() const { return m_pCapture; }
 
 protected:
@@ -66,7 +66,7 @@ private:
 	class CUICast
 	{
 	public:
-		CUICast(CUIBase *ptr) : m_ptr(ptr) {}
+		CUICast(CUIView *ptr) : m_ptr(ptr) {}
 
 		template<typename T>
 		operator T *() const
@@ -77,7 +77,7 @@ private:
 		}
 
 	private:
-		CUIBase *m_ptr;
+		CUIView *m_ptr;
 	};
 
 public:

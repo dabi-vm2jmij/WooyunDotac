@@ -33,12 +33,11 @@ public:
 	CUIView(CUIView *pParent);
 	virtual ~CUIView();
 
-	const vector<CUIBase *> &GetChilds() const { return m_vecChilds; }
-	void InvalidateRect(LPCRECT lpRect);
+	const vector<CUIView *> &GetChilds() const { return m_vecChilds; }
 	void InvalidateLayout();
-	void RemoveChild(CUIBase *pItem);
-	CUIBase *Search(LPCWSTR lpszId, UINT nDepth = -1) const;
-	CUIBase *AddChild(CUIBase *pItem);
+	void RemoveChild(CUIView *pItem);
+	CUIView *Search(LPCWSTR lpszId, UINT nDepth = -1) const;
+	CUIView *AddChild(CUIView *pItem);
 	CUIView *AddView();
 	CUIButton *AddButton(LPCWSTR lpFileName);
 	CUIButtonEx *AddButtonEx(LPCWSTR lpFileName);
@@ -65,7 +64,7 @@ public:
 	CUIWebTabBar *AddWebTabBar(LPCWSTR lpFileName);
 
 protected:
-	virtual CUIBase *DoSearch(LPCWSTR lpszId, UINT nDepth) const override;
+	virtual CUIView *DoSearch(LPCWSTR lpszId, UINT nDepth) const;
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void OnPaint(CUIDC &dc) const override;
@@ -75,8 +74,8 @@ protected:
 	virtual void RecalcLayout(LPRECT lpClipRect);
 	virtual void OnChildMoving(CUIControl *pCtrl, CPoint point) {}
 	virtual void OnChildMoved(CUIControl *pCtrl, CPoint point) {}
-	void PushBackChild(CUIBase *pItem);
+	void PushBackChild(CUIView *pItem);
 
 	bool m_bNeedLayout;
-	vector<CUIBase *> m_vecChilds;
+	vector<CUIView *> m_vecChilds;
 };

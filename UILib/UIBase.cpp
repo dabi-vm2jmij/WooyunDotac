@@ -229,17 +229,12 @@ CUIView *CUIBase::GetParent() const
 
 CUIRootView *CUIBase::GetRootView() const
 {
-	CUIBase *pItem = const_cast<CUIBase *>(this);
+	auto pItem = const_cast<CUIBase *>(this);
 	for (CUIBase *pParent; pParent = pItem->m_pParent; pItem = pParent);
 
 	CUIRootView *pRootView = dynamic_cast<CUIRootView *>(pItem);
 	ATLASSERT(pRootView);
 	return pRootView;
-}
-
-CUIBase *CUIBase::DoSearch(LPCWSTR lpszId, UINT nDepth) const
-{
-	return (m_strId.size() && _wcsicmp(m_strId.c_str(), lpszId) == 0) ? const_cast<CUIBase *>(this) : NULL;
 }
 
 CRect CUIBase::GetWindowRect() const
@@ -249,6 +244,18 @@ CRect CUIBase::GetWindowRect() const
 	pRootView->ClientToScreen((LPPOINT)&rect);
 	pRootView->ClientToScreen((LPPOINT)&rect + 1);
 	return rect;
+}
+
+void CUIBase::InvalidateRect(LPCRECT lpRect)
+{
+	CRect rect(m_rcReal);
+	if (lpRect)
+		rect &= *lpRect;
+
+	if (rect.IsRectEmpty())
+		return;
+
+	GetRootView()->InvalidateRect(rect);
 }
 
 void CUIBase::SetEnabled(bool bEnabled)
@@ -276,7 +283,7 @@ void CUIBase::SetVisible(bool bVisible)
 
 bool CUIBase::IsRealEnabled() const
 {
-	for (const CUIBase *pItem = this; pItem; pItem = pItem->m_pParent)
+	for (auto pItem = this; pItem; pItem = pItem->m_pParent)
 	{
 		if (!pItem->IsEnabled())
 			return false;

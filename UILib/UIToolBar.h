@@ -21,5 +21,5 @@ protected:
 
 	COLORREF m_moreBg;
 	HWND     m_hMoreWnd;
-	vector<CUIBase *> m_vecMoreItems;
+	vector<CUIView *> m_vecMoreItems;
 };

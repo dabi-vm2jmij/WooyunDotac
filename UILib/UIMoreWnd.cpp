@@ -11,7 +11,7 @@ CUIMoreWnd::~CUIMoreWnd()
 	m_rootView.ClearItems();
 }
 
-HWND CUIMoreWnd::Init(HWND hParent, CPoint point, const vector<CUIBase *> &vecItems)
+HWND CUIMoreWnd::Init(HWND hParent, CPoint point, const vector<CUIView *> &vecItems)
 {
 	m_rootView.InitItems(vecItems);
 

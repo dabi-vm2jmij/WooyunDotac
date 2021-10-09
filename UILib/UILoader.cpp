@@ -248,15 +248,9 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddWebTabBar(lpFileName);
 	}
-	else if (auto pItem = pParent->GetRootView()->OnCustomUI(CA2W(lpName, CP_UTF8), pParent))
+	else if (pView = pParent->GetRootView()->OnCustomUI(CA2W(lpName, CP_UTF8), pParent))
 	{
-		pParent->AddChild(pItem);
-
-		if ((pView = dynamic_cast<CUIView *>(pItem)) == NULL)
-		{
-			pItem->OnLoaded(attrs);
-			return true;
-		}
+		pParent->AddChild(pView);
 	}
 	else
 	{

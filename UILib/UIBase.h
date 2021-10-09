@@ -24,6 +24,7 @@ public:
 	CSize GetSize() const { return m_size; }
 	CRect GetClientRect() const { return m_rect; }
 	CRect GetWindowRect() const;
+	void InvalidateRect(LPCRECT lpRect);
 	void SetBgColor(COLORREF color) { m_colorBg = color; }
 	void SetEnabled(bool bEnabled);
 	void SetVisible(bool bVisible);
@@ -68,7 +69,6 @@ protected:
 		}
 	};
 
-	virtual CUIBase *DoSearch(LPCWSTR lpszId, UINT nDepth) const;
 	virtual void OnLoaded(const IUIXmlAttrs &attrs);
 	virtual bool OnHitTest(UIHitTest &hitTest) { return false; }
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
