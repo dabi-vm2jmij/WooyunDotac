@@ -78,4 +78,28 @@ protected:
 
 	bool m_bNeedLayout;
 	vector<CUIView *> m_vecChilds;
+
+private:
+	// 自动类型转换
+	class CUICast
+	{
+		CUIView *m_ptr;
+
+	public:
+		CUICast(CUIView *ptr) : m_ptr(ptr) {}
+
+		template<typename T>
+		operator T *() const
+		{
+			T *ptr = dynamic_cast<T *>(m_ptr);
+			ATLASSERT(ptr);
+			return ptr;
+		}
+	};
+
+public:
+	CUICast SearchCast(LPCWSTR lpszId) const
+	{
+		return Search(lpszId);
+	}
 };

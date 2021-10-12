@@ -17,6 +17,7 @@ public:
 	CImagex() = default;
 	CImagex(const CImagePtr &spImage);
 	CImagex(CImagePtr &&spImage);
+	CImagex(const CImagex &_Right) = default;
 	CImagex(CImagex &&_Right);
 	CImagex &operator=(const CImagePtr &spImage);
 	CImagex &operator=(CImagePtr &&spImage);

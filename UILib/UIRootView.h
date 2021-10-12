@@ -60,29 +60,4 @@ protected:
 	CUIControl *m_pCurFocus;
 	vector<CUIEdit *> m_vecEdits;
 	vector<CUIBase *> m_vecEnterItems;
-
-private:
-	// 自动类型转换
-	class CUICast
-	{
-	public:
-		CUICast(CUIView *ptr) : m_ptr(ptr) {}
-
-		template<typename T>
-		operator T *() const
-		{
-			T *ptr = dynamic_cast<T *>(m_ptr);
-			ATLASSERT(ptr);
-			return ptr;
-		}
-
-	private:
-		CUIView *m_ptr;
-	};
-
-public:
-	CUICast SearchCast(LPCWSTR lpszId) const
-	{
-		return Search(lpszId);
-	}
 };

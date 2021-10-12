@@ -213,7 +213,7 @@ LRESULT CUIMenuWnd::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandl
 	{
 		if (isgraph(wParam))
 		{
-			wchar_t szKey[4] = { '&', tolower(wParam) };
+			wchar_t szKey[4] = { '&', (wchar_t)tolower(wParam) };
 
 			for (int i = 0; i != m_pUIMenu->m_vecItems.size(); i++)
 			{
