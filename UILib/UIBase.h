@@ -22,7 +22,7 @@ public:
 	void SetHeight(int nHeight);
 	void SetSize(CSize size);
 	CSize GetSize() const { return m_size; }
-	CRect GetClientRect() const { return m_rect; }
+	CRect GetRect() const { return m_rect; }
 	CRect GetWindowRect() const;
 	void InvalidateRect(LPCRECT lpRect);
 	void SetBgColor(COLORREF color) { m_colorBg = color; }
@@ -32,6 +32,7 @@ public:
 	bool IsVisible() const { return m_bVisible; }
 	bool IsRealEnabled() const;
 	bool IsRealVisible() const;
+	bool IsFullVisible() const;
 	bool IsChild(const CUIBase *pItem) const;
 	bool IsControl() const { return m_bControl; }
 	bool IsMouseEnter() const { return m_ppEnter != NULL; }

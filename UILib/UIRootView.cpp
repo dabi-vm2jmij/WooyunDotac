@@ -553,7 +553,7 @@ void CUIRootView::NextTabsEdit()
 		if (i == iCurId)
 			break;
 
-		if (m_vecEdits[i]->IsRealEnabled() && !m_vecEdits[i]->m_rect.IsRectEmpty())
+		if (m_vecEdits[i]->IsRealEnabled() && m_vecEdits[i]->IsRealVisible())
 		{
 			m_vecEdits[i]->SetSel(0, -1);
 			SetFocus(m_vecEdits[i]);

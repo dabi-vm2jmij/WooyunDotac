@@ -105,7 +105,7 @@ void CUIVScroll::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 
 void CUIVScroll::OnLButtonDown(CPoint point)
 {
-	CRect rect = m_pButton->GetClientRect();
+	CRect rect = m_pButton->GetRect();
 
 	// 滚动一个滑块大小
 	if (point.y < rect.top)

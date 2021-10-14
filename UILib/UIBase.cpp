@@ -297,6 +297,11 @@ bool CUIBase::IsRealVisible() const
 	return !m_rect.IsRectEmpty();
 }
 
+bool CUIBase::IsFullVisible() const
+{
+	return !m_rect.IsRectEmpty() && m_rect == m_rcReal;
+}
+
 bool CUIBase::IsChild(const CUIBase *pItem) const
 {
 	for (; pItem; pItem = pItem->m_pParent)
