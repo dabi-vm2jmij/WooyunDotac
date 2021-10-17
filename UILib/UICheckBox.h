@@ -11,7 +11,7 @@ public:
 	CUICheckBox(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUICheckBox();
 
-	void OnClick(function<void(bool)> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
+	void BindClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 	void SetTextLeft(int nTextLeft);
 	void SetCheck(bool bCheck);
 	bool IsChecked() const { return m_bCheck; }
@@ -21,10 +21,10 @@ protected:
 	virtual void MyPaint(CUIDC &dc) const override;
 	virtual void OnLButtonUp(CPoint point) override;
 	virtual void OnTextSize(CSize size) override;
-	virtual void OnCheckChanged();
+	virtual void OnChecked() {}
 
 	CImagex m_imagexs[2];
 	int     m_nTextLeft;
 	bool    m_bCheck;
-	function<void(bool)> m_fnOnClick;
+	function<void()> m_fnOnClick;
 };

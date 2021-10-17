@@ -95,7 +95,7 @@ HFONT CUIFontMgr::GetCachedFont(LPCWSTR lpszName, int nWeight, BYTE bItalic, BYT
 
 HFONT CUIFontMgr::GetCachedFont(const FontKey &fontKey)
 {
-	auto lpszFaceName = fontKey.m_szFaceName;
+	LPCWSTR lpszFaceName = fontKey.m_szFaceName;
 	if (*lpszFaceName == 0)
 		lpszFaceName = m_fontKey.m_szFaceName;
 

@@ -39,10 +39,10 @@ void CUIPageView::SetCount(UINT nCount)
 				pRadio->SetCursor(LoadCursor(NULL, IDC_HAND));
 			}
 
-			pRadio->OnClick([this, i](bool bCheck)
+			pRadio->BindClick([this, i]
 			{
-				if (m_fnOnChanged && bCheck)
-					m_fnOnChanged(i);
+				if (m_fnOnChange)
+					m_fnOnChange(i);
 			});
 		}
 	}
@@ -68,14 +68,26 @@ void CUIPageView::SetCount(UINT nCount)
 void CUIPageView::SetIndex(UINT nIndex)
 {
 	if (nIndex < m_vecChilds.size())
-		((CUIRadioBox *)m_vecChilds[nIndex])->SetCheck(true);
+	{
+		auto pRadio = (CUIRadioBox *)m_vecChilds[nIndex];
+
+		if (!pRadio->IsChecked())
+		{
+			pRadio->SetCheck(true);
+
+			if (m_fnOnChange)
+				m_fnOnChange(nIndex);
+		}
+	}
 }
 
 UINT CUIPageView::GetIndex() const
 {
 	for (int i = 0; i != m_vecChilds.size(); i++)
 	{
-		if (((CUIRadioBox *)m_vecChilds[i])->IsChecked())
+		auto pRadio = (CUIRadioBox *)m_vecChilds[i];
+
+		if (pRadio->IsChecked())
 			return i;
 	}
 

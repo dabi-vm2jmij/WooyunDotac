@@ -7,7 +7,7 @@ class CUISimpleWnd : public CUIWindow
 public:
 	CUISimpleWnd(bool bModal = false) : m_bModal(bModal) {}
 
-	void OnInitUI(function<void(const IUIXmlAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
+	void BindInitUI(function<void(const IUIXmlAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
 
 private:
 	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;

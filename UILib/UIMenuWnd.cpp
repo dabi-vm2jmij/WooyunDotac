@@ -63,7 +63,7 @@ bool CUIMenuWnd::Init(HWND hParent, int x1, int y1, int x2, int y2)
 		return false;
 
 	m_imageWnd.Create(nWidth, nHeight, 32, CImage::createAlphaChannel);
-	OnSelChanged(-1, true);
+	OnSelChange(-1, true);
 	SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 	return true;
 }
@@ -179,7 +179,7 @@ bool CUIMenuWnd::IsMenuWnd(HWND hWnd) const
 LRESULT CUIMenuWnd::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
 	m_imageWnd.Destroy();
-	m_ptMouse = CPoint(MAXINT16, MAXINT16);
+	m_ptMouse.SetPoint(MAXINT16, MAXINT16);
 	m_nItemId = -1;
 	m_nCurSel = -1;
 	return 0;
@@ -223,11 +223,11 @@ LRESULT CUIMenuWnd::OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandl
 				wcsncpy_s(szText, item.m_strText.c_str(), _countof(szText) - 1);
 				CharLowerW(szText);
 
-				if (item.m_bEnabled && item.m_nId && wcsstr(szText, szKey))
+				if (item.m_bEnable && item.m_nId && wcsstr(szText, szKey))
 				{
 					if (item.GetSubMenu())
 					{
-						OnSelChanged(i, false);
+						OnSelChange(i, false);
 						OnTimeOut(true);
 						break;
 					}
@@ -259,9 +259,9 @@ LRESULT CUIMenuWnd::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 			{
 				nIndex = (nIndex - 1 + nCount) % nCount;
 
-				if (m_pUIMenu->m_vecItems[nIndex].m_bEnabled && m_pUIMenu->m_vecItems[nIndex].m_nId)
+				if (m_pUIMenu->m_vecItems[nIndex].m_bEnable && m_pUIMenu->m_vecItems[nIndex].m_nId)
 				{
-					OnSelChanged(nIndex, false);
+					OnSelChange(nIndex, false);
 					break;
 				}
 			}
@@ -272,9 +272,9 @@ LRESULT CUIMenuWnd::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 			{
 				nIndex = (nIndex + 1) % nCount;
 
-				if (m_pUIMenu->m_vecItems[nIndex].m_bEnabled && m_pUIMenu->m_vecItems[nIndex].m_nId)
+				if (m_pUIMenu->m_vecItems[nIndex].m_bEnable && m_pUIMenu->m_vecItems[nIndex].m_nId)
 				{
-					OnSelChanged(nIndex, false);
+					OnSelChange(nIndex, false);
 					break;
 				}
 			}
@@ -331,7 +331,7 @@ LRESULT CUIMenuWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &b
 	if (nCurSel != -1)
 	{
 		if (m_pParent)
-			m_pParent->OnSelChanged(m_nItemId, false);	// 确保父菜单已选中
+			m_pParent->OnSelChange(m_nItemId, false);	// 确保父菜单已选中
 
 		SetTimer(TIMER_ID, m_pUIMenu->GetShowDelay(), NULL);
 	}
@@ -340,7 +340,7 @@ LRESULT CUIMenuWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &b
 		return 0;	// 已弹出子菜单
 	}
 
-	OnSelChanged(nCurSel, false);
+	OnSelChange(nCurSel, false);
 	return 0;
 }
 
@@ -350,7 +350,7 @@ LRESULT CUIMenuWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL 
 
 	if (nCurSel != -1)
 	{
-		OnSelChanged(nCurSel, false);
+		OnSelChange(nCurSel, false);
 		OnTimeOut(true);
 	}
 
@@ -374,7 +374,7 @@ void CUIMenuWnd::ResetSel()
 	if (m_pChild && *m_pChild)
 	{
 		m_pChild->DestroyWindow();
-		OnSelChanged(-1, false);
+		OnSelChange(-1, false);
 	}
 }
 
@@ -445,14 +445,14 @@ UINT CUIMenuWnd::Point2Sel(CPoint point) const
 			nHeight += item.m_nHeight;
 
 			if (cy < nHeight)
-				return item.m_bEnabled && item.m_nId ? i : -1;
+				return item.m_bEnable && item.m_nId ? i : -1;
 		}
 	}
 
 	return -1;
 }
 
-void CUIMenuWnd::OnSelChanged(UINT nCurSel, bool bInit)
+void CUIMenuWnd::OnSelChange(UINT nCurSel, bool bInit)
 {
 	if (nCurSel == m_nCurSel && !bInit)
 		return;

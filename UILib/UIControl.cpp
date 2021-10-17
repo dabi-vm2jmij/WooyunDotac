@@ -58,7 +58,7 @@ bool CUIControl::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			{
 				GetRootView()->SetCapture(NULL);
 				FRIEND(GetParent())->OnChildMoved(this, CPoint(lParam) - m_ptClick);
-				m_ptClick = CSize(MAXINT16, MAXINT16);
+				m_ptClick.SetSize(MAXINT16, MAXINT16);
 			}
 
 			m_bLButtonDown = false;
@@ -102,13 +102,35 @@ void CUIControl::OnPaint(CUIDC &dc) const
 	__super::OnPaint(dc);
 }
 
-bool CUIControl::DoMouseLeave(bool bForce)
+void CUIControl::OnEnable(bool bEnable)
 {
-	if (!__super::DoMouseLeave(bForce))
-		return false;
+	__super::OnEnable(bEnable);
 
+	if (!bEnable)
+	{
+		auto pRootView = GetRootView();
+		if (pRootView->GetFocus() == this)
+			pRootView->SetFocus(NULL);
+	}
+}
+
+void CUIControl::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
+{
+	__super::OnRectChange(lpOldRect, lpClipRect);
+
+	if (m_rect.IsRectEmpty())
+	{
+		auto pRootView = GetRootView();
+		if (pRootView->GetFocus() == this)
+			pRootView->SetFocus(NULL);
+	}
+}
+
+void CUIControl::OnMouseLeave()
+{
 	m_bLButtonDown = m_bRButtonDown = false;
-	return true;
+
+	__super::OnMouseLeave();
 }
 
 void CUIControl::OnLostCapture()
@@ -120,7 +142,7 @@ void CUIControl::OnLostCapture()
 		GetRootView()->ScreenToClient(&point);
 
 		FRIEND(GetParent())->OnChildMoved(this, point - m_ptClick);
-		m_ptClick = CSize(MAXINT16, MAXINT16);
+		m_ptClick.SetSize(MAXINT16, MAXINT16);
 	}
 }
 
@@ -138,8 +160,8 @@ void CUIControl::OnLoaded(const IUIXmlAttrs &attrs)
 	__super::OnLoaded(attrs);
 
 	int nValue;
-	if (attrs.GetInt(L"stretch", &nValue))
-		SetStretch(nValue != 0);
+	if (attrs.GetInt(L"stretch", &nValue) && nValue)
+		SetStretch(true);
 
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"tooltip"))

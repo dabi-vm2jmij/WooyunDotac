@@ -6,11 +6,6 @@ CUIMoreWnd::CUIMoreWnd(COLORREF color) : m_rootView(this)
 	m_rootView.SetBgColor(color);
 }
 
-CUIMoreWnd::~CUIMoreWnd()
-{
-	m_rootView.ClearItems();
-}
-
 HWND CUIMoreWnd::Init(HWND hParent, CPoint point, const vector<CUIView *> &vecItems)
 {
 	m_rootView.InitItems(vecItems);
@@ -38,5 +33,11 @@ void CUIMoreWnd::OnFinalMessage(HWND hWnd)
 LRESULT CUIMoreWnd::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
 	PostMessage(WM_CLOSE);
+	return 0;
+}
+
+LRESULT CUIMoreWnd::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+{
+	m_rootView.ClearItems();
 	return 0;
 }

@@ -28,7 +28,7 @@ void CMainFrame::OnLoadedUI(const IUIXmlAttrs &attrs)
 	m_pViews[2] = m_rootView.SearchCast(L"中部2");
 
 	CUIMenuButton *pMenuBtn = m_rootView.SearchCast(L"主菜单");
-	pMenuBtn->OnGetUIMenu([this]
+	pMenuBtn->BindGetUIMenu([this]
 	{
 		if (m_uiMenu.GetCount() == 0)
 		{
@@ -41,13 +41,13 @@ void CMainFrame::OnLoadedUI(const IUIXmlAttrs &attrs)
 	});
 
 	CUIButton *pButton = m_rootView.SearchCast(L"安装");
-	pButton->OnClick([this]{ DoSetup(); });
+	pButton->BindClick([this]{ DoSetup(); });
 
 	CUICheckBox *pChkBox = m_rootView.SearchCast(L"check1");
-	pChkBox->OnClick([pButton](bool bCheck){ pButton->SetEnabled(bCheck); });
+	pChkBox->BindClick([pChkBox, pButton]{ pButton->SetEnable(pChkBox->IsChecked()); });
 
 	pButton = m_rootView.SearchCast(L"自定义");
-	pButton->OnClick([this, pButton]{ pButton->SetVisible(false); ShowBottom(true); });
+	pButton->BindClick([this, pButton]{ pButton->SetVisible(false); ShowBottom(true); });
 
 	m_pProgress = m_rootView.SearchCast(L"进度条");
 

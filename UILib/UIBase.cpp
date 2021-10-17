@@ -2,14 +2,12 @@
 #include "UIBase.h"
 
 CUIBase::CUIBase(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0), m_colorBg(-1)
-	, m_bEnabled(true), m_bVisible(true), m_bControl(false), m_bKeepEnter(false), m_ppEnter(NULL)
+	, m_bEnable(true), m_bVisible(true), m_bControl(false), m_bMouseEnter(false)
 {
 }
 
 CUIBase::~CUIBase()
 {
-	if (m_ppEnter)
-		*m_ppEnter = NULL;
 }
 
 static int Int2Offset(int nValue, bool bClip)
@@ -195,7 +193,7 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 
 		m_rect = rect;
 		m_rcReal = rcReal;
-		OnRectChanged(rcOld, lpClipRect);
+		OnRectChange(rcOld, lpClipRect);
 	}
 }
 
@@ -232,7 +230,7 @@ CUIRootView *CUIBase::GetRootView() const
 	auto pItem = const_cast<CUIBase *>(this);
 	for (CUIBase *pParent; pParent = pItem->m_pParent; pItem = pParent);
 
-	CUIRootView *pRootView = dynamic_cast<CUIRootView *>(pItem);
+	auto pRootView = dynamic_cast<CUIRootView *>(pItem);
 	ATLASSERT(pRootView);
 	return pRootView;
 }
@@ -258,15 +256,15 @@ void CUIBase::InvalidateRect(LPCRECT lpRect)
 	GetRootView()->InvalidateRect(rect);
 }
 
-void CUIBase::SetEnabled(bool bEnabled)
+void CUIBase::SetEnable(bool bEnable)
 {
-	if (bEnabled)
-		bEnabled = true;
+	if (bEnable)
+		bEnable = true;
 
-	if (m_bEnabled == bEnabled)
+	if (m_bEnable == bEnable)
 		return;
 
-	OnEnabled(m_bEnabled = bEnabled);
+	OnEnable(m_bEnable = bEnable);
 }
 
 void CUIBase::SetVisible(bool bVisible)
@@ -277,7 +275,7 @@ void CUIBase::SetVisible(bool bVisible)
 	if (m_bVisible == bVisible)
 		return;
 
-	m_bVisible = bVisible;	// 不需要 OnVisible，因为有 OnRectChanged
+	m_bVisible = bVisible;	// 不需要 OnVisible，因为有 OnRectChange
 	GetParent()->InvalidateLayout();
 }
 
@@ -311,20 +309,6 @@ bool CUIBase::IsChild(const CUIBase *pItem) const
 	}
 
 	return false;
-}
-
-bool CUIBase::DoMouseLeave(bool bForce)
-{
-	if (m_ppEnter == NULL)
-		return true;
-
-	if (m_bKeepEnter && !bForce)
-		return false;
-
-	*m_ppEnter = NULL;
-	m_ppEnter = NULL;
-	OnMouseLeave();
-	return true;
 }
 
 static int Str2Offset(LPCWSTR lpStr)
@@ -369,11 +353,11 @@ void CUIBase::OnLoaded(const IUIXmlAttrs &attrs)
 		ATLASSERT(m_offset.top == MAXINT16 || m_offset.bottom == MAXINT16);
 	}
 
-	if (attrs.GetInt(L"enabled", &nValue))
-		SetEnabled(nValue != 0);
+	if (attrs.GetInt(L"enable", &nValue) && nValue == 0)
+		SetEnable(false);
 
-	if (attrs.GetInt(L"visible", &nValue))
-		SetVisible(nValue != 0);
+	if (attrs.GetInt(L"visible", &nValue) && nValue == 0)
+		SetVisible(false);
 
 	if (lpStr = attrs.GetStr(L"colorBg"))
 	{

@@ -10,7 +10,7 @@ public:
 		wstring m_strText;
 		CImagex m_imagex;
 		bool    m_bCheck;
-		bool    m_bEnabled;
+		bool    m_bEnable;
 		int     m_nHeight;
 
 		Item(UINT nId = 0, LPCWSTR lpText = NULL);

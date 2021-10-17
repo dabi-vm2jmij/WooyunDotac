@@ -331,6 +331,26 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 	}
 }
 
+void CUITextImpl::SetFont(HFONT hFont)
+{
+	ATLASSERT(hFont);
+	if (m_hFont == hFont || hFont == NULL)
+		return;
+
+	m_hFont = hFont;
+	RecalcSize();
+	Invalidate();
+}
+
+void CUITextImpl::SetTextColor(COLORREF color)
+{
+	if (m_color == color)
+		return;
+
+	m_color = color;
+	Invalidate();
+}
+
 void CUITextImpl::SetText(LPCWSTR lpText)
 {
 	if (lpText == NULL)
@@ -352,32 +372,12 @@ void CUITextImpl::SetText(LPCWSTR lpText)
 	Invalidate();
 }
 
-void CUITextImpl::SetFont(HFONT hFont)
-{
-	ATLASSERT(hFont);
-	if (m_hFont == hFont || hFont == NULL)
-		return;
-
-	m_hFont = hFont;
-	RecalcSize();
-	Invalidate();
-}
-
-void CUITextImpl::SetTextColor(COLORREF color)
-{
-	if (m_color == color)
-		return;
-
-	m_color = color;
-	Invalidate();
-}
-
 void CUITextImpl::Invalidate()
 {
 	if (m_sizeText.cx == 0 || m_sizeText.cy == 0)
 		return;
 
-	CUIControl *pCtrl = dynamic_cast<CUIControl *>(this);
+	auto pCtrl = dynamic_cast<CUIControl *>(this);
 	ATLASSERT(pCtrl);
 	pCtrl->InvalidateRect(NULL);
 }

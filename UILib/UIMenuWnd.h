@@ -41,7 +41,7 @@ private:
 	void ResetSel();
 	void OnTimeOut(bool bReset);
 	UINT Point2Sel(CPoint point) const;
-	void OnSelChanged(UINT nCurSel, bool bInit);
+	void OnSelChange(UINT nCurSel, bool bInit);
 
 	CUIMenu    *m_pUIMenu;
 	CUIMenuWnd *m_pParent;

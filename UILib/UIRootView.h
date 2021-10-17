@@ -30,6 +30,7 @@ public:
 	virtual BOOL ClientToScreen(LPPOINT lpPoint);
 	virtual BOOL ScreenToClient(LPPOINT lpPoint);
 	CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent);
+	CUIControl *GetFocus() const { return m_pFocus; }
 	CUIControl *GetCapture() const { return m_pCapture; }
 
 protected:
@@ -41,7 +42,7 @@ protected:
 	void OnPaintLayered(HDC hDC);
 	void OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void CheckMouseLeave(const UIHitTest &hitTest);
-	void EnableImm(bool bEnabled);
+	void EnableImm(bool bEnable);
 	void AddTabsEdit(CUIEdit *pEdit);
 	void DelTabsEdit(CUIEdit *pEdit);
 	void NextTabsEdit();
@@ -51,13 +52,12 @@ protected:
 	CRect       m_rectClip;		// 当前无效区域
 	BYTE        m_nWndAlpha;	// 透明度：0~255
 	bool        m_bLayered;
-	bool        m_bMouseEnter;
 	HIMC        m_hImc;
 	HCURSOR     m_hCursor;
 	HWND        m_hToolTip;
 	wstring     m_strTipText;
+	CUIControl *m_pFocus;
 	CUIControl *m_pCapture;
-	CUIControl *m_pCurFocus;
 	vector<CUIEdit *> m_vecEdits;
 	vector<CUIBase *> m_vecEnterItems;
 };

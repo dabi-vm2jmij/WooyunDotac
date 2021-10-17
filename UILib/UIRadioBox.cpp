@@ -17,19 +17,16 @@ void CUIRadioBox::OnLButtonUp(CPoint point)
 	__super::OnLButtonUp(point);
 }
 
-void CUIRadioBox::OnCheckChanged()
+void CUIRadioBox::OnChecked()
 {
-	__super::OnCheckChanged();
-
-	if (!m_bCheck)
-		return;
-
 	for (auto pItem : GetParent()->GetChilds())
 	{
-		if (CUIRadioBox *pRadio = dynamic_cast<CUIRadioBox *>(pItem))
+		auto pRadio = dynamic_cast<CUIRadioBox *>(pItem);
+
+		if (pRadio && pRadio != this && pRadio->m_bCheck)
 		{
-			if (pRadio != this)
-				pRadio->SetCheck(false);
+			pRadio->m_bCheck = false;
+			pRadio->InvalidateRect(NULL);
 		}
 	}
 }

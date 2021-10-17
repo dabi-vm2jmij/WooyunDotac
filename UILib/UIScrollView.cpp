@@ -9,7 +9,7 @@ void CUIScrollView::SetVScroll(CUIVScroll *pVScroll)
 {
 	ATLASSERT(pVScroll->GetParent() != this);
 	m_pVScroll = pVScroll;
-	m_pVScroll->OnChanged([this](int){ InvalidateLayout(); });
+	m_pVScroll->BindChange([this](int){ InvalidateLayout(); });
 }
 
 void CUIScrollView::CheckVScroll()
@@ -36,12 +36,12 @@ bool CUIScrollView::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return uMsg == WM_MOUSEWHEEL && m_pVScroll && m_pVScroll->IsEnabled() && m_pVScroll->IsVisible() && FRIEND(m_pVScroll)->OnMessage(uMsg, wParam, lParam);
 }
 
-void CUIScrollView::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
+void CUIScrollView::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	if (m_rect.Height() != lpOldRect->bottom - lpOldRect->top)
 		CheckVScroll();
 
-	__super::OnRectChanged(lpOldRect, lpClipRect);
+	__super::OnRectChange(lpOldRect, lpClipRect);
 }
 
 void CUIScrollView::OnNeedLayout(LPRECT lpClipRect)

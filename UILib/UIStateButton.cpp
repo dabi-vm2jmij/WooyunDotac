@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIStateButton.h"
 
-CUIStateButton::CUIStateButton(CUIView *pParent) : CUIView(pParent), m_nState(0)
+CUIStateButton::CUIStateButton(CUIView *pParent) : CUIControl(pParent), m_nState(0)
 {
 }
 
@@ -27,8 +27,6 @@ void CUIStateButton::EndAddChild()
 			return;
 		}
 
-		((CUIButton *)pItem)->OnClick([this]{ OnChildClick(); });
-
 		CSize size = pItem->GetSize();
 
 		if (nWidth < size.cx)
@@ -41,6 +39,58 @@ void CUIStateButton::EndAddChild()
 	SetSize({ nWidth, nHeight });
 }
 
+void CUIStateButton::SetState(UINT nState)
+{
+	nState %= m_vecChilds.size();
+
+	if (m_nState == nState)
+		return;
+
+	m_nState = nState;
+	InvalidateLayout();
+}
+
+HCURSOR CUIStateButton::GetCursor() const
+{
+	return ((CUIControl *)m_vecChilds[m_nState])->GetCursor();
+}
+
+LPCWSTR CUIStateButton::GetToolTip() const
+{
+	return ((CUIControl *)m_vecChilds[m_nState])->GetToolTip();
+}
+
+bool CUIStateButton::OnHitTest(UIHitTest &hitTest)
+{
+	if (m_vecChilds.size() <= m_nState || !m_vecChilds[m_nState]->GetRect().PtInRect(hitTest.point))
+		return false;
+
+	hitTest.Add(this);
+	hitTest.Add(m_vecChilds[m_nState]);
+
+	if (!IsEnabled())
+		hitTest.items[hitTest.nCount - 1].bEnable = false;
+
+	return true;
+}
+
+void CUIStateButton::OnLButtonDown(CPoint point)
+{
+	FRIEND(m_vecChilds[m_nState])->OnLButtonDown(point);
+}
+
+void CUIStateButton::OnLButtonUp(CPoint point)
+{
+	FRIEND(m_vecChilds[m_nState])->OnLButtonUp(point);
+
+	// ÏÔÊ¾ÏÂÒ»Ì¬
+	UINT nState = m_nState;
+	SetState(m_nState + 1);
+
+	if (m_fnOnClick)
+		m_fnOnClick(nState);
+}
+
 void CUIStateButton::RecalcLayout(LPRECT lpClipRect)
 {
 	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
@@ -50,31 +100,6 @@ void CUIStateButton::RecalcLayout(LPRECT lpClipRect)
 	{
 		FRIEND(m_vecChilds[i])->CalcRect(i == m_nState ? &CRect(m_rect) : NULL, lpClipRect);
 	}
-}
-
-void CUIStateButton::SetState(int nState)
-{
-	nState = (nState + m_vecChilds.size()) % m_vecChilds.size();
-
-	if (m_nState == nState)
-		return;
-
-	m_nState = nState;
-	InvalidateLayout();
-}
-
-void CUIStateButton::OnChildClick()
-{
-	int nState = m_nState;
-	m_nState = (nState + 1 + m_vecChilds.size()) % m_vecChilds.size();
-
-	if (m_fnOnClick)
-		m_fnOnClick(nState);
-
-	if (m_nState == nState)
-		return;
-
-	InvalidateLayout();
 }
 
 void CUIStateButton::OnLoaded(const IUIXmlAttrs &attrs)

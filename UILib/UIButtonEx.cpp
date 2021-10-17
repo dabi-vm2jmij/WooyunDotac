@@ -49,7 +49,7 @@ void CUIButtonEx::SetTextLeft(int nTextLeft)
 void CUIButtonEx::MyPaint(CUIDC &dc) const
 {
 	CRect rect(m_rect);
-	const CImagex &curImgxIcon = m_imgxIcons[m_nDrawState];
+	const CImagex &curImgxIcon = m_imgxIcons[m_btnState];
 
 	if (curImgxIcon)
 	{
@@ -66,32 +66,6 @@ void CUIButtonEx::MyPaint(CUIDC &dc) const
 		nFormat |= DT_CENTER;
 
 	OnDrawText(dc, rect, nFormat);
-}
-
-void CUIButtonEx::OnMouseEnter()
-{
-	__super::OnMouseEnter();
-
-	if (m_bUnderline)
-	{
-		CUIFontMgr::FontKey fontKey(m_hFont);
-		fontKey.m_bUnderline = true;
-		m_hFont = g_theApp.GetFontMgr().GetCachedFont(fontKey);
-		InvalidateRect(NULL);
-	}
-}
-
-void CUIButtonEx::OnMouseLeave()
-{
-	if (m_bUnderline)
-	{
-		CUIFontMgr::FontKey fontKey(m_hFont);
-		fontKey.m_bUnderline = false;
-		m_hFont = g_theApp.GetFontMgr().GetCachedFont(fontKey);
-		InvalidateRect(NULL);
-	}
-
-	__super::OnMouseLeave();
 }
 
 void CUIButtonEx::OnTextSize(CSize size)
@@ -114,15 +88,28 @@ void CUIButtonEx::OnTextSize(CSize size)
 	SetSize(size);
 }
 
-void CUIButtonEx::OnDrawState(UINT nState)
+void CUIButtonEx::OnButtonState(ButtonState btnState)
 {
-	if (m_imgxIcons[m_nDrawState] != m_imgxIcons[nState])
+	if (m_bUnderline)
+	{
+		CUIFontMgr::FontKey fontKey(m_hFont);
+		fontKey.m_bUnderline = btnState == Hover || btnState == Press;
+		HFONT hFont = g_theApp.GetFontMgr().GetCachedFont(fontKey);
+
+		if (m_hFont != hFont)
+		{
+			m_hFont = hFont;
+			InvalidateRect(NULL);
+		}
+	}
+
+	if (m_imgxIcons[m_btnState] != m_imgxIcons[btnState])
 		InvalidateRect(NULL);
 
-	if (m_colors[m_nDrawState] != m_colors[nState])
-		SetTextColor(m_colors[nState]);
+	if (m_colors[m_btnState] != m_colors[btnState])
+		SetTextColor(m_colors[btnState]);
 
-	__super::OnDrawState(nState);
+	__super::OnButtonState(btnState);
 }
 
 void CUIButtonEx::OnLoaded(const IUIXmlAttrs &attrs)
@@ -136,8 +123,8 @@ void CUIButtonEx::OnLoaded(const IUIXmlAttrs &attrs)
 	if (attrs.GetInt(L"textLeft", &nValue))
 		SetTextLeft(nValue);
 
-	if (attrs.GetInt(L"underline", &nValue))
-		SetUnderline(nValue != 0);
+	if (attrs.GetInt(L"underline", &nValue) && nValue)
+		SetUnderline(true);
 
 	OnLoadedText(attrs);
 

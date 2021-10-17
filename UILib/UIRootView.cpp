@@ -2,8 +2,8 @@
 #include "UIRootView.h"
 #include "UILibApp.h"
 
-CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_nWndAlpha(255), m_bLayered(false), m_bMouseEnter(false), m_hImc(NULL), m_hCursor(NULL)
-	, m_hToolTip(NULL), m_pCapture(NULL), m_pCurFocus(NULL)
+CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_nWndAlpha(255), m_bLayered(false), m_hImc(NULL), m_hCursor(NULL)
+	, m_hToolTip(NULL), m_pFocus(NULL), m_pCapture(NULL)
 {
 	m_vecEnterItems.reserve(8);
 }
@@ -84,7 +84,12 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_MOUSELEAVE:
 		m_bMouseEnter = false;
 		CheckMouseLeave(UIHitTest());
-		ShowToolTip(L"");
+
+		if (m_strTipText.size())
+		{
+			m_strTipText.clear();
+			ShowToolTip(NULL);
+		}
 		return TRUE;
 
 	case WM_MOUSEMOVE:
@@ -132,45 +137,45 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_KEYUP:
 	case WM_CHAR:
 	case WM_IME_CHAR:
-		if (m_pCurFocus)
+		if (m_pFocus)
 		{
-			m_pCurFocus->OnMessage(uMsg, wParam, lParam);
+			m_pFocus->OnMessage(uMsg, wParam, lParam);
 			return TRUE;
 		}
 		break;
 
 	case WM_SETFOCUS:
-		if (m_pCurFocus)
-			m_pCurFocus->OnSetFocus();
+		if (m_pFocus)
+			m_pFocus->OnSetFocus();
 		break;
 
 	case WM_KILLFOCUS:
-		if (m_pCurFocus)
+		if (m_pFocus)
 		{
-			m_pCurFocus->OnKillFocus();
+			m_pFocus->OnKillFocus();
 
 			if (wParam && ::IsChild(GetHwnd(), (HWND)wParam))
-				m_pCurFocus = NULL;
+				m_pFocus = NULL;
 		}
 		break;
 
 	case WM_PARENTNOTIFY:
-		if (m_pCurFocus)
+		if (m_pFocus)
 		{
 			switch (LOWORD(wParam))
 			{
 			case WM_LBUTTONDOWN:
 			case WM_RBUTTONDOWN:
-				m_pCurFocus->OnKillFocus();
-				m_pCurFocus = NULL;
+				m_pFocus->OnKillFocus();
+				m_pFocus = NULL;
 			}
 		}
 		break;
 
 	case WM_INPUTLANGCHANGE:
-		if (m_pCurFocus && wParam)
+		if (m_pFocus && wParam)
 		{
-			if (CUIEdit *pEdit = dynamic_cast<CUIEdit *>(m_pCurFocus))
+			if (auto pEdit = dynamic_cast<CUIEdit *>(m_pFocus))
 			{
 				pEdit->OnInputLangChange(lParam);
 				lResult = TRUE;
@@ -222,8 +227,8 @@ bool CUIRootView::OnNcHitTest(CPoint point)
 	{
 		if (hit.pItem->IsControl())
 		{
-			if (hit.bEnabled)
-				m_hCursor = ((CUIControl *)hit.pItem)->m_hCursor;
+			if (hit.bEnable)
+				m_hCursor = ((CUIControl *)hit.pItem)->GetCursor();
 			break;
 		}
 	}
@@ -239,7 +244,7 @@ void CUIRootView::OnSize(CSize size)
 		m_rect = m_rcReal = CRect(0, 0, size.cx, size.cy);
 
 		CRect rect;
-		OnRectChanged(NULL, rect);
+		OnRectChange(NULL, rect);
 
 		if (!rect.IsRectEmpty())
 			InvalidateRect(rect);
@@ -257,7 +262,7 @@ void CUIRootView::OnPaint()
 	else
 		DoPaint(CUIMemDC(dc, dc.PaintRect()), dc.PaintRect());
 
-	m_rectClip = CRect();
+	m_rectClip.SetRectEmpty();
 }
 
 void CUIRootView::OnPaintLayered(HDC hDC)
@@ -273,7 +278,7 @@ void CUIRootView::OnPaintLayered(HDC hDC)
 	if (!m_rectClip.IsRectEmpty())
 	{
 		DoPaint(CUIMemDC(hImgDC, m_rectClip, true), m_rectClip);
-		m_rectClip = CRect();
+		m_rectClip.SetRectEmpty();
 	}
 
 	BLENDFUNCTION bf = { AC_SRC_OVER, 0, m_nWndAlpha, AC_SRC_ALPHA };
@@ -302,45 +307,47 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN)
 	{
-		LPCWSTR lpToolTip = L"";
+		LPCWSTR lpTipText = L"";
 
 		for (auto hit : hitTest)
 		{
 			if (hit.pItem->IsControl())
 			{
-				if (uMsg == WM_MOUSEMOVE)
-				{
-					lpToolTip = ((CUIControl *)hit.pItem)->m_strToolTip.c_str();
-				}
-				else if (hit.bEnabled && dynamic_cast<CUIEdit *>(hit.pItem) == NULL)
-				{
-					SetFocus(NULL);		// 使输入框失去焦点
-				}
+				lpTipText = ((CUIControl *)hit.pItem)->GetToolTip();
 				break;
 			}
 		}
 
-		if (uMsg == WM_MOUSEMOVE)
-			ShowToolTip(lpToolTip);
-		else
-			ShowToolTip(NULL);
+		if (m_strTipText != lpTipText)
+		{
+			m_strTipText = lpTipText;
+
+			if (wParam & (MK_LBUTTON | MK_RBUTTON))
+				ShowToolTip(NULL);
+			else
+				ShowToolTip(m_strTipText.c_str());
+		}
 
 		for (auto hit : hitTest)
 		{
-			if (hit.bEnabled)
+			if (hit.bEnable)
 				DoMouseEnter(hit.pItem);
 		}
-	}
 
-	if (uMsg == WM_MOUSEMOVE)
 		CheckMouseLeave(hitTest);
+	}
 
 	for (auto hit : hitTest)
 	{
 		if (hit.pItem->IsControl())
 		{
-			if (hit.bEnabled)
+			if (hit.bEnable)
+			{
+				if (m_pFocus && m_pFocus != hit.pItem && (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN))
+					SetFocus(NULL);		// 使输入框失去焦点
+
 				hit.pItem->OnMessage(uMsg, wParam, lParam);
+			}
 			break;
 		}
 	}
@@ -364,7 +371,7 @@ void CUIRootView::RaiseMouseMove()
 	{
 		for (auto hit : hitTest)
 		{
-			if (hit.bEnabled)
+			if (hit.bEnable)
 				DoMouseEnter(hit.pItem);
 		}
 	}
@@ -374,63 +381,54 @@ void CUIRootView::RaiseMouseMove()
 
 void CUIRootView::DoMouseEnter(CUIBase *pItem)
 {
-	auto itNull = m_vecEnterItems.end();
-
 	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); ++it)
 	{
-		if (pItem == *it)
+		if (*it == pItem)
 			return;
-
-		if (itNull == m_vecEnterItems.end() && *it == NULL)
-			itNull = it;
 	}
 
-	if (itNull == m_vecEnterItems.end())
-	{
-		auto pData = m_vecEnterItems.data();
-		m_vecEnterItems.push_back(pItem);
-
-		if (pData != m_vecEnterItems.data())
-		{
-			// vector 内存地址变了，需要更新
-			for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); ++it)
-			{
-				(*it)->m_ppEnter = &*it;
-			}
-		}
-		else
-			pItem->m_ppEnter = &m_vecEnterItems.back();
-	}
-	else
-	{
-		*itNull = pItem;
-		pItem->m_ppEnter = &*itNull;
-	}
-
+	m_vecEnterItems.push_back(pItem);
+	pItem->m_bMouseEnter = true;
 	pItem->OnMouseEnter();
 }
 
 void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 {
-	for (auto pItem : m_vecEnterItems)
+	std::vector<CUIBase *> vecLeaveItems;
+
+	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); )
 	{
-		if (pItem == NULL || pItem == m_pCapture)
+		if (*it == m_pCapture)
+		{
+			++it;
 			continue;
+		}
 
 		bool bEnter = false;
 
 		for (auto hit : hitTest)
 		{
-			if (pItem == hit.pItem)
+			if (hit.pItem == *it)
 			{
-				if (hit.bEnabled)
+				if (hit.bEnable)
 					bEnter = true;
 				break;
 			}
 		}
 
 		if (!bEnter)
-			pItem->DoMouseLeave(false);
+		{
+			vecLeaveItems.push_back(*it);
+			it = m_vecEnterItems.erase(it);
+		}
+		else
+			++it;
+	}
+
+	for (auto pItem : vecLeaveItems)
+	{
+		pItem->m_bMouseEnter = false;
+		pItem->OnMouseLeave();
 	}
 }
 
@@ -470,11 +468,11 @@ void CUIRootView::SetCapture(CUIControl *pCtrl)
 
 void CUIRootView::SetFocus(CUIControl *pCtrl)
 {
-	if (m_pCurFocus == pCtrl)
+	if (m_pFocus == pCtrl)
 		return;
 
-	CUIControl *pOldFocus = m_pCurFocus;
-	m_pCurFocus = pCtrl;
+	auto pOldFocus = m_pFocus;
+	m_pFocus = pCtrl;
 
 	if (m_rect.IsRectEmpty())
 		return;
@@ -488,9 +486,9 @@ void CUIRootView::SetFocus(CUIControl *pCtrl)
 		pCtrl->OnSetFocus();
 }
 
-void CUIRootView::EnableImm(bool bEnabled)
+void CUIRootView::EnableImm(bool bEnable)
 {
-	if (!m_hImc == !bEnabled)
+	if (!m_hImc == !bEnable)
 		m_hImc = ImmAssociateContext(GetHwnd(), m_hImc);
 }
 
@@ -507,12 +505,6 @@ void CUIRootView::AddTabsEdit(CUIEdit *pEdit)
 
 void CUIRootView::DelTabsEdit(CUIEdit *pEdit)
 {
-	if (m_pCurFocus == pEdit)
-	{
-		m_pCurFocus->OnKillFocus();
-		m_pCurFocus = NULL;
-	}
-
 	for (auto it = m_vecEdits.begin(); it != m_vecEdits.end(); ++it)
 	{
 		if (*it == pEdit)
@@ -533,7 +525,7 @@ void CUIRootView::NextTabsEdit()
 
 	for (int i = 0; i != nSize; i++)
 	{
-		if (m_vecEdits[i] == m_pCurFocus)
+		if (m_vecEdits[i] == m_pFocus)
 		{
 			iCurId = i;
 			break;
@@ -564,12 +556,6 @@ void CUIRootView::NextTabsEdit()
 
 void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
 {
-	if (m_strTipText == (lpTipText ? lpTipText : L""))
-		return;
-
-	if (lpTipText)
-		m_strTipText = lpTipText;
-
 	if (lpTipText && *lpTipText)
 	{
 		HWND hWnd = GetHwnd();
@@ -579,7 +565,7 @@ void CUIRootView::ShowToolTip(LPCWSTR lpTipText)
 		ti.hwnd      = ::GetParent(hWnd);
 		ti.uId       = (UINT_PTR)hWnd;
 		ti.hinst     = _AtlBaseModule.GetResourceInstance();
-		ti.lpszText  = (LPWSTR)m_strTipText.c_str();
+		ti.lpszText  = (LPWSTR)lpTipText;
 
 		if (m_hToolTip)
 		{

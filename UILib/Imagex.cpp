@@ -83,7 +83,7 @@ void CImagex::Reset(const CImagePtr &spImage, const CRect &rect)
 		m_rect = rect;
 	}
 	else
-		m_rect = CRect();
+		m_rect.SetRectEmpty();
 }
 
 UINT CImagex::GetFrameCount() const
@@ -99,9 +99,9 @@ void CImagex::SetFrameIndex(UINT nIndex)
 void CImagex::SetRect()
 {
 	if (*this)
-		m_rect = CRect(0, 0, m_spImage->GetWidth(), m_spImage->GetHeight());
+		m_rect.SetRect(0, 0, m_spImage->GetWidth(), m_spImage->GetHeight());
 	else
-		m_rect = CRect();
+		m_rect.SetRectEmpty();
 }
 
 void CImagex::BitBlt(HDC hdcDst, int xDst, int yDst, int nDstWidth, int nDstHeight, int xSrc, int ySrc, DWORD dwROP) const

@@ -26,16 +26,16 @@ public:
 	CRect GetWindowRect() const;
 	void InvalidateRect(LPCRECT lpRect);
 	void SetBgColor(COLORREF color) { m_colorBg = color; }
-	void SetEnabled(bool bEnabled);
+	void SetEnable(bool bEnable);
 	void SetVisible(bool bVisible);
-	bool IsEnabled() const { return m_bEnabled; }
+	bool IsEnabled() const { return m_bEnable; }
 	bool IsVisible() const { return m_bVisible; }
 	bool IsRealEnabled() const;
 	bool IsRealVisible() const;
 	bool IsFullVisible() const;
 	bool IsChild(const CUIBase *pItem) const;
 	bool IsControl() const { return m_bControl; }
-	bool IsMouseEnter() const { return m_ppEnter != NULL; }
+	bool IsMouseEnter() const { return m_bMouseEnter; }
 	CUIView *GetParent() const;
 	CUIRootView *GetRootView() const;
 
@@ -48,8 +48,8 @@ protected:
 		struct
 		{
 			CUIBase *pItem;
-			bool     bEnabled;
-		} items[64];
+			bool     bEnable;
+		} items[20];
 
 		UIHitTest() : nCount(0) {}
 
@@ -74,30 +74,27 @@ protected:
 	virtual bool OnHitTest(UIHitTest &hitTest) { return false; }
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
 	virtual void OnPaint(CUIDC &dc) const {}
-	virtual void OnEnabled(bool bEnabled) {}
-	virtual void OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect) {}
+	virtual void OnEnable(bool bEnable) {}
+	virtual void OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect) {}
 	virtual void OnNeedLayout(LPRECT lpClipRect) {}
 	virtual void CalcRect(LPRECT lpRect, LPRECT lpClipRect);
 	virtual void OnMouseEnter() {}
 	virtual void OnMouseLeave() {}
-	virtual bool DoMouseLeave(bool bForce);
 	void DoPaint(CUIDC &dc) const;
 
-	CUIView  *m_pParent;
-	CRect     m_offset;		// 对齐和偏移，左右互斥、上下互斥
-	CSize     m_size;		// 宽或高小于零为自适应
-	CRect     m_rect;		// 完整区域，包括不可见部分
-	wstring   m_strId;
-	COLORREF  m_colorBg;
-	bool      m_bEnabled;
-	bool      m_bVisible;
-	bool      m_bControl;	// 是否 CUIControl
-	bool      m_bKeepEnter;	// 保持 MouseEnter 状态
+	CUIView *m_pParent;
+	CRect    m_offset;		// 上下左右的偏移
+	CSize    m_size;		// 宽、高 == 0 为填充
+	CRect    m_rect;		// 完整区域，包括不可见部分
+	CRect    m_rcReal;		// 实际可见区域
+	wstring  m_strId;
+	COLORREF m_colorBg;
+	bool     m_bEnable;
+	bool     m_bVisible;
+	bool     m_bControl;	// 是否 CUIControl
+	bool     m_bMouseEnter;
 
 private:
-	CRect     m_rcReal;		// 实际可见区域
-	CUIBase **m_ppEnter;	// 参考 CUIRootView::DoMouseEnter
-
 	CUIBase(const CUIBase &) = delete;
 	CUIBase &operator=(const CUIBase &) = delete;
 };

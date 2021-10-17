@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UICheckButton.h"
 
-CUICheckButton::CUICheckButton(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName)
+CUICheckButton::CUICheckButton(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName), m_bCheck(false)
 {
 }
 
@@ -14,30 +14,26 @@ void CUICheckButton::SetCheck(bool bCheck)
 	if (bCheck)
 		bCheck = true;
 
-	if (m_bKeepEnter == bCheck)
+	if (m_bCheck == bCheck)
 		return;
 
-	if (m_bKeepEnter = bCheck)
-	{
-		GetRootView()->DoMouseEnter(this);
-		OnLButtonDown(m_rect.TopLeft());
-	}
-	else
-		GetRootView()->RaiseMouseMove();
+	m_bCheck = bCheck;
+	OnButtonState(Normal);
+
+	if (bCheck)
+		OnChecked();
 }
 
 void CUICheckButton::OnLButtonUp(CPoint point)
 {
-	if (m_bKeepEnter)
-	{
-		m_bKeepEnter = false;
-		__super::OnLButtonUp(point);
-	}
-	else
-		m_bKeepEnter = true;
+	SetCheck(!m_bCheck);
 
-	if (m_fnOnClick)
-		m_fnOnClick(m_bKeepEnter);
+	__super::OnLButtonUp(point);
+}
+
+void CUICheckButton::OnButtonState(ButtonState btnState)
+{
+	__super::OnButtonState(m_bCheck ? Press : btnState);
 }
 
 void CUICheckButton::OnLoaded(const IUIXmlAttrs &attrs)
@@ -45,6 +41,6 @@ void CUICheckButton::OnLoaded(const IUIXmlAttrs &attrs)
 	__super::OnLoaded(attrs);
 
 	int nValue;
-	if (attrs.GetInt(L"check", &nValue))
-		SetCheck(nValue != 0);
+	if (attrs.GetInt(L"check", &nValue) && nValue)
+		SetCheck(true);
 }

@@ -3,7 +3,7 @@
 #include "UIResource.h"
 #include "UIFontMgr.h"
 
-#define WM_NEEDLAYOUT	WM_USER + 1000
+#define WM_NEEDLAYOUT	WM_USER + 988
 
 class CUILibApp : public CWindowImpl<CUILibApp>
 {

@@ -7,15 +7,15 @@ CUIToolBar::CUIToolBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent),
 	CUIButton *pButton = AddButton(lpFileName);
 	pButton->SetRight(0, true);
 	pButton->SetToolTip(L"更多工具");
-	pButton->OnClick([this]{ OnMoreBtn(); });
+	pButton->BindClick([this]{ OnMoreBtn(); });
 }
 
 CUIToolBar::~CUIToolBar()
 {
-	for (auto pItem : m_vecMoreItems)
+	if (m_vecMoreItems.size())
 	{
-		FRIEND(pItem)->m_pParent = this;
-		delete pItem;
+		CloseMoreWnd();
+		m_vecChilds.insert(m_vecChilds.end(), m_vecMoreItems.begin(), m_vecMoreItems.end());
 	}
 }
 
@@ -35,13 +35,7 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 	if (m_vecMoreItems.size())
 	{
 		CloseMoreWnd();
-
-		for (auto pItem : m_vecMoreItems)
-		{
-			FRIEND(pItem)->m_pParent = this;
-			m_vecChilds.push_back(pItem);
-		}
-
+		m_vecChilds.insert(m_vecChilds.end(), m_vecMoreItems.begin(), m_vecMoreItems.end());
 		m_vecMoreItems.clear();
 	}
 

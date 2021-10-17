@@ -36,7 +36,7 @@ bool CUIView::OnHitTest(UIHitTest &hitTest)
 	{
 		for (int i = nIndex; i != hitTest.nCount; i++)
 		{
-			hitTest.items[i].bEnabled = false;
+			hitTest.items[i].bEnable = false;
 		}
 	}
 
@@ -82,13 +82,13 @@ void CUIView::OnPaint(CUIDC &dc) const
 		pCapture->DoPaint(dc);
 }
 
-void CUIView::OnEnabled(bool bEnabled)
+void CUIView::OnEnable(bool bEnable)
 {
 	for (auto pItem : m_vecChilds)
-		pItem->OnEnabled(bEnabled);
+		pItem->OnEnable(bEnable);
 }
 
-void CUIView::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
+void CUIView::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	m_bNeedLayout = false;
 	RecalcLayout(lpClipRect);
@@ -136,7 +136,7 @@ void CUIView::InvalidateLayout()
 	g_theApp.DelayLayout(GetRootView());
 }
 
-void CUIView::RemoveChild(CUIView *pItem)
+void CUIView::DeleteChild(CUIView *pItem)
 {
 	for (auto it = m_vecChilds.begin(); it != m_vecChilds.end(); ++it)
 	{
@@ -145,6 +145,8 @@ void CUIView::RemoveChild(CUIView *pItem)
 			CRect rect;
 			pItem->CalcRect(NULL, rect);
 			InvalidateRect(rect);
+
+			GetRootView()->RaiseMouseMove();
 
 			m_vecChilds.erase(it);
 			delete pItem;

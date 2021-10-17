@@ -10,10 +10,16 @@ public:
 	CUIWebTabBar(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIWebTabBar();
 
+	void BindSelect(function<void()> &&fnOnSelect) { m_fnOnSelect = std::move(fnOnSelect); }
 	void SetTabWidth(int nWidth) { m_nTabWidth = nWidth; }
-	void ActivateTab(CUIWebTab *pWebTab);
-	UINT GetTabIndex(CUIWebTab *pWebTab) const;
-	CUIWebTab *AddWebTab(CUIWebTab *pWebTab = NULL);
+	void SetTabSpace(int nSpace) { m_nTabSpace = nSpace; }
+	UINT GetCurSel() const;
+	CUIWebTab *GetCurTab() const;
+	CUIWebTab *AddWebTab();
+	void DeleteTab(CUIWebTab *pWebTab);
+	void SelectTab(CUIWebTab *pWebTab);
+	void SelectNext();
+	void SelectPrev();
 
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
@@ -22,5 +28,7 @@ protected:
 	virtual void OnChildMoved(CUIControl *, CPoint point) override;
 
 	CImagex m_imgxTabs[4];
-	int     m_nTabWidth;
+	int     m_nTabWidth;	// tab 最大宽度
+	int     m_nTabSpace;	// tab 间距
+	function<void()> m_fnOnSelect;
 };

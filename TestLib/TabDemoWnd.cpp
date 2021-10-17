@@ -39,21 +39,21 @@ void CTabDemoWnd::InitUI()
 	CUIButton *pButton = pView->AddButton(L"关闭.png:4");
 	pButton->SetRight(1, true);
 	pButton->SetTop(0);
-	pButton->OnClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_CLOSE); });
+	pButton->BindClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_CLOSE); });
 	pButton->SetToolTip(L"关闭");
 
 	m_pBtnMax = pView->AddStateButton();
 	m_pBtnMax->SetRight(0, true);
 	m_pBtnMax->SetTop(0);
 	m_pBtnMax->AddButton(L"最大化.png:4")->SetToolTip(L"最大化");
-	m_pBtnMax->AddButton(L"还原.png:4")->SetToolTip(L"还原");
+	m_pBtnMax->AddButton(L"还原.png:4")->SetToolTip(L"向下还原");
 	m_pBtnMax->EndAddChild();
-	m_pBtnMax->OnClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
+	m_pBtnMax->BindClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
 
 	pButton = pView->AddButton(L"最小化.png:4");
 	pButton->SetRight(0, true);
 	pButton->SetTop(0);
-	pButton->OnClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
+	pButton->BindClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
 	pButton->SetToolTip(L"最小化");
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -73,14 +73,13 @@ void CTabDemoWnd::InitUI()
 		pButton = pWebTab->AddButton(L"标签栏\\关闭.png:4");
 		pButton->SetRight(5, true);
 
-		pButton->OnClick([pWebTab]
+		pButton->BindClick([pWebTab]
 		{
-			CUIWebTabBar *pWebTabBar = pWebTab->GetWebTabBar();
-			pWebTabBar->RemoveChild(pWebTab);
+			pWebTab->GetWebTabBar()->DeleteTab(pWebTab);
 		});
 	}
 
-	m_pWebTabBar->ActivateTab(pWebTab);
+	m_pWebTabBar->SelectTab(pWebTab);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 工具栏例子
@@ -98,7 +97,7 @@ void CTabDemoWnd::InitUI()
 	CUISlider *pSlider = pView->AddSlider(L"滑块.png:3", L"滑块bg.png:2");
 	pSlider->SetMaxPos(200);
 	pSlider->SetCurPos(50);
-	pSlider->OnChanged([](int nPos){ ATLTRACE(_T("Changed: %d\n"), nPos); });
+	pSlider->BindChange([](int nPos){ ATLTRACE(_T("Slider: %d\n"), nPos); });
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 滚动条例子
@@ -132,11 +131,13 @@ void CTabDemoWnd::InitUI()
 
 		CUIButtonEx *pButton = pView2->AddButtonEx(L"\\按钮.png:3");
 		pButton->SetTop(16, true);
-		pButton->SetText(szText);
 		pButton->SetTextColor(RGB(51, 51, 51));
+		pButton->SetText(szText);
+		pButton->SetToolTip(szText);
+		pButton->BindClick([pButton]{ pButton->GetParent()->DeleteChild(pButton); });
 	}
 
-	pBtnAdd->OnClick([pView2]
+	pBtnAdd->BindClick([pView2]
 	{
 		wchar_t szText[64];
 		swprintf_s(szText, L"%d", GetTickCount());
@@ -147,13 +148,13 @@ void CTabDemoWnd::InitUI()
 		pButton->SetTextColor(RGB(51, 51, 51));
 	});
 
-	pBtnDel->OnClick([pView2]
+	pBtnDel->BindClick([pView2]
 	{
 		if (pView2->GetChilds().size() == 0)
 			return;
 
 		UINT nIndex = GetTickCount() % pView2->GetChilds().size();
-		pView2->RemoveChild(pView2->GetChilds()[nIndex]);
+		pView2->DeleteChild(pView2->GetChilds()[nIndex]);
 	});
 }
 

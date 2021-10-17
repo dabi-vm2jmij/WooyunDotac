@@ -10,8 +10,8 @@ public:
 	CUIPageView(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIPageView();
 
-	void OnNewRadio(function<CUIRadioBox *(int)> &&fnNewRadio) { m_fnNewRadio = std::move(fnNewRadio); }
-	void OnChanged(function<void(int)> &&fnOnChanged) { m_fnOnChanged = std::move(fnOnChanged); }
+	void BindNewRadio(function<CUIRadioBox *(int)> &&fnNewRadio) { m_fnNewRadio = std::move(fnNewRadio); }
+	void BindChange(function<void(int)> &&fnOnChange) { m_fnOnChange = std::move(fnOnChange); }
 	void SetSpace(int nSpace) { m_nSpace = nSpace; }
 	void SetCount(UINT nCount);
 	void SetIndex(UINT nIndex);
@@ -24,5 +24,5 @@ protected:
 	wstring m_strImage;
 	int     m_nSpace;	// ¼ä¾à
 	function<CUIRadioBox *(int)> m_fnNewRadio;
-	function<void(int)> m_fnOnChanged;
+	function<void(int)> m_fnOnChange;
 };

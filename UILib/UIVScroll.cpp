@@ -47,11 +47,11 @@ void CUIVScroll::SetRange(int nMinPos, int nMaxPos)
 	if (m_nMinPos == nMinPos && m_nMaxPos == nMaxPos)
 		return;
 
-	bool bChanged = false;
+	bool bChange = false;
 	if (m_fCurPos > nMaxPos - nMinPos)
 	{
 		m_fCurPos = nMaxPos - nMinPos;
-		bChanged  = true;
+		bChange  = true;
 	}
 
 	m_nMinPos = nMinPos;
@@ -59,8 +59,8 @@ void CUIVScroll::SetRange(int nMinPos, int nMaxPos)
 	m_pButton->SetHeight((int)(m_rect.Height() * m_nMinPos / (double)m_nMaxPos + 0.5));
 	ResetOffset(0, false);
 
-	if (m_fnOnChanged && bChanged)
-		m_fnOnChanged(GetCurPos());
+	if (m_fnOnChange && bChange)
+		m_fnOnChange(GetCurPos());
 }
 
 void CUIVScroll::SetCurPos(int nCurPos)
@@ -76,8 +76,8 @@ void CUIVScroll::SetCurPos(int nCurPos)
 	m_fCurPos = nCurPos;
 	ResetOffset(0, false);
 
-	if (m_fnOnChanged)
-		m_fnOnChanged(GetCurPos());
+	if (m_fnOnChange)
+		m_fnOnChange(GetCurPos());
 }
 
 bool CUIVScroll::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -92,7 +92,7 @@ bool CUIVScroll::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return __super::OnMessage(uMsg, wParam, lParam);
 }
 
-void CUIVScroll::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
+void CUIVScroll::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	if (m_rect.Size() != ((CRect *)lpOldRect)->Size())
 	{
@@ -100,7 +100,7 @@ void CUIVScroll::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
 		ResetOffset(0, false);
 	}
 
-	__super::OnRectChanged(lpOldRect, lpClipRect);
+	__super::OnRectChange(lpOldRect, lpClipRect);
 }
 
 void CUIVScroll::OnLButtonDown(CPoint point)
@@ -143,8 +143,8 @@ void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
 	int nOldPos = GetCurPos();
 	m_fCurPos = nOffset * (m_nMaxPos - m_nMinPos) / (double)nHeight;
 
-	if (m_fnOnChanged && GetCurPos() != nOldPos)
-		m_fnOnChanged(GetCurPos());
+	if (m_fnOnChange && GetCurPos() != nOldPos)
+		m_fnOnChange(GetCurPos());
 }
 
 void CUIVScroll::OnLoaded(const IUIXmlAttrs &attrs)

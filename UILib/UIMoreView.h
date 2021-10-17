@@ -8,6 +8,7 @@ class CUIMoreView : public CUIRootView
 {
 public:
 	CUIMoreView(IUIWindow *pOwner);
+	~CUIMoreView();
 
 	void InitItems(const vector<CUIView *> &vecItems);
 	void ClearItems();
@@ -15,4 +16,6 @@ public:
 
 protected:
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
+
+	CUIView *m_pToolBar;
 };

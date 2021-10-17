@@ -10,13 +10,14 @@ public:
 	CUICheckButton(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUICheckButton();
 
-	void OnClick(function<void(bool)> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 	void SetCheck(bool bCheck);
-	bool IsChecked() const { return m_bKeepEnter; }
+	bool IsChecked() const { return m_bCheck; }
 
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void OnLButtonUp(CPoint point) override;
+	virtual void OnButtonState(ButtonState btnState) override;
+	virtual void OnChecked() {}
 
-	function<void(bool)> m_fnOnClick;
+	bool m_bCheck;
 };

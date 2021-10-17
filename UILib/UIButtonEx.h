@@ -19,10 +19,8 @@ public:
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual void MyPaint(CUIDC &dc) const override;
-	virtual void OnMouseEnter() override;
-	virtual void OnMouseLeave() override;
 	virtual void OnTextSize(CSize size) override;
-	virtual void OnDrawState(UINT nState) override;
+	virtual void OnButtonState(ButtonState btnState) override;
 
 	CImagex  m_imgxIcons[4];
 	COLORREF m_colors[4];

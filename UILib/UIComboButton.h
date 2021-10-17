@@ -5,9 +5,8 @@
 // 组合按钮，多个按钮共享鼠标进入、离开
 // 最常用为：左边是普通按钮，右边是下拉按钮或菜单按钮
 
-class UILIB_API CUIComboButton : public CUIView
+class UILIB_API CUIComboButton : public CUIControl
 {
-	friend class CUIButton;
 public:
 	CUIComboButton(CUIView *pParent);
 	virtual ~CUIComboButton();
@@ -16,8 +15,11 @@ public:
 
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
-	virtual void OnChildEnter(CUIButton *pChild);
-	virtual void OnChildLeave(CUIButton *pChild);
+	virtual bool OnHitTest(UIHitTest &hitTest) override;
+	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+	virtual void OnMouseEnter() override;
+	virtual void OnMouseLeave() override;
+	CUIControl *GetHitChild(CPoint point);
 
-	bool m_bInNotify;
+	bool m_bNoLeave;
 };

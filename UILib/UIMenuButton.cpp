@@ -1,12 +1,20 @@
 #include "stdafx.h"
 #include "UIMenuButton.h"
 
-CUIMenuButton::CUIMenuButton(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName)
+CUIMenuButton::CUIMenuButton(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName), m_bNoLeave(false)
 {
 }
 
 CUIMenuButton::~CUIMenuButton()
 {
+}
+
+void CUIMenuButton::OnMouseLeave()
+{
+	if (m_bNoLeave)
+		return;
+
+	__super::OnMouseLeave();
 }
 
 void CUIMenuButton::OnLButtonDown(CPoint point)
@@ -16,17 +24,23 @@ void CUIMenuButton::OnLButtonDown(CPoint point)
 	CRect rect(0, 0, MAXINT16, MAXINT16);
 	GetPopupPos(rect);
 
-	m_bKeepEnter = true;
+	m_bNoLeave = true;
 	m_fnGetUIMenu()->Popup(GetRootView()->GetHwnd(), rect.left, rect.top, rect.right, rect.bottom, true);
-	m_bKeepEnter = false;
+	m_bNoLeave = false;
 
-	if (GetAsyncKeyState(VK_LBUTTON) >= 0)	// 通过键盘关闭菜单
+	// 检查鼠标是否离开
+	GetCursorPos(&point);
+	GetRootView()->ScreenToClient(&point);
+
+	if (!m_rect.PtInRect(point))
+	{
+		OnMouseLeave();
+	}
+	else if (GetKeyState(VK_LBUTTON) >= 0)
 	{
 		m_bLButtonDown = false;
 		OnLButtonUp(point);
 	}
-
-	GetRootView()->RaiseMouseMove();
 }
 
 void CUIMenuButton::GetPopupPos(LPRECT lpRect)

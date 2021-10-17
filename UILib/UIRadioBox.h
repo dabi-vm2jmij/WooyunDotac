@@ -12,5 +12,5 @@ public:
 
 protected:
 	virtual void OnLButtonUp(CPoint point) override;
-	virtual void OnCheckChanged() override;
+	virtual void OnChecked() override;
 };

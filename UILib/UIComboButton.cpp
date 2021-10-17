@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIComboButton.h"
 
-CUIComboButton::CUIComboButton(CUIView *pParent) : CUIView(pParent), m_bInNotify(false)
+CUIComboButton::CUIComboButton(CUIView *pParent) : CUIControl(pParent), m_bNoLeave(false)
 {
 }
 
@@ -74,46 +74,113 @@ void CUIComboButton::EndAddChild()
 	SetSize({ nWidth, nHeight });
 }
 
-void CUIComboButton::OnChildEnter(CUIButton *pChild)
+bool CUIComboButton::OnHitTest(UIHitTest &hitTest)
 {
-	if (m_bInNotify)
-		return;
+	UINT nCount = hitTest.nCount;
+	hitTest.Add(this);
 
-	m_bInNotify = true;
-
-	for (auto pItem : m_vecChilds)
+	if (!CUIView::OnHitTest(hitTest))
 	{
-		if (pItem != pChild && !pItem->IsMouseEnter())
-			FRIEND(pItem)->OnMouseEnter();
+		// 没有进入子控件
+		hitTest.nCount = nCount;
+		return false;
 	}
 
-	m_bInNotify = false;
-}
-
-void CUIComboButton::OnChildLeave(CUIButton *pChild)
-{
-	if (m_bInNotify)
-		return;
-
-	m_bInNotify = true;
-
-	for (auto pItem : m_vecChilds)
+	// 记录子控件的 cursor、tooltip
+	for (UINT i = nCount + 1; i < hitTest.nCount; i++)
 	{
-		if (pItem != pChild && pItem->IsMouseEnter())
+		auto hit = hitTest.items[i];
+
+		if (hit.pItem->IsControl())
 		{
-			FRIEND(pChild)->OnMouseEnter();
-			m_bInNotify = false;
-			return;
+			if (hit.bEnable)
+				m_hCursor = FRIEND(hit.pItem)->m_hCursor;
+
+			m_strToolTip = FRIEND(hit.pItem)->m_strToolTip;
+			break;
 		}
 	}
 
-	for (auto pItem : m_vecChilds)
+	return true;
+}
+
+bool CUIComboButton::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
 	{
-		if (pItem != pChild && !pItem->IsMouseEnter())
-			FRIEND(pItem)->OnMouseLeave();
+	case WM_MOUSEMOVE:
+		OnMouseEnter();
+		return false;
+
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONDBLCLK:
+	case WM_LBUTTONUP:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONDBLCLK:
+	case WM_RBUTTONUP:
+		break;
+
+	default:
+		return __super::OnMessage(uMsg, wParam, lParam);
 	}
 
-	m_bInNotify = false;
+	// 转发消息给子控件
+	if (auto pCtrl = GetHitChild(lParam))
+	{
+		bool bLBtnDown = uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK;
+		m_bNoLeave = bLBtnDown;
+		FRIEND(pCtrl)->OnMessage(uMsg, wParam, lParam);
+		m_bNoLeave = false;
+
+		if (bLBtnDown && !IsMouseEnter())
+		{
+			// MenuButton 菜单关闭
+			UIHitTest hitTest;
+			GetCursorPos(&hitTest.point);
+			GetRootView()->ScreenToClient(&hitTest.point);
+
+			if (CUIView::OnHitTest(hitTest))
+				OnMouseEnter();
+			else
+				OnMouseLeave();
+		}
+	}
+
+	return true;
+}
+
+void CUIComboButton::OnMouseEnter()
+{
+	for (auto pItem : m_vecChilds)
+		FRIEND(pItem)->OnMouseEnter();
+}
+
+void CUIComboButton::OnMouseLeave()
+{
+	if (m_bNoLeave)
+		return;
+
+	for (auto pItem : m_vecChilds)
+		FRIEND(pItem)->OnMouseLeave();
+}
+
+CUIControl *CUIComboButton::GetHitChild(CPoint point)
+{
+	UIHitTest hitTest;
+	hitTest.point = point;
+	CUIView::OnHitTest(hitTest);
+
+	for (auto hit : hitTest)
+	{
+		if (hit.pItem->IsControl())
+		{
+			if (hit.bEnable)
+				return (CUIControl *)hit.pItem;
+			break;
+		}
+	}
+
+	return NULL;
 }
 
 void CUIComboButton::OnLoaded(const IUIXmlAttrs &attrs)

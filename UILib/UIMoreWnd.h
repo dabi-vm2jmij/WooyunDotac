@@ -10,7 +10,6 @@ public:
 	DECLARE_WND_CLASS_EX(NULL, CS_DBLCLKS | CS_DROPSHADOW, -1)
 
 	CUIMoreWnd(COLORREF color);
-	~CUIMoreWnd();
 
 	HWND Init(HWND hParent, CPoint point, const vector<CUIView *> &vecItems);
 
@@ -18,11 +17,13 @@ private:
 	BEGIN_MSG_MAP(CUIMoreWnd)
 		CHAIN_MSG_MAP_MEMBER(m_rootView)
 		MESSAGE_HANDLER(WM_KILLFOCUS, OnKillFocus)
+		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 	END_MSG_MAP()
 
 	virtual void OnFinalMessage(HWND hWnd) override;
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 	LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
+	LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 
 	CUIMoreView m_rootView;
 };

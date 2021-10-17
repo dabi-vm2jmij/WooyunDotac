@@ -2,7 +2,7 @@
 #include "UIMenu.h"
 #include "UIMenuWnd.h"
 
-CUIMenu::Item::Item(UINT nId, LPCWSTR lpText) : m_nId(nId), m_bCheck(false), m_bEnabled(true), m_pSubMenu(NULL)
+CUIMenu::Item::Item(UINT nId, LPCWSTR lpText) : m_nId(nId), m_bCheck(false), m_bEnable(true), m_pSubMenu(NULL)
 {
 	if (lpText)
 		m_strText = lpText;
@@ -63,7 +63,7 @@ void CUIMenu::CreateFromMenu(HMENU hMenu)
 			item.m_bCheck = true;
 
 		if (nState & MF_DISABLED)
-			item.m_bEnabled = false;
+			item.m_bEnable = false;
 
 		m_vecItems.push_back(item);
 	}
@@ -121,7 +121,7 @@ void CUIMenu::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
 		if (bSelected)
 			dc.FillSolidRect(rect, RGB(235, 235, 235));
 
-		if (item.m_bEnabled)
+		if (item.m_bEnable)
 			dc.SetTextColor(RGB(0, 0, 0));
 		else
 			dc.SetTextColor(RGB(161, 161, 161));

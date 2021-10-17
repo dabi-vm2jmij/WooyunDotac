@@ -47,18 +47,18 @@ void CUISlider::SetMaxPos(int nMaxPos)
 	if (nMaxPos <= 0 || nMaxPos == m_nMaxPos)
 		return;
 
-	bool bChanged = false;
+	bool bChange = false;
 	if (m_fCurPos > nMaxPos)
 	{
 		m_fCurPos = nMaxPos;
-		bChanged  = true;
+		bChange  = true;
 	}
 
 	m_nMaxPos = nMaxPos;
 	ResetOffset(0, false);
 
-	if (m_fnOnChanged && bChanged)
-		m_fnOnChanged(GetCurPos());
+	if (m_fnOnChange && bChange)
+		m_fnOnChange(GetCurPos());
 }
 
 void CUISlider::SetCurPos(int nCurPos)
@@ -74,18 +74,18 @@ void CUISlider::SetCurPos(int nCurPos)
 	m_fCurPos = nCurPos;
 	ResetOffset(0, false);
 
-	if (m_fnOnChanged)
-		m_fnOnChanged(GetCurPos());
+	if (m_fnOnChange)
+		m_fnOnChange(GetCurPos());
 }
 
-void CUISlider::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
+void CUISlider::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	if (m_rect.Size() != ((CRect *)lpOldRect)->Size())
 	{
 		ResetOffset(0, false);
 	}
 
-	__super::OnRectChanged(lpOldRect, lpClipRect);
+	__super::OnRectChange(lpOldRect, lpClipRect);
 }
 
 void CUISlider::OnLButtonDown(CPoint point)
@@ -138,8 +138,8 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 	int nOldPos = GetCurPos();
 	m_fCurPos = nOffset * m_nMaxPos / (double)nWidth;
 
-	if (m_fnOnChanged && GetCurPos() != nOldPos)
-		m_fnOnChanged(GetCurPos());
+	if (m_fnOnChange && GetCurPos() != nOldPos)
+		m_fnOnChange(GetCurPos());
 }
 
 void CUISlider::OnLoaded(const IUIXmlAttrs &attrs)

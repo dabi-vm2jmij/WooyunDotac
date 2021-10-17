@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UITimer.h"
 
-CUITimer::CUITimer(function<void()> &&fnOnTimer) : m_fnOnTimer(std::move(fnOnTimer)), m_pThunk(NULL), m_nTimerId(0)
+CUITimer::CUITimer(function<void()> &&fnOnTimer) : m_pThunk(NULL), m_nTimerId(0), m_fnOnTimer(std::move(fnOnTimer))
 {
 }
 
@@ -9,6 +9,12 @@ CUITimer::CUITimer(CUITimer &&_Right) : m_pThunk(_Right.m_pThunk), m_nTimerId(_R
 {
 	_Right.m_pThunk = NULL;
 	_Right.m_nTimerId = 0;
+
+	if (m_pThunk)
+	{
+		m_pThunk->m_this = (DWORD)this;
+		FlushInstructionCache(GetCurrentProcess(), m_pThunk, sizeof(_stdcallthunk));
+	}
 }
 
 CUITimer::~CUITimer()

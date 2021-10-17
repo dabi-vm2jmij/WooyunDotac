@@ -105,7 +105,10 @@ bool CUILoader::Load(CUIStream *pStream, CUIView *pView)
 	tinyxml2::XMLError errId = doc.Parse(pStream->Data(), pStream->Size());
 
 	if (errId != tinyxml2::XML_SUCCESS)
+	{
+		ATLASSERT(0);
 		return false;
+	}
 
 	tinyxml2::XMLElement *pElem = doc.RootElement();
 	if (pElem == NULL || !IsNameClass(pElem->Value(), pView))
@@ -279,8 +282,8 @@ void CUILoader::InitFont(const IUIXmlAttrs &attrs)
 		else
 			nWeight = FW_NORMAL;
 
-		auto lpszName = attrs.GetStr(L"name");
-		auto bItalic = attrs.GetInt(L"italic"), bUnderline = attrs.GetInt(L"underline");
+		LPCWSTR lpszName = attrs.GetStr(L"name");
+		BOOL bItalic = attrs.GetInt(L"italic"), bUnderline = attrs.GetInt(L"underline");
 		ATLVERIFY(m_mapFonts.emplace(std::piecewise_construct, std::forward_as_tuple(StrLower(lpszId)), std::forward_as_tuple(lpszName, nWeight, bItalic, bUnderline)).second);
 	}
 }

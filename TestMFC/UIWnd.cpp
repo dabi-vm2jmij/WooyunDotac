@@ -53,17 +53,17 @@ void CUIWnd::OnLoadedUI(const IUIXmlAttrs &attrs)
 	m_nBorderSize = attrs.GetInt(L"border");
 	m_nCaptionHeight = attrs.GetInt(L"caption");
 
-	CUIButton *pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"关闭"));
+	auto pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"关闭"));
 	if (pButton)
-		pButton->OnClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_CLOSE); });
+		pButton->BindClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_CLOSE); });
 
 	pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"最小化"));
 	if (pButton)
-		pButton->OnClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
+		pButton->BindClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
 
 	m_pBtnMax = dynamic_cast<CUIStateButton *>(m_rootView.Search(L"最大化"));
 	if (m_pBtnMax)
-		m_pBtnMax->OnClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
+		m_pBtnMax->BindClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
 
 	DWORD dwStyle = attrs.GetInt(L"style");
 	if (m_nBorderSize > 0)

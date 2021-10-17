@@ -11,12 +11,17 @@ public:
 	CUIWebTab(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIWebTab();
 
+	bool IsSelected() const { return m_bSelect; }
+	void SetTabPage(CUIView *pTabPage) { m_pTabPage = pTabPage; }
+	CUIView *GetTabPage() const { return m_pTabPage; }
 	CUIWebTabBar *GetWebTabBar() const;
 
 protected:
-	virtual bool DoMouseLeave(bool bForce) override;
 	virtual void OnLButtonDown(CPoint point) override;
-	virtual void OnLButtonUp(CPoint point) final {}
-	virtual void OnActivate(bool bActive) {}
-	void SetActive(bool bActive);
+	virtual void OnButtonState(ButtonState btnState) override;
+	virtual void OnSelect(bool bSelect);
+
+private:
+	bool     m_bSelect;
+	CUIView *m_pTabPage;	// tab ¹ØÁªµÄÒ³
 };

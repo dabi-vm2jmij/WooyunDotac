@@ -8,10 +8,10 @@ public:
 	CUITextImpl();
 	virtual ~CUITextImpl();
 
-	LPCWSTR GetText() const { return m_strText.c_str(); }
-	void SetText(LPCWSTR lpText);
 	void SetFont(HFONT hFont);
 	void SetTextColor(COLORREF color);
+	void SetText(LPCWSTR lpText);
+	LPCWSTR GetText() const { return m_strText.c_str(); }
 
 protected:
 	virtual void OnTextSize(CSize size) = 0;

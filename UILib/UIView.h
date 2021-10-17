@@ -35,7 +35,7 @@ public:
 
 	const vector<CUIView *> &GetChilds() const { return m_vecChilds; }
 	void InvalidateLayout();
-	void RemoveChild(CUIView *pItem);
+	void DeleteChild(CUIView *pItem);
 	CUIView *Search(LPCWSTR lpszId, UINT nDepth = -1) const;
 	CUIView *AddChild(CUIView *pItem);
 	CUIView *AddView();
@@ -68,8 +68,8 @@ protected:
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void OnPaint(CUIDC &dc) const override;
-	virtual void OnEnabled(bool bEnabled) override;
-	virtual void OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect) override;
+	virtual void OnEnable(bool bEnable) override;
+	virtual void OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect) override;
 	virtual void OnNeedLayout(LPRECT lpClipRect) override;
 	virtual void RecalcLayout(LPRECT lpClipRect);
 	virtual void OnChildMoving(CUIControl *pCtrl, CPoint point) {}
@@ -81,12 +81,12 @@ protected:
 
 private:
 	// 自动类型转换
-	class CUICast
+	class CUIPtr
 	{
 		CUIView *m_ptr;
 
 	public:
-		CUICast(CUIView *ptr) : m_ptr(ptr) {}
+		CUIPtr(CUIView *ptr) : m_ptr(ptr) {}
 
 		template<typename T>
 		operator T *() const
@@ -98,7 +98,7 @@ private:
 	};
 
 public:
-	CUICast SearchCast(LPCWSTR lpszId) const
+	CUIPtr SearchCast(LPCWSTR lpszId) const
 	{
 		return Search(lpszId);
 	}

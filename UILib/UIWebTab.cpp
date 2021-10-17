@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIWebTab.h"
 
-CUIWebTab::CUIWebTab(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName)
+CUIWebTab::CUIWebTab(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName), m_bSelect(false), m_pTabPage(NULL)
 {
 	SetStretch(true);
 	SetDraggable(true);
@@ -13,47 +13,28 @@ CUIWebTab::~CUIWebTab()
 
 CUIWebTabBar *CUIWebTab::GetWebTabBar() const
 {
-	CUIWebTabBar *pWebTabBar = dynamic_cast<CUIWebTabBar *>(GetParent());
+	auto pWebTabBar = dynamic_cast<CUIWebTabBar *>(GetParent());
 	ATLASSERT(pWebTabBar);
 	return pWebTabBar;
-}
-
-bool CUIWebTab::DoMouseLeave(bool bForce)
-{
-	bool bRet = __super::DoMouseLeave(bForce);
-	m_bLButtonDown = m_bRButtonDown = false;	// 清除鼠标状态，防止不能拖动标签
-	return bRet;
 }
 
 void CUIWebTab::OnLButtonDown(CPoint point)
 {
 	__super::OnLButtonDown(point);
 
-	m_bKeepEnter = true;
-	OnActivate(true);
-	GetWebTabBar()->ActivateTab(this);
-
-	if (m_fnOnClick)
-		m_fnOnClick();
+	GetWebTabBar()->SelectTab(this);
 }
 
-void CUIWebTab::SetActive(bool bActive)
+void CUIWebTab::OnButtonState(ButtonState btnState)
 {
-	if (bActive)
-		bActive = true;
+	__super::OnButtonState(m_bSelect ? Press : btnState);
+}
 
-	if (m_bKeepEnter == bActive)
-		return;
+void CUIWebTab::OnSelect(bool bSelect)
+{
+	m_bSelect = bSelect;
+	OnButtonState(Normal);
 
-	if (m_bKeepEnter = bActive)
-	{
-		GetRootView()->DoMouseEnter(this);
-		OnLButtonDown(m_rect.TopLeft());
-	}
-	else
-	{
-		OnActivate(false);
-		OnDrawState(1);
-		GetRootView()->RaiseMouseMove();
-	}
+	if (m_pTabPage)
+		m_pTabPage->SetVisible(bSelect);
 }

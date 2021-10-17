@@ -54,7 +54,7 @@ void CUIEdit::SetText(LPCWSTR lpText)
 	m_undo.SetPosLen(-1);
 	m_undo.m_strDiff.clear();
 
-	OnChanged();
+	OnTextChange();
 	MySetCaretPos();
 }
 
@@ -180,22 +180,11 @@ void CUIEdit::MyPaint(CUIDC &dc) const
 	dc.FillAlpha(m_rect, 255);
 }
 
-void CUIEdit::OnEnabled(bool bEnabled)
+void CUIEdit::OnEnable(bool bEnable)
 {
-	__super::OnEnabled(bEnabled);
-
-	if (m_bFocus && !bEnabled)
-		GetRootView()->SetFocus(NULL);
+	__super::OnEnable(bEnable);
 
 	InvalidateSel(0, -1);
-}
-
-void CUIEdit::OnRectChanged(LPCRECT lpOldRect, LPRECT lpClipRect)
-{
-	__super::OnRectChanged(lpOldRect, lpClipRect);
-
-	if (m_bFocus && m_rect.IsRectEmpty())
-		GetRootView()->SetFocus(NULL);
 }
 
 void CUIEdit::OnMouseMove(CPoint point)
@@ -257,14 +246,14 @@ void CUIEdit::OnRButtonUp(CPoint point)
 
 	// 撤销
 	if (m_undo.m_nLen == 0 && m_undo.m_strDiff.empty())
-		pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnabled = false;
+		pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnable = false;
 
 	// 剪切、复制、删除
 	if (m_iStart == m_iEnd)
 	{
-		pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnabled = false;
-		pUIMenu->GetItem(ID_EDIT_COPY)->m_bEnabled = false;
-		pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnabled = false;
+		pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnable = false;
+		pUIMenu->GetItem(ID_EDIT_COPY)->m_bEnable = false;
+		pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnable = false;
 	}
 
 	// 粘贴
@@ -276,19 +265,19 @@ void CUIEdit::OnRButtonUp(CPoint point)
 	}
 
 	if (!bPaste)
-		pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnabled = false;
+		pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnable = false;
 
 	// 全选
 	if (abs(m_iStart - m_iEnd) == m_strText.size())
-		pUIMenu->GetItem(ID_EDIT_SELECT_ALL)->m_bEnabled = false;
+		pUIMenu->GetItem(ID_EDIT_SELECT_ALL)->m_bEnable = false;
 
 	// 只读
 	if (m_bReadonly)
 	{
-		pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnabled = false;
-		pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnabled = false;
-		pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnabled = false;
-		pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnabled = false;
+		pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnable = false;
+		pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnable = false;
+		pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnable = false;
+		pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnable = false;
 	}
 
 	// 弹出菜单时光标暂停
@@ -431,7 +420,7 @@ void CUIEdit::CalcSelRect(int iStart, int iEnd, LPRECT lpRect) const
 {
 	if (iStart == iEnd)
 	{
-		*lpRect = CRect();
+		SetRectEmpty(lpRect);
 		return;
 	}
 
@@ -566,7 +555,7 @@ void CUIEdit::OnKeyMove(int nMove)
 	MySetCaretPos();
 }
 
-void CUIEdit::DelStartEnd(int iStart, int iEnd, bool bChanged)
+void CUIEdit::DelStartEnd(int iStart, int iEnd, bool bChange)
 {
 	if (iStart == iEnd || m_bReadonly)
 		return;
@@ -594,10 +583,10 @@ void CUIEdit::DelStartEnd(int iStart, int iEnd, bool bChanged)
 	m_strText.erase(iStart, iEnd - iStart);
 	m_iStart = m_iEnd = iStart;
 
-	if (!bChanged)
+	if (!bChange)
 		return;
 
-	OnChanged();
+	OnTextChange();
 	MySetCaretPos();
 }
 
@@ -634,7 +623,7 @@ void CUIEdit::OnUndo()
 	m_iEnd = m_iStart + (m_undo.m_nLen = m_undo.m_strDiff.size());
 	m_undo.m_strDiff = strDiff;
 
-	OnChanged();
+	OnTextChange();
 	MySetCaretPos();
 }
 
@@ -735,7 +724,7 @@ void CUIEdit::Insert(LPWSTR lpText)
 	m_iStart = m_iEnd += wcslen(lpText);
 	m_undo.m_nLen = m_iEnd - m_undo.m_nPos;
 
-	OnChanged();
+	OnTextChange();
 	MySetCaretPos();
 }
 
@@ -752,7 +741,7 @@ void CUIEdit::MyCreateCaret()
 		ImmReleaseContext(hWnd, hImc);
 	}
 
-	m_ptCaret = CPoint(MAXINT16, MAXINT16);
+	m_ptCaret.SetPoint(MAXINT16, MAXINT16);
 	MySetCaretPos();
 }
 
@@ -919,11 +908,11 @@ void CUIEdit::OnLoaded(const IUIXmlAttrs &attrs)
 	else if (attrs.GetInt(L"maxChars", &nValue))
 		SetMaxChars(nValue);
 
-	if (attrs.GetInt(L"password", &nValue))
-		SetPassword(nValue != 0);
+	if (attrs.GetInt(L"password", &nValue) && nValue)
+		SetPassword(true);
 
-	if (attrs.GetInt(L"readonly", &nValue))
-		SetReadonly(nValue != 0);
+	if (attrs.GetInt(L"readonly", &nValue) && nValue)
+		SetReadonly(true);
 
 	if (lpStr = attrs.GetStr(L"text"))
 		SetText(lpStr);

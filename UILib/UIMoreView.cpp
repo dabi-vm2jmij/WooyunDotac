@@ -1,12 +1,19 @@
 #include "stdafx.h"
 #include "UIMoreView.h"
 
-CUIMoreView::CUIMoreView(IUIWindow *pOwner) : CUIRootView(pOwner)
+CUIMoreView::CUIMoreView(IUIWindow *pOwner) : CUIRootView(pOwner), m_pToolBar(NULL)
 {
+}
+
+CUIMoreView::~CUIMoreView()
+{
+	ClearItems();
 }
 
 void CUIMoreView::InitItems(const vector<CUIView *> &vecItems)
 {
+	m_pToolBar = vecItems[0]->GetParent();
+
 	for (auto pItem : vecItems)
 	{
 		if (pItem->IsVisible())
@@ -19,18 +26,14 @@ void CUIMoreView::InitItems(const vector<CUIView *> &vecItems)
 
 void CUIMoreView::ClearItems()
 {
-	for (auto pItem : m_vecEnterItems)
-	{
-		if (pItem)
-			FRIEND(pItem)->DoMouseLeave(true);
-	}
+	CheckMouseLeave(UIHitTest());
 
 	for (auto pItem : m_vecChilds)
 	{
 		if (FRIEND(pItem)->m_pParent == this)
 		{
 			FRIEND(pItem)->CalcRect(NULL, NULL);
-			FRIEND(pItem)->m_pParent = NULL;
+			FRIEND(pItem)->m_pParent = m_pToolBar;
 		}
 	}
 

@@ -10,19 +10,21 @@ public:
 	CUIButton(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIButton();
 
-	void OnClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
+	enum ButtonState { Normal, Hover, Press, Disable };
+
+	void BindClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
+	void ResetImages(const CImagex imagexs[], int nCount);
 
 protected:
-	virtual void OnEnabled(bool bEnabled) override;
+	virtual void OnEnable(bool bEnable) override;
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;
-	virtual void OnDrawState(UINT nState);
-	void ResetImages(const CImagex imagexs[], int nCount);
-	void Fill4States(CImagex imagexs[], int nCount) const;
+	virtual void OnButtonState(ButtonState btnState);
+	static void Fill4States(CImagex imagexs[], int nCount);
 
 	CImagex m_imagexs[4];
-	UINT    m_nDrawState;
+	ButtonState m_btnState;
 	function<void()> m_fnOnClick;
 };
