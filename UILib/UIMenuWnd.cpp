@@ -42,11 +42,11 @@ bool CUIMenuWnd::Init(HWND hParent, int x1, int y1, int x2, int y2)
 		m_pUIMenu->m_vecItems[i].m_nHeight = size.cy;
 	}
 
-	CRect rcInf;
-	m_pUIMenu->InflateRect(rcInf);
+	CRect rcMargin;
+	m_pUIMenu->GetMargins(rcMargin);
 
-	nWidth += rcInf.Width();
-	nHeight += rcInf.Height();
+	nWidth += rcMargin.left + rcMargin.right;
+	nHeight += rcMargin.top + rcMargin.bottom;
 
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromPoint(CPoint(x1, y1), MONITOR_DEFAULTTONEAREST), &mi);
@@ -396,8 +396,8 @@ void CUIMenuWnd::OnTimeOut(bool bReset)
 			m_pChild->DestroyWindow();	// 关闭不需要的子菜单
 		}
 
-		CRect rcInf;
-		m_pUIMenu->InflateRect(rcInf);
+		CRect rcMargin;
+		m_pUIMenu->GetMargins(rcMargin);
 		int nSpace = m_pUIMenu->GetHoriSpace();
 
 		// 计算选中项的矩形
@@ -409,7 +409,7 @@ void CUIMenuWnd::OnTimeOut(bool bReset)
 			rect.top += m_pUIMenu->m_vecItems[i].m_nHeight;
 		}
 
-		rect.bottom = rect.top + m_pUIMenu->m_vecItems[m_nCurSel].m_nHeight + rcInf.Height();
+		rect.bottom = rect.top + m_pUIMenu->m_vecItems[m_nCurSel].m_nHeight + rcMargin.top + rcMargin.bottom;
 
 		// 弹出子菜单
 		if (m_pChild == NULL)
@@ -429,11 +429,11 @@ void CUIMenuWnd::OnTimeOut(bool bReset)
 
 UINT CUIMenuWnd::Point2Sel(CPoint point) const
 {
-	CRect rcInf;
-	m_pUIMenu->InflateRect(rcInf);
+	CRect rcMargin;
+	m_pUIMenu->GetMargins(rcMargin);
 
 	CRect rect(0, 0, m_imageWnd.GetWidth(), m_imageWnd.GetHeight());
-	rect.DeflateRect(-rcInf.left, -rcInf.top, rcInf.right, rcInf.bottom);
+	rect.DeflateRect(rcMargin);
 
 	if (rect.PtInRect(point))
 	{
@@ -457,8 +457,8 @@ void CUIMenuWnd::OnSelChange(UINT nCurSel, bool bInit)
 	if (nCurSel == m_nCurSel && !bInit)
 		return;
 
-	CRect rcInf;
-	m_pUIMenu->InflateRect(rcInf);
+	CRect rcMargin;
+	m_pUIMenu->GetMargins(rcMargin);
 	BYTE nAlpha = m_pUIMenu->GetWndAlpha();
 
 	int nWidth = m_imageWnd.GetWidth(), nHeight = m_imageWnd.GetHeight();
@@ -470,7 +470,7 @@ void CUIMenuWnd::OnSelChange(UINT nCurSel, bool bInit)
 
 	CRect rect(0, 0, nWidth, nHeight);
 	m_pUIMenu->DrawBg(dc, rect);
-	rect.DeflateRect(-rcInf.left, -rcInf.top, rcInf.right, rcInf.bottom);
+	rect.DeflateRect(rcMargin);
 
 	for (int i = 0; i != m_pUIMenu->m_vecItems.size(); i++)
 	{

@@ -32,7 +32,7 @@ void CUICheckBox::SetCheck(bool bCheck)
 		OnChecked();
 }
 
-void CUICheckBox::MyPaint(CUIDC &dc) const
+void CUICheckBox::DoPaint(CUIDC &dc) const
 {
 	if (m_imagexs[0])
 		m_imagexs[m_bCheck].Draw(dc, m_rect.left, m_rect.top + (m_rect.Height() - m_imagexs[0].Rect().Height()) / 2);

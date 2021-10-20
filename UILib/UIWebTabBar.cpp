@@ -45,10 +45,9 @@ CUIWebTab *CUIWebTabBar::AddWebTab()
 {
 	auto pWebTab = new CUIWebTab(this, NULL);
 	pWebTab->ResetImages(m_imgxTabs, _countof(m_imgxTabs));
-	pWebTab->SetBottom(0);
-	pWebTab->SetWidth(0);
 
 	AddChild(pWebTab);
+	GetParent()->InvalidateLayout();
 	return pWebTab;
 }
 
@@ -63,6 +62,7 @@ void CUIWebTabBar::DeleteTab(CUIWebTab *pWebTab)
 	}
 
 	DeleteChild(pWebTab);
+	GetParent()->InvalidateLayout();
 }
 
 void CUIWebTabBar::SelectTab(CUIWebTab *pWebTab)
@@ -96,6 +96,31 @@ void CUIWebTabBar::SelectPrev()
 	SelectTab((CUIWebTab *)m_vecChilds[(GetCurSel() - 1 + m_vecChilds.size()) % m_vecChilds.size()]);
 }
 
+void CUIWebTabBar::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
+{
+	if (IsVisible() && !IsRectEmpty(lpRect) && m_offset.left >> 16 && m_size.cx == 0)
+	{
+		CRect rect = lpRect;
+		CalcLeftRight(rect.left, rect.right, m_offset.left, m_offset.right, m_size.cx);
+
+		int nNeedWidth = 0;
+		if (m_vecChilds.size())
+			nNeedWidth = (m_nTabWidth + m_nTabSpace) * m_vecChilds.size() - m_nTabSpace;
+
+		// 可用宽度大于需要宽度时，使用需要宽度
+		if (rect.Width() > nNeedWidth)
+		{
+			int nRight = lpRect->right;
+			lpRect->right -= rect.Width() - nNeedWidth;
+			__super::CalcRect(lpRect, lpClipRect);
+			lpRect->right = nRight;
+			return;
+		}
+	}
+
+	__super::CalcRect(lpRect, lpClipRect);
+}
+
 void CUIWebTabBar::RecalcLayout(LPRECT lpClipRect)
 {
 	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
@@ -120,6 +145,7 @@ void CUIWebTabBar::RecalcLayout(LPRECT lpClipRect)
 	for (auto pItem : m_vecChilds)
 	{
 		rect.right = rect.left + nTabWidth;
+		rect.top = rect.bottom - pItem->GetSize().cy;
 
 		if (nMore)
 		{
@@ -127,17 +153,16 @@ void CUIWebTabBar::RecalcLayout(LPRECT lpClipRect)
 			rect.right++;
 		}
 
-		int nRight = rect.right;
+		int nRight = rect.right + m_nTabSpace;
 
 		// 如果正在拖动标签，使用拖到的位置
 		if (FRIEND(pItem)->m_offset.left != MAXINT16)
 		{
-			rect.right = m_rect.left + FRIEND(pItem)->m_offset.left + rect.Width();
-			rect.left = m_rect.left;
+			rect.MoveToX(FRIEND(pItem)->m_offset.left);
 		}
 
-		FRIEND(pItem)->CalcRect(rect, lpClipRect);
-		rect.left = nRight + m_nTabSpace;
+		FRIEND(pItem)->SetRect(rect, lpClipRect);
+		rect.left = nRight;
 	}
 }
 
@@ -186,7 +211,7 @@ void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
 		m_vecChilds[nNewIndex] = pCtrl;
 	}
 
-	pCtrl->SetLeft(point.x - m_rect.left);
+	pCtrl->SetLeft(point.x);
 }
 
 void CUIWebTabBar::OnChildMoved(CUIControl *pCtrl, CPoint point)

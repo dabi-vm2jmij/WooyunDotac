@@ -20,7 +20,7 @@ void CUINotice::RecalcLayout(LPRECT lpClipRect)
 	for (int i = 0; i != m_vecChilds.size(); i++)
 	{
 		if (i != nIndex1 && i != nIndex2)
-			FRIEND(m_vecChilds[i])->CalcRect(NULL, lpClipRect);
+			FRIEND(m_vecChilds[i])->SetRect(NULL, lpClipRect);
 	}
 
 	CRect rect(m_rect);

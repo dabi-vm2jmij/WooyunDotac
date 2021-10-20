@@ -82,7 +82,6 @@ int CUIWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  在此添加您专用的创建代码
-	SetWindowRgn(CUIRgn(0, 0, 4000, 3000), FALSE);
 	CenterWindow();
 
 	return 0;
@@ -95,6 +94,8 @@ void CUIWnd::OnSize(UINT nType, int cx, int cy)
 	// TODO:  在此处添加消息处理程序代码
 	if (m_pBtnMax)
 		m_pBtnMax->SetState(nType == SIZE_MAXIMIZED);
+
+	SetWindowRgn(nType == SIZE_MAXIMIZED ? NULL : CreateRectRgn(0, 0, cx, cy), TRUE);
 }
 
 void CUIWnd::OnWindowPosChanging(WINDOWPOS* lpwndpos)

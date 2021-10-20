@@ -21,8 +21,8 @@ protected:
 	virtual void OnDestroy() { DefWindowProc(); }
 	virtual void OnGetMinMaxInfo(MINMAXINFO *lpMMI) { DefWindowProc(); }
 	virtual void OnKillFocus(HWND hNewWnd) { DefWindowProc(); }
-	virtual BOOL OnNcActivate(BOOL bActive) { return DefWindowProc(); }
-	virtual void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) { DefWindowProc(); }
+	virtual BOOL OnNcActivate(BOOL bActive) { return TRUE; }
+	virtual void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) {}
 	virtual long OnNcHitTest(CPoint point);
 	virtual void OnSetFocus(HWND hOldWnd) { DefWindowProc(); }
 	virtual void OnSize(UINT nType, CSize size);
@@ -203,4 +203,6 @@ inline void CUIWindow::OnSize(UINT nType, CSize size)
 
 	if (m_pBtnMax)
 		m_pBtnMax->SetState(nType == SIZE_MAXIMIZED);
+
+	SetWindowRgn(nType == SIZE_MAXIMIZED ? NULL : CreateRectRgn(0, 0, size.cx, size.cy), TRUE);
 }

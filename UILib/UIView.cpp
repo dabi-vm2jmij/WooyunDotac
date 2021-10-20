@@ -67,19 +67,12 @@ bool CUIView::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CUIView::OnPaint(CUIDC &dc) const
 {
 	auto pCapture = GetRootView()->GetCapture();
-	bool bFound = false;
 
 	for (auto pItem : m_vecChilds)
 	{
-		if (pItem == pCapture)
-			bFound = true;
-		else
-			pItem->DoPaint(dc);
+		if (pItem != pCapture)
+			pItem->MyPaint(dc);
 	}
-
-	// 最后画，保证在上
-	if (bFound)
-		pCapture->DoPaint(dc);
 }
 
 void CUIView::OnEnable(bool bEnable)
@@ -142,13 +135,14 @@ void CUIView::DeleteChild(CUIView *pItem)
 	{
 		if (*it == pItem)
 		{
+			m_vecChilds.erase(it);
+
 			CRect rect;
-			pItem->CalcRect(NULL, rect);
+			pItem->SetRect(NULL, rect);
 			InvalidateRect(rect);
 
+			// 先 OnMouseLeave 再 delete
 			GetRootView()->RaiseMouseMove();
-
-			m_vecChilds.erase(it);
 			delete pItem;
 			InvalidateLayout();
 			break;

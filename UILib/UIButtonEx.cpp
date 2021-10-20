@@ -46,7 +46,7 @@ void CUIButtonEx::SetTextLeft(int nTextLeft)
 	OnTextSize(m_sizeText);
 }
 
-void CUIButtonEx::MyPaint(CUIDC &dc) const
+void CUIButtonEx::DoPaint(CUIDC &dc) const
 {
 	CRect rect(m_rect);
 	const CImagex &curImgxIcon = m_imgxIcons[m_btnState];

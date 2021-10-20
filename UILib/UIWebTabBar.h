@@ -23,6 +23,7 @@ public:
 
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void CalcRect(LPRECT lpRect, LPRECT lpClipRect) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual void OnChildMoving(CUIControl *, CPoint point) override;
 	virtual void OnChildMoved(CUIControl *, CPoint point) override;

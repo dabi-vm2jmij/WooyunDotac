@@ -13,7 +13,7 @@ CUIProgress::~CUIProgress()
 {
 }
 
-void CUIProgress::MyPaint(CUIDC &dc) const
+void CUIProgress::DoPaint(CUIDC &dc) const
 {
 	CRect rect(m_rect);
 	rect.right = rect.left + rect.Width() * m_nCurPos / m_nMaxPos;

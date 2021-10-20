@@ -135,7 +135,7 @@ bool CUIEdit::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return __super::OnMessage(uMsg, wParam, lParam);
 }
 
-void CUIEdit::MyPaint(CUIDC &dc) const
+void CUIEdit::DoPaint(CUIDC &dc) const
 {
 	// √‹¬Îœ‘ æ–«∫≈
 	LPCWSTR lpText = m_strText.c_str();

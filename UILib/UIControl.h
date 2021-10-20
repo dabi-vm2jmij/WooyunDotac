@@ -29,7 +29,7 @@ protected:
 	virtual void OnLButtonUp(CPoint point) {}
 	virtual void OnRButtonDown(CPoint point) {}
 	virtual void OnRButtonUp(CPoint point) {}
-	virtual void MyPaint(CUIDC &dc) const {}
+	virtual void DoPaint(CUIDC &dc) const {}
 	virtual void OnSetFocus() {}
 	virtual void OnKillFocus() {}
 	virtual void OnLostCapture();

@@ -16,8 +16,6 @@ void CUIPageView::SetCount(UINT nCount)
 	if (m_vecChilds.size() == nCount)
 		return;
 
-	CRect rect;
-
 	if (m_vecChilds.size() < nCount)
 	{
 		for (int i = m_vecChilds.size(); i != nCount; i++)
@@ -48,18 +46,22 @@ void CUIPageView::SetCount(UINT nCount)
 	}
 	else
 	{
-		while (m_vecChilds.size() != nCount)
-		{
-			auto pItem = m_vecChilds.back();
-			m_vecChilds.pop_back();
+		vector<CUIView *> vecChilds;
+		vecChilds.insert(vecChilds.end(), m_vecChilds.begin() + nCount, m_vecChilds.end());
+		m_vecChilds.erase(m_vecChilds.begin() + nCount, m_vecChilds.end());
 
-			FRIEND(pItem)->CalcRect(NULL, rect);
+		CRect rect;
+		RecalcLayout(rect);
+
+		for (auto pItem : vecChilds)
+			FRIEND(pItem)->SetRect(NULL, rect);
+
+		InvalidateRect(rect);
+		GetRootView()->RaiseMouseMove();
+
+		for (auto pItem : vecChilds)
 			delete pItem;
-		}
 	}
-
-	RecalcLayout(rect);
-	InvalidateRect(rect);
 
 	if (GetIndex() == -1)
 		SetIndex(nCount - 1);
@@ -99,16 +101,15 @@ void CUIPageView::RecalcLayout(LPRECT lpClipRect)
 	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
 		return;
 
-	CSize size = m_vecChilds[0]->GetSize();
-
+	int nWidth = m_vecChilds[0]->GetSize().cx;
 	CRect rect(m_rect);
-	rect.left += (int)(m_rect.Width() - (size.cx + m_nSpace) * m_vecChilds.size() + m_nSpace) / 2;
-	rect.right = rect.left + size.cx;
+	rect.left = (int)(rect.left + rect.right - (nWidth + m_nSpace) * m_vecChilds.size() + m_nSpace) / 2;
 
 	for (auto pItem : m_vecChilds)
 	{
-		FRIEND(pItem)->CalcRect(CRect(rect), lpClipRect);
-		rect.MoveToX(rect.right + m_nSpace);
+		rect.right = rect.left + nWidth;
+		FRIEND(pItem)->SetRect(rect, lpClipRect);
+		rect.left = rect.right + m_nSpace;
 	}
 }
 

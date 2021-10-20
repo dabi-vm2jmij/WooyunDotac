@@ -13,8 +13,6 @@ private:
 	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	virtual void OnWindowPosChanging(WINDOWPOS *lpWndPos) override;
-	virtual BOOL OnNcActivate(BOOL bActive) override { return TRUE; }
-	virtual void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) override {}
 
 	bool m_bModal;
 	function<void(const IUIXmlAttrs &)> m_fnInitUI;
@@ -33,7 +31,6 @@ inline int CUISimpleWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	SetWindowRgn(CUIRgn(0, 0, 4000, 3000));
 	CenterWindow();
 	return 0;
 }

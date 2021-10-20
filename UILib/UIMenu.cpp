@@ -89,6 +89,11 @@ UINT CUIMenu::Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostMsg)
 	return CUIMenuWnd(this).Popup(hParent, x1, y1, x2, y2, bPostMsg);
 }
 
+void CUIMenu::GetMargins(LPRECT lpRect) const
+{
+	SetRect(lpRect, 1, 3, 1, 3);
+}
+
 void CUIMenu::MeasureItem(UINT nIndex, LPSIZE lpSize) const
 {
 	if (m_vecItems[nIndex].m_nId)

@@ -71,13 +71,11 @@ void CUILibApp::DelayLayout(CUIRootView *pRootView)
 
 LRESULT CUILibApp::OnNeedLayout(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
-	LRESULT lResult;
-
 	while (m_deqRootViews.size())
 	{
 		auto pRootView = m_deqRootViews.front();
 		m_deqRootViews.pop_front();
-		pRootView->ProcessWindowMessage(NULL, uMsg, 0, 0, lResult);
+		pRootView->UpdateLayout();
 	}
 
 	m_bPostMsg = false;

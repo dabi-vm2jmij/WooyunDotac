@@ -133,24 +133,24 @@ CUITheme::~CUITheme()
 	FreeLibrary(m_hModule);
 }
 
-CUIMemDC::CUIMemDC(HDC hDC, LPCRECT lpClipRect, bool bImage) : m_hDC(hDC), m_hMemDC(NULL), m_hBufferedPaint(NULL), m_rectClip(*lpClipRect)
+CUIMemDC::CUIMemDC(HDC hDC, LPCRECT lpClipRect, bool bImage) : m_hDC(hDC), m_hMemDC(NULL), m_hBufferedPaint(NULL), m_clipRect(*lpClipRect)
 {
 	if (!bImage && g_theme.m_pBeginBufferedPaint && g_theme.m_pEndBufferedPaint)
 	{
-		if (m_hBufferedPaint = g_theme.m_pBeginBufferedPaint(hDC, m_rectClip, BPBF_TOPDOWNDIB, NULL, &m_hMemDC))
+		if (m_hBufferedPaint = g_theme.m_pBeginBufferedPaint(hDC, m_clipRect, BPBF_TOPDOWNDIB, NULL, &m_hMemDC))
 			return;
 	}
 
-	if (bImage || (m_hBitmap = CreateCompatibleBitmap(m_hDC, m_rectClip.Width(), m_rectClip.Height())) == NULL)
+	if (bImage || (m_hBitmap = CreateCompatibleBitmap(m_hDC, m_clipRect.Width(), m_clipRect.Height())) == NULL)
 	{
 		CImage image;
-		image.Create(m_rectClip.Width(), m_rectClip.Height(), 32, CImage::createAlphaChannel);
+		image.Create(m_clipRect.Width(), m_clipRect.Height(), 32, CImage::createAlphaChannel);
 		m_hBitmap = image.Detach();
 	}
 
 	m_hMemDC  = g_cache.GetDC();
 	m_hOldBmp = (HBITMAP)SelectObject(m_hMemDC, m_hBitmap);
-	SetViewportOrgEx(m_hMemDC, -m_rectClip.left, -m_rectClip.top, &m_point);
+	SetViewportOrgEx(m_hMemDC, -m_clipRect.left, -m_clipRect.top, &m_point);
 	ATLASSERT(m_point.x == 0 && m_point.y == 0);
 }
 
@@ -162,7 +162,7 @@ CUIMemDC::~CUIMemDC()
 		return;
 	}
 
-	BitBlt(m_hDC, m_rectClip.left, m_rectClip.top, m_rectClip.Width(), m_rectClip.Height(), m_hMemDC, m_rectClip.left, m_rectClip.top, SRCCOPY);
+	BitBlt(m_hDC, m_clipRect.left, m_clipRect.top, m_clipRect.Width(), m_clipRect.Height(), m_hMemDC, m_clipRect.left, m_clipRect.top, SRCCOPY);
 	SetViewportOrgEx(m_hMemDC, m_point.x, m_point.y, NULL);
 	SelectObject(m_hMemDC, m_hOldBmp);
 	DeleteObject(m_hBitmap);

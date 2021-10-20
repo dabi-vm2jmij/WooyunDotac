@@ -63,7 +63,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetIcon(hIcon, TRUE);
 	SetIcon(hIcon, FALSE);
 
-	SetWindowRgn(CUIRgn(0, 0, 4000, 3000));
 	CenterWindow();
 	return 0;
 }

@@ -10,17 +10,17 @@ CUIBase::~CUIBase()
 {
 }
 
-static int Int2Offset(int nValue, bool bClip)
+static int Int2Offset(int nValue, bool bAlign)
 {
 	ATLASSERT(nValue > -32768 && nValue <= 32767);
 
-	*((short *)&nValue + 1) = bClip;
+	*((short *)&nValue + 1) = bAlign;
 	return nValue;
 }
 
-void CUIBase::SetLeft(int nLeft, bool bClip)
+void CUIBase::SetLeft(int nLeft, bool bAlign)
 {
-	nLeft = Int2Offset(nLeft, bClip);
+	nLeft = Int2Offset(nLeft, bAlign);
 
 	if (m_offset.left != nLeft)
 	{
@@ -29,9 +29,9 @@ void CUIBase::SetLeft(int nLeft, bool bClip)
 	}
 }
 
-void CUIBase::SetRight(int nRight, bool bClip)
+void CUIBase::SetRight(int nRight, bool bAlign)
 {
-	nRight = Int2Offset(nRight, bClip);
+	nRight = Int2Offset(nRight, bAlign);
 
 	if (m_offset.right != nRight)
 	{
@@ -40,9 +40,9 @@ void CUIBase::SetRight(int nRight, bool bClip)
 	}
 }
 
-void CUIBase::SetTop(int nTop, bool bClip)
+void CUIBase::SetTop(int nTop, bool bAlign)
 {
-	nTop = Int2Offset(nTop, bClip);
+	nTop = Int2Offset(nTop, bAlign);
 
 	if (m_offset.top != nTop)
 	{
@@ -51,9 +51,9 @@ void CUIBase::SetTop(int nTop, bool bClip)
 	}
 }
 
-void CUIBase::SetBottom(int nBottom, bool bClip)
+void CUIBase::SetBottom(int nBottom, bool bAlign)
 {
-	nBottom = Int2Offset(nBottom, bClip);
+	nBottom = Int2Offset(nBottom, bAlign);
 
 	if (m_offset.bottom != nBottom)
 	{
@@ -89,99 +89,91 @@ void CUIBase::SetSize(CSize size)
 	}
 }
 
-// 从给定的 lpRect 中切出自己需要的部分
+void CUIBase::SetRect(LPCRECT lpRect, LPRECT lpClipRect)
+{
+	CRect rect, rcReal;
+
+	if (IsVisible() && !IsRectEmpty(lpRect))
+	{
+		rcReal = rect = lpRect;
+	}
+
+	MySetRect(rect, rcReal, lpClipRect);
+}
+
+// 从给定的 lpRect 中切出自己的区域
 void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 {
 	CRect rect, rcReal;
 
 	if (IsVisible() && !IsRectEmpty(lpRect))
 	{
-		rcReal = rect = *(CRect *)lpRect;
-
-		// 左右方向
-		if (m_offset.left != MAXINT16)
-		{
-			rect.left += (short)m_offset.left;
-
-			if (m_offset.right != MAXINT16)
-			{
-				// 同时指定左右
-				rect.right -= (short)m_offset.right;
-
-				if (m_offset.right >> 16)
-					lpRect->right = rect.left;
-			}
-			else if (m_size.cx > 0)
-				rect.right = rect.left + m_size.cx;
-
-			if (m_offset.left >> 16)
-				lpRect->left = rect.right;
-		}
-		else if (m_offset.right != MAXINT16)
-		{
-			rect.right -= (short)m_offset.right;
-
-			if (m_size.cx > 0)
-				rect.left = rect.right - m_size.cx;
-
-			if (m_offset.right >> 16)
-				lpRect->right = rect.left;
-		}
-		else if (m_size.cx > 0)
-		{
-			rect.left = (rect.left + rect.right - m_size.cx) / 2;
-			rect.right = rect.left + m_size.cx;
-		}
-
-		// 上下方向
-		if (m_offset.top != MAXINT16)
-		{
-			rect.top += (short)m_offset.top;
-
-			if (m_offset.bottom != MAXINT16)
-			{
-				// 同时指定上下
-				rect.bottom -= (short)m_offset.bottom;
-
-				if (m_offset.bottom >> 16)
-					lpRect->bottom = rect.top;
-			}
-			else if (m_size.cy > 0)
-				rect.bottom = rect.top + m_size.cy;
-
-			if (m_offset.top >> 16)
-				lpRect->top = rect.bottom;
-		}
-		else if (m_offset.bottom != MAXINT16)
-		{
-			rect.bottom -= (short)m_offset.bottom;
-
-			if (m_size.cy > 0)
-				rect.top = rect.bottom - m_size.cy;
-
-			if (m_offset.bottom >> 16)
-				lpRect->bottom = rect.top;
-		}
-		else if (m_size.cy > 0)
-		{
-			rect.top = (rect.top + rect.bottom - m_size.cy) / 2;
-			rect.bottom = rect.top + m_size.cy;
-		}
-
-		// 修正可见区域
+		rcReal = rect = lpRect;
+		CalcLeftRight(rect.left, rect.right, m_offset.left, m_offset.right, m_size.cx);
+		CalcLeftRight(rect.top, rect.bottom, m_offset.top, m_offset.bottom, m_size.cy);
 		rcReal &= rect;
 
-		if (m_pParent)
-			rcReal &= m_pParent->m_rcReal;
+		// 返回切剩余的区域
+		if (m_offset.left >> 16)
+			lpRect->left = rect.right;
+		else if (m_offset.right >> 16)
+			lpRect->right = rect.left;
 
-		if (rcReal.IsRectEmpty())
-			rcReal = rect = CRect();
+		if (m_offset.top >> 16)
+			lpRect->top = rect.bottom;
+		else if (m_offset.bottom >> 16)
+			lpRect->bottom = rect.top;
 	}
 
-	CRect rcOld(m_rect);
+	MySetRect(rect, rcReal, lpClipRect);
+}
 
-	if (rcOld.IsRectEmpty())
-		rcOld = CRect();
+void CUIBase::CalcLeftRight(long &nLeft, long &nRight, long nOffsetLeft, long nOffsetRight, long nWidth)
+{
+	bool bNoWidth = nWidth == 0;
+
+	if (nWidth < 0)	// -nWidth 为百分比
+		nWidth = (nLeft - nRight) * nWidth / 100;
+
+	// 算左、右偏移
+	if (nOffsetLeft != MAXINT16)
+		nLeft += (short)nOffsetLeft;
+
+	if (nOffsetRight != MAXINT16)
+		nRight -= (short)nOffsetRight;
+
+	if (nOffsetLeft != MAXINT16 && nOffsetRight != MAXINT16 || bNoWidth)
+		return;
+
+	if (nOffsetLeft != MAXINT16)
+	{
+		// 指定宽、左，算出右
+		nRight = nLeft + nWidth;
+	}
+	else if (nOffsetRight != MAXINT16)
+	{
+		// 指定宽、右，算出左
+		nLeft = nRight - nWidth;
+	}
+	else
+	{
+		// 只指定宽，左右居中
+		nLeft = (nLeft + nRight - nWidth) / 2;
+		nRight = nLeft + nWidth;
+	}
+}
+
+void CUIBase::MySetRect(CRect &rect, CRect &rcReal, LPRECT lpClipRect)
+{
+	if (m_pParent)
+		rcReal &= m_pParent->m_rcReal;
+
+	if (rcReal.IsRectEmpty())
+		rcReal = rect = CRect();
+
+	CRect rcOld;
+	if (!m_rect.IsRectEmpty())
+		rcOld = m_rect;
 
 	if (rcOld != rect || m_rcReal != rcReal)
 	{
@@ -197,7 +189,7 @@ void CUIBase::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 	}
 }
 
-void CUIBase::DoPaint(CUIDC &dc) const
+void CUIBase::MyPaint(CUIDC &dc) const
 {
 	CRect rect(m_rcReal);
 
@@ -210,7 +202,10 @@ void CUIBase::DoPaint(CUIDC &dc) const
 		if (m_rect != m_rcReal || dynamic_cast<const CUIEdit *>(this))
 		{
 			// 剪裁超出的区域
-			SelectClipRgn(dc, CUIRgn(CreateRectRgnIndirect(rect)));
+			HRGN hRgn = CreateRectRgnIndirect(rect);
+			SelectClipRgn(dc, hRgn);
+			DeleteObject(hRgn);
+
 			OnPaint(dc);
 			SelectClipRgn(dc, NULL);
 		}
@@ -359,7 +354,7 @@ void CUIBase::OnLoaded(const IUIXmlAttrs &attrs)
 	if (attrs.GetInt(L"visible", &nValue) && nValue == 0)
 		SetVisible(false);
 
-	if (lpStr = attrs.GetStr(L"colorBg"))
+	if (lpStr = attrs.GetStr(L"bgColor"))
 	{
 		COLORREF color = 0;
 		ATLVERIFY(StrToColor(lpStr, color));

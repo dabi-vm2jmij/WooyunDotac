@@ -40,7 +40,7 @@ CUIGif::~CUIGif()
 	delete m_pImage;
 }
 
-void CUIGif::MyPaint(CUIDC &dc) const
+void CUIGif::DoPaint(CUIDC &dc) const
 {
 	Gdiplus::Graphics graphics(dc);
 	graphics.DrawImage(m_pImage, m_rect.left, m_rect.top);

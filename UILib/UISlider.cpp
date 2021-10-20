@@ -94,13 +94,8 @@ void CUISlider::OnLButtonDown(CPoint point)
 	CSize size = m_pButton->GetSize();
 	ResetOffset(point.x - m_rect.left - size.cx / 2, true);
 
-	// 立即重新布局滑块
-	CRect rect;
-	RecalcLayout(rect);
-	InvalidateRect(rect);
-
 	// 鼠标消息转给滑块
-	GetRootView()->DoMouseEnter(m_pButton);
+	GetRootView()->UpdateLayout();
 	FRIEND(m_pButton)->OnMessage(WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
 
 	// LButtonUp 消息会被滑块处理，重置以响应下次点击

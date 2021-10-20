@@ -312,6 +312,8 @@ bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 		bRet = loader.Load(pStream, pView);
 		pStream->Release();
 	}
+	else
+		ATLASSERT(0);
 
 	return bRet;
 }

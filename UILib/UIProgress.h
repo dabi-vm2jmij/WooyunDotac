@@ -14,7 +14,7 @@ public:
 
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
-	virtual void MyPaint(CUIDC &dc) const override;
+	virtual void DoPaint(CUIDC &dc) const override;
 
 	CImagex m_imagexs[2];
 	int     m_nMaxPos;

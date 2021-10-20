@@ -23,10 +23,7 @@ void CUIRadioButton::OnChecked()
 	{
 		auto pRadio = dynamic_cast<CUIRadioButton *>(pItem);
 
-		if (pRadio && pRadio != this && pRadio->m_bCheck)
-		{
-			pRadio->m_bCheck = false;
-			pRadio->OnButtonState(Normal);
-		}
+		if (pRadio && pRadio != this)
+			pRadio->SetCheck(false);
 	}
 }

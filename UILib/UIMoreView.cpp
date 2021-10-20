@@ -32,7 +32,7 @@ void CUIMoreView::ClearItems()
 	{
 		if (FRIEND(pItem)->m_pParent == this)
 		{
-			FRIEND(pItem)->CalcRect(NULL, NULL);
+			FRIEND(pItem)->SetRect(NULL, NULL);
 			FRIEND(pItem)->m_pParent = m_pToolBar;
 		}
 	}
@@ -49,24 +49,10 @@ void CUIMoreView::RecalcLayout(LPRECT lpClipRect)
 	{
 		CSize size = pItem->GetSize();
 
-		CRect rcItem(rect);
-		rcItem.right = rect.left + size.cx;
-		rcItem.bottom = (rect.top += size.cy);
-
-		// 需要修正左、上、下，使 CalcRect 切出正确的 rect
-		ATLASSERT(FRIEND(pItem)->m_offset.left >> 16);
-		rcItem.left -= (short)FRIEND(pItem)->m_offset.left;
-
-		if (FRIEND(pItem)->m_offset.top != MAXINT16)
-		{
-			rcItem.top -= (short)FRIEND(pItem)->m_offset.top;
-		}
-		else if (FRIEND(pItem)->m_offset.bottom != MAXINT16)
-		{
-			rcItem.bottom += (short)FRIEND(pItem)->m_offset.bottom;
-		}
-
-		FRIEND(pItem)->CalcRect(rcItem, lpClipRect);
+		rect.right = rect.left + size.cx;
+		rect.bottom = rect.top + size.cy;
+		FRIEND(pItem)->SetRect(rect, lpClipRect);
+		rect.top = rect.bottom;
 	}
 }
 

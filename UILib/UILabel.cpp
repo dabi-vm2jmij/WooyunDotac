@@ -10,7 +10,7 @@ CUILabel::~CUILabel()
 {
 }
 
-void CUILabel::MyPaint(CUIDC &dc) const
+void CUILabel::DoPaint(CUIDC &dc) const
 {
 	OnDrawText(dc, CRect(m_rect), 0);
 }

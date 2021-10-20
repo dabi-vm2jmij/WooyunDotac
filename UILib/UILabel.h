@@ -11,6 +11,6 @@ public:
 
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
-	virtual void MyPaint(CUIDC &dc) const override;
+	virtual void DoPaint(CUIDC &dc) const override;
 	virtual void OnTextSize(CSize size) override;
 };

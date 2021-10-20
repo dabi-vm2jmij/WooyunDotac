@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UISkin.h"
 
-CUISkin::CUISkin(LPCWSTR lpSkinName) : m_nRefCount(1), m_hFileMap(NULL), m_lpData(NULL)
+CUISkin::CUISkin(LPCWSTR lpSkinName) : m_nRefCount(1), m_lpAlloc(NULL), m_lpData(NULL)
 {
 	*m_szSkinPath = 0;
 	LoadSkin(lpSkinName);
@@ -9,13 +9,8 @@ CUISkin::CUISkin(LPCWSTR lpSkinName) : m_nRefCount(1), m_hFileMap(NULL), m_lpDat
 
 CUISkin::~CUISkin()
 {
-	if (m_hFileMap)
-	{
-		if (m_lpData)
-			UnmapViewOfFile(m_lpData);
-
-		CloseHandle(m_hFileMap);
-	}
+	if (m_lpAlloc)
+		free(m_lpAlloc);
 }
 
 void CUISkin::AddRef()
@@ -35,13 +30,13 @@ void CUISkin::LoadSkin(LPCWSTR lpSkinName)
 	if ((UINT)lpSkinName >> 16 == 0)
 	{
 		HMODULE hModule = NULL;
-		m_lpData = (LPSTR)LockResource(LoadResource(hModule, FindResourceW(hModule, lpSkinName, L"SKIN")));
+		m_lpData = LockResource(LoadResource(hModule, FindResourceW(hModule, lpSkinName, L"SKIN")));
 		return;
 	}
 
 	if (*(int *)lpSkinName == 'JGK')
 	{
-		m_lpData = (LPSTR)lpSkinName;
+		m_lpData = lpSkinName;
 		return;
 	}
 
@@ -79,59 +74,14 @@ void CUISkin::LoadSkin(LPCWSTR lpSkinName)
 		nPathLen += 4;
 	}
 
-	class CSkinLock
-	{
-	public:
-		CSkinLock(LPCWSTR lpName)
-		{
-			m_hMutex = CreateMutexW(NULL, FALSE, lpName);
-			WaitForSingleObject(m_hMutex, INFINITE);
-		}
-
-		~CSkinLock()
-		{
-			ReleaseMutex(m_hMutex);
-			CloseHandle(m_hMutex);
-		}
-
-	private:
-		HANDLE m_hMutex;
-	};
-
-	// 使用 Skin 路径作为 Mutex、FileMap 的名字
-	wchar_t szName[MAX_PATH];
-	wcsncpy_s(szName, szFileName, nPathLen = min(nPathLen, MAX_PATH - 3));
-	CharLowerBuffW(szName, nPathLen);
-
-	for (int i = 0; i != nPathLen; i++)
-	{
-		if (szName[i] == '\\')
-			szName[i] = '/';
-	}
-
-	wcscpy_s(szName + nPathLen, 3, L"/m");
-	CSkinLock skinLock(szName);
-	wcscpy_s(szName + nPathLen, 3, L"/s");
-
-	m_hFileMap = OpenFileMappingW(FILE_MAP_READ, FALSE, szName);
-	if (m_hFileMap)
-	{
-		m_lpData = (LPSTR)MapViewOfFile(m_hFileMap, FILE_MAP_READ, 0, 0, 0);
-		return;
-	}
-
 	HANDLE hFile = CreateFileW(szFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 		return;
 
 	DWORD dwSize = GetFileSize(hFile, NULL);
-	m_hFileMap = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, dwSize, szName);
 
-	if (m_hFileMap)
-	{
-		m_lpData = (LPSTR)MapViewOfFile(m_hFileMap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-		ReadFile(hFile, m_lpData, dwSize, &dwSize, NULL);
-	}
+	if (m_lpData = m_lpAlloc = malloc(dwSize))
+		ReadFile(hFile, m_lpAlloc, dwSize, &dwSize, NULL);
 
 	CloseHandle(hFile);
 }
@@ -200,9 +150,9 @@ CUIStream *CUISkin::GetStream(LPCWSTR lpFileName)
 
 	wcscpy_s(szFileName, lpFileName);
 
-	LPCSTR lpData = FindFile(m_lpData + 4, szFileName);
+	LPCSTR lpData = FindFile((LPCSTR)m_lpData + 4, szFileName);
 	if (lpData == NULL)
 		return NULL;
 
-	return CUIStream::FromData(lpData + 4, *(int *)lpData);
+	return CUIStream::FromData((LPCSTR)lpData + 4, *(int *)lpData);
 }

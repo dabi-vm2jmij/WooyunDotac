@@ -27,7 +27,7 @@ public:
 protected:
 	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-	virtual void MyPaint(CUIDC &dc) const override;
+	virtual void DoPaint(CUIDC &dc) const override;
 	virtual void OnEnable(bool bEnable) override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;

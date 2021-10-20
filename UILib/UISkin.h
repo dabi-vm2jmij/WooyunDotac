@@ -17,8 +17,8 @@ private:
 	LPCSTR FindFile(LPCSTR lpBase, LPWSTR lpFileName) const;
 
 	ULONG   m_nRefCount;
-	HANDLE  m_hFileMap;
-	LPSTR   m_lpData;
+	LPVOID  m_lpAlloc;
+	LPCVOID m_lpData;
 	wchar_t m_szSkinPath[MAX_PATH];
 
 	CUISkin(const CUISkin &) = delete;

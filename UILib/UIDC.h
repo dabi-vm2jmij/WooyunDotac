@@ -31,7 +31,7 @@ private:
 	HANDLE  m_hBufferedPaint;
 	HBITMAP m_hBitmap;
 	HBITMAP m_hOldBmp;
-	CRect   m_rectClip;
+	CRect   m_clipRect;
 	CPoint  m_point;
 };
 
@@ -103,27 +103,4 @@ public:
 private:
 	HWND m_hWnd;
 	HDC  m_hDC;
-};
-
-class CUIRgn
-{
-public:
-	CUIRgn(HRGN hRgn) : m_hRgn(hRgn)
-	{
-		ATLASSERT(hRgn);
-	}
-
-	CUIRgn(int x1, int y1, int x2, int y2) : m_hRgn(CreateRectRgn(x1, y1, x2, y2))
-	{
-	}
-
-	~CUIRgn()
-	{
-		DeleteObject(m_hRgn);
-	}
-
-	operator HRGN() const { return m_hRgn; }
-
-private:
-	HRGN m_hRgn;
 };

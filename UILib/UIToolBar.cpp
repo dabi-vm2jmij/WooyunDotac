@@ -55,7 +55,7 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 
 		for (auto it = itm; it != m_vecChilds.end(); ++it)
 		{
-			FRIEND(*it)->CalcRect(NULL, lpClipRect);
+			FRIEND(*it)->SetRect(NULL, lpClipRect);
 		}
 
 		m_vecMoreItems.insert(m_vecMoreItems.end(), itm, m_vecChilds.end());
@@ -63,7 +63,7 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 	}
 	else
 	{
-		FRIEND(m_vecChilds[0])->CalcRect(NULL, lpClipRect);
+		FRIEND(m_vecChilds[0])->SetRect(NULL, lpClipRect);
 
 		for (int i = 1; i != m_vecChilds.size(); i++)
 		{

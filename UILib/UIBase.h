@@ -14,10 +14,10 @@ public:
 	void SetId(const wstring &strId) { m_strId = strId; }
 	void SetId(wstring &&strId) { m_strId = std::move(strId); }
 	LPCWSTR GetId() const { return m_strId.c_str(); }
-	void SetLeft(int nLeft, bool bClip = false);
-	void SetRight(int nRight, bool bClip = false);
-	void SetTop(int nTop, bool bClip = false);
-	void SetBottom(int nBottom, bool bClip = false);
+	void SetLeft(int nLeft, bool bAlign = false);
+	void SetRight(int nRight, bool bAlign = false);
+	void SetTop(int nTop, bool bAlign = false);
+	void SetBottom(int nBottom, bool bAlign = false);
 	void SetWidth(int nWidth);
 	void SetHeight(int nHeight);
 	void SetSize(CSize size);
@@ -77,10 +77,11 @@ protected:
 	virtual void OnEnable(bool bEnable) {}
 	virtual void OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect) {}
 	virtual void OnNeedLayout(LPRECT lpClipRect) {}
+	virtual void SetRect(LPCRECT lpRect, LPRECT lpClipRect);
 	virtual void CalcRect(LPRECT lpRect, LPRECT lpClipRect);
 	virtual void OnMouseEnter() {}
 	virtual void OnMouseLeave() {}
-	void DoPaint(CUIDC &dc) const;
+	static void CalcLeftRight(long &nLeft, long &nRight, long nOffsetLeft, long nOffsetRight, long nWidth);
 
 	CUIView *m_pParent;
 	CRect    m_offset;		// ÉÏÏÂ×óÓÒµÄÆ«ÒÆ
@@ -95,6 +96,9 @@ protected:
 	bool     m_bMouseEnter;
 
 private:
+	void MySetRect(CRect &rect, CRect &rcReal, LPRECT lpClipRect);
+	void MyPaint(CUIDC &dc) const;
+
 	CUIBase(const CUIBase &) = delete;
 	CUIBase &operator=(const CUIBase &) = delete;
 };

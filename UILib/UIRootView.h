@@ -21,9 +21,9 @@ public:
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
 	HWND GetHwnd() const;
 	void SetWndAlpha(BYTE nWndAlpha);
+	void UpdateLayout();
 	void DoPaint(HDC hDC, LPCRECT lpClipRect) const;
 	void RaiseMouseMove();
-	void DoMouseEnter(CUIBase *pItem);
 	void SetFocus(CUIControl *pCtrl);
 	virtual void SetCapture(CUIControl *pCtrl);
 	virtual void InvalidateRect(LPCRECT lpRect);
@@ -41,6 +41,7 @@ protected:
 	void OnPaint();
 	void OnPaintLayered(HDC hDC);
 	void OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	void DoMouseEnter(CUIBase *pItem);
 	void CheckMouseLeave(const UIHitTest &hitTest);
 	void EnableImm(bool bEnable);
 	void AddTabsEdit(CUIEdit *pEdit);
@@ -49,7 +50,7 @@ protected:
 
 	IUIWindow  *m_pOwner;
 	CImage      m_imageWnd;		// 透明窗口缓存
-	CRect       m_rectClip;		// 当前无效区域
+	CRect       m_clipRect;		// 当前无效区域
 	BYTE        m_nWndAlpha;	// 透明度：0~255
 	bool        m_bLayered;
 	HIMC        m_hImc;

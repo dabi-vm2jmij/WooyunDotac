@@ -97,7 +97,7 @@ void CUIControl::OnPaint(CUIDC &dc) const
 			m_curImagex.StretchDraw(dc, m_rect);
 	}
 
-	MyPaint(dc);
+	DoPaint(dc);
 
 	__super::OnPaint(dc);
 }

@@ -23,10 +23,7 @@ void CUIRadioBox::OnChecked()
 	{
 		auto pRadio = dynamic_cast<CUIRadioBox *>(pItem);
 
-		if (pRadio && pRadio != this && pRadio->m_bCheck)
-		{
-			pRadio->m_bCheck = false;
-			pRadio->InvalidateRect(NULL);
-		}
+		if (pRadio && pRadio != this)
+			pRadio->SetCheck(false);
 	}
 }

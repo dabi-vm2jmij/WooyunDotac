@@ -23,20 +23,6 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 	switch (uMsg)
 	{
-	case WM_NEEDLAYOUT:
-		{
-			// 重新布局所有延迟布局的控件
-			CRect rect;
-			OnNeedLayout(rect);
-
-			if (!rect.IsRectEmpty())
-				InvalidateRect(rect);
-
-			if (m_pCapture == NULL)
-				RaiseMouseMove();
-		}
-		return TRUE;
-
 	case WM_CREATE:
 		if (GetWindowLong(GetHwnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
 			m_bLayered = true;
@@ -99,6 +85,16 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			m_bMouseEnter = TrackMouseEvent(&tme) != 0;
 		}
 
+		if (m_hToolTip)
+		{
+			MSG msg;
+			msg.hwnd = GetHwnd();
+			msg.message = uMsg;
+			msg.wParam = wParam;
+			msg.lParam = lParam;
+			SendMessage(m_hToolTip, TTM_RELAYEVENT, 0, (LPARAM)&msg);
+		}
+
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
@@ -111,16 +107,6 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
 	case WM_RBUTTONDBLCLK:
-		if (m_hToolTip)
-		{
-			MSG msg;
-			msg.hwnd = GetHwnd();
-			msg.message = uMsg;
-			msg.wParam = wParam;
-			msg.lParam = lParam;
-			SendMessage(m_hToolTip, TTM_RELAYEVENT, 0, (LPARAM)&msg);
-		}
-
 		OnMouseMessage(uMsg, wParam, lParam);
 		return TRUE;
 
@@ -214,6 +200,19 @@ void CUIRootView::SetWndAlpha(BYTE nWndAlpha)
 		OnPaintLayered(CUIClientDC(GetHwnd()));
 }
 
+void CUIRootView::UpdateLayout()
+{
+	// 重新布局所有延迟布局的控件
+	CRect rect;
+	OnNeedLayout(rect);
+
+	if (!rect.IsRectEmpty())
+		InvalidateRect(rect);
+
+	if (m_pCapture == NULL)
+		RaiseMouseMove();
+}
+
 bool CUIRootView::OnNcHitTest(CPoint point)
 {
 	UIHitTest hitTest;
@@ -262,7 +261,7 @@ void CUIRootView::OnPaint()
 	else
 		DoPaint(CUIMemDC(dc, dc.PaintRect()), dc.PaintRect());
 
-	m_rectClip.SetRectEmpty();
+	m_clipRect.SetRectEmpty();
 }
 
 void CUIRootView::OnPaintLayered(HDC hDC)
@@ -270,15 +269,15 @@ void CUIRootView::OnPaintLayered(HDC hDC)
 	if (m_imageWnd.IsNull())
 	{
 		m_imageWnd.Create(m_rect.Width(), m_rect.Height(), 32, CImage::createAlphaChannel);
-		m_rectClip = m_rect;
+		m_clipRect = m_rect;
 	}
 
 	HDC hImgDC = m_imageWnd.GetDC();
 
-	if (!m_rectClip.IsRectEmpty())
+	if (!m_clipRect.IsRectEmpty())
 	{
-		DoPaint(CUIMemDC(hImgDC, m_rectClip, true), m_rectClip);
-		m_rectClip.SetRectEmpty();
+		DoPaint(CUIMemDC(hImgDC, m_clipRect, true), m_clipRect);
+		m_clipRect.SetRectEmpty();
 	}
 
 	BLENDFUNCTION bf = { AC_SRC_OVER, 0, m_nWndAlpha, AC_SRC_ALPHA };
@@ -291,12 +290,16 @@ void CUIRootView::DoPaint(HDC hDC, LPCRECT lpClipRect) const
 	CUIDC dc(hDC, lpClipRect, m_bLayered);
 	SetBkMode(dc, TRANSPARENT);
 
-	// 填充背景色
 	if (m_colorBg != -1)
 		dc.FillSolidRect(m_rect, m_colorBg);
+	else
+		m_pOwner->OnDrawBg(dc, m_rect);
 
-	m_pOwner->OnDrawBg(dc, m_rect);
 	__super::OnPaint(dc);
+
+	// 最后画在最上
+	if (m_pCapture)
+		m_pCapture->MyPaint(dc);
 }
 
 void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -305,7 +308,7 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	hitTest.point = lParam;
 	OnHitTest(hitTest);
 
-	if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN)
+	if (uMsg == WM_MOUSEMOVE)
 	{
 		LPCWSTR lpTipText = L"";
 
@@ -318,16 +321,20 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-		if (m_strTipText != lpTipText)
+		if (m_strTipText != lpTipText && (*lpTipText == 0 || (wParam & (MK_LBUTTON | MK_RBUTTON)) == 0))
 		{
 			m_strTipText = lpTipText;
-
-			if (wParam & (MK_LBUTTON | MK_RBUTTON))
-				ShowToolTip(NULL);
-			else
-				ShowToolTip(m_strTipText.c_str());
+			ShowToolTip(m_strTipText.c_str());
 		}
+	}
+	else if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN)
+	{
+		if (m_strTipText.size())
+			ShowToolTip(NULL);
+	}
 
+	if (uMsg == WM_MOUSEMOVE || uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN)
+	{
 		for (auto hit : hitTest)
 		{
 			if (hit.bEnable)
@@ -337,6 +344,7 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CheckMouseLeave(hitTest);
 	}
 
+	// 最上层 Control 处理消息
 	for (auto hit : hitTest)
 	{
 		if (hit.pItem->IsControl())
@@ -394,7 +402,7 @@ void CUIRootView::DoMouseEnter(CUIBase *pItem)
 
 void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 {
-	std::vector<CUIBase *> vecLeaveItems;
+	vector<CUIBase *> vecLeaveItems;
 
 	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); )
 	{
@@ -442,7 +450,7 @@ void CUIRootView::InvalidateRect(LPCRECT lpRect)
 		return;
 
 	::InvalidateRect(GetHwnd(), rect, TRUE);
-	m_rectClip |= rect;
+	m_clipRect |= rect;
 }
 
 BOOL CUIRootView::ClientToScreen(LPPOINT lpPoint)

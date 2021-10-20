@@ -21,8 +21,6 @@ private:
 	void OnLoadedUI(const IUIXmlAttrs &attrs) override;
 	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	void OnClose() override;
-	BOOL OnNcActivate(BOOL bActive) override { return TRUE; }
-	void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP) override {}
 	LRESULT OnShowAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled);
 	LRESULT OnTestFunc(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled);
 	LRESULT OnThreadResult(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
