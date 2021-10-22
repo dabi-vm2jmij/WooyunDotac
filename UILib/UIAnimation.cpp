@@ -5,17 +5,25 @@ CUIAnimation::CUIAnimation(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pP
 {
 	m_bClickable = false;
 
-	m_curImagex = GetImage(lpFileName);
-	SetSize(m_curImagex.Rect().Size());
+	m_imagex = GetImage(lpFileName);
+	SetSize(m_imagex.Rect().Size());
 }
 
 CUIAnimation::~CUIAnimation()
 {
 }
 
+void CUIAnimation::OnPaint(CUIDC &dc) const
+{
+	__super::OnPaint(dc);
+
+	if (m_imagex)
+		m_imagex.Draw(dc, m_rect);
+}
+
 void CUIAnimation::OnUITimer()
 {
-	if (++m_nFrameIdx == m_curImagex.GetFrameCount())
+	if (++m_nFrameIdx == m_imagex.GetFrameCount())
 	{
 		m_nFrameIdx = 0;
 
@@ -26,13 +34,13 @@ void CUIAnimation::OnUITimer()
 		}
 	}
 
-	m_curImagex.SetFrameIndex(m_nFrameIdx);
-	InvalidateRect(NULL);
+	m_imagex.SetFrameIndex(m_nFrameIdx);
+	InvalidateRect();
 }
 
 void CUIAnimation::Start(bool bLoop)
 {
-	if (m_curImagex.GetFrameCount() < 2)
+	if (m_imagex.GetFrameCount() < 2)
 	{
 		ATLASSERT(0);
 		return;
@@ -65,4 +73,7 @@ void CUIAnimation::OnLoad(const IUIXmlAttrs &attrs)
 	int nValue;
 	if (attrs.GetInt(L"elapse", &nValue))
 		SetElapse(nValue);
+
+	if (attrs.GetInt(L"start"))
+		Start();
 }

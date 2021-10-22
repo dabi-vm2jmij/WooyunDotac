@@ -7,19 +7,17 @@
 class UILIB_API CUIToolBar : public CUIView
 {
 public:
-	CUIToolBar(CUIView *pParent, LPCWSTR lpFileName);
+	CUIToolBar(CUIView *pParent);
 	virtual ~CUIToolBar();
 
-	void SetMoreBg(COLORREF color) { m_moreBg = color; }
-	void CloseMoreWnd();
+	void GetMoreItems(vector<CUIView *> &vecItems);
+	void SetMoreWnd(HWND hMoreWnd) { m_hMoreWnd = hMoreWnd; }
 
 protected:
-	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
-	virtual void OnMoreBtn();
 	int  GetMoreIndex() const;
+	void CloseMoreWnd();
 
-	COLORREF m_moreBg;
-	HWND     m_hMoreWnd;
+	HWND m_hMoreWnd;
 	vector<CUIView *> m_vecMoreItems;
 };

@@ -1,22 +1,10 @@
 #include "stdafx.h"
 #include "UIWebTabBar.h"
 
-CUIWebTabBar::CUIWebTabBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent), m_nTabWidth(100), m_nTabSpace(0)
+CUIWebTabBar::CUIWebTabBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent), m_nTabWidth(100), m_nSpacing(0)
 {
-	if (lpFileName == NULL)
-		return;
-
-	// 预加载标签图片
-	UINT nCount = SplitImage(lpFileName, m_imgxTabs);
-	m_nTabWidth = m_imgxTabs[0].Rect().Width();
-
-	// 如果为3态，则为：0、1、2、0
-	for (UINT i = nCount; i < 4; i++)
-		m_imgxTabs[i] = m_imgxTabs[0];
-
-	// 如果为2态，则为：0、0、1、0
-	if (nCount == 2)
-		m_imgxTabs[2].Swap(m_imgxTabs[1]);
+	if (lpFileName)
+		m_strTabImage = lpFileName;
 }
 
 CUIWebTabBar::~CUIWebTabBar()
@@ -25,7 +13,7 @@ CUIWebTabBar::~CUIWebTabBar()
 
 UINT CUIWebTabBar::GetCurSel() const
 {
-	for (UINT i = 0; i != m_vecChilds.size(); i++)
+	for (int i = 0; i != m_vecChilds.size(); i++)
 	{
 		if (((CUIWebTab *)m_vecChilds[i])->IsSelected())
 			return i;
@@ -42,9 +30,7 @@ CUIWebTab *CUIWebTabBar::GetCurTab() const
 
 CUIWebTab *CUIWebTabBar::AddWebTab()
 {
-	auto pWebTab = new CUIWebTab(this, NULL);
-	pWebTab->ResetImages(m_imgxTabs, _countof(m_imgxTabs));
-
+	auto pWebTab = new CUIWebTab(this, m_strTabImage.c_str());
 	AddChild(pWebTab);
 	GetParent()->InvalidateLayout();
 	return pWebTab;
@@ -81,30 +67,42 @@ void CUIWebTabBar::SelectTab(CUIWebTab *pWebTab)
 
 void CUIWebTabBar::SelectNext()
 {
-	if (m_vecChilds.size() < 2)
-		return;
-
-	SelectTab((CUIWebTab *)m_vecChilds[(GetCurSel() + 1) % m_vecChilds.size()]);
+	if (m_vecChilds.size() > 1)
+		SelectTab((CUIWebTab *)m_vecChilds[(GetCurSel() + 1) % m_vecChilds.size()]);
 }
 
 void CUIWebTabBar::SelectPrev()
 {
-	if (m_vecChilds.size() < 2)
-		return;
+	if (m_vecChilds.size() > 1)
+		SelectTab((CUIWebTab *)m_vecChilds[(GetCurSel() - 1 + m_vecChilds.size()) % m_vecChilds.size()]);
+}
 
-	SelectTab((CUIWebTab *)m_vecChilds[(GetCurSel() - 1 + m_vecChilds.size()) % m_vecChilds.size()]);
+void CUIWebTabBar::PaintChilds(CUIDC &dc) const
+{
+	CUIView *pMoving = NULL;
+
+	for (auto pItem : m_vecChilds)
+	{
+		if (pItem->GetOffset().left != MAXINT16)
+			pMoving = pItem;
+		else
+			pItem->DoPaint(dc);
+	}
+
+	if (pMoving)
+		pMoving->DoPaint(dc);
 }
 
 void CUIWebTabBar::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 {
 	if (IsVisible() && !IsRectEmpty(lpRect) && m_offset.left >> 16 && m_size.cx == 0)
 	{
-		CRect rect = lpRect;
+		CRect rect(lpRect);
 		CalcLeftRight(rect.left, rect.right, m_offset.left, m_offset.right, m_size.cx);
 
 		int nNeedWidth = 0;
 		if (m_vecChilds.size())
-			nNeedWidth = (m_nTabWidth + m_nTabSpace) * m_vecChilds.size() - m_nTabSpace;
+			nNeedWidth = (m_nTabWidth + m_nSpacing) * m_vecChilds.size() - m_nSpacing;
 
 		// 可用宽度大于需要宽度时，使用需要宽度
 		if (rect.Width() > nNeedWidth)
@@ -127,7 +125,7 @@ void CUIWebTabBar::RecalcLayout(LPRECT lpClipRect)
 
 	// 计算每个标签宽度，不能整除的宽度，平均分给前 more 个
 	int nTabWidth = m_nTabWidth, nCount = m_vecChilds.size(), nMore = 0;
-	int nAllWidth = m_rect.Width() - m_nTabSpace * (nCount - 1);
+	int nAllWidth = m_rect.Width() - m_nSpacing * (nCount - 1);
 
 	if (nTabWidth * nCount > nAllWidth)
 	{
@@ -152,22 +150,20 @@ void CUIWebTabBar::RecalcLayout(LPRECT lpClipRect)
 			rect.right++;
 		}
 
-		int nRight = rect.right + m_nTabSpace;
+		int nRight = rect.right + m_nSpacing;
 
 		// 如果正在拖动标签，使用拖到的位置
-		if (FRIEND(pItem)->m_offset.left != MAXINT16)
-		{
-			rect.MoveToX(FRIEND(pItem)->m_offset.left);
-		}
+		if (pItem->GetOffset().left != MAXINT16)
+			rect.MoveToX((short)pItem->GetOffset().left);
 
-		FRIEND(pItem)->SetRect(rect, lpClipRect);
+		pItem->SetRect(rect, lpClipRect);
 		rect.left = nRight;
 	}
 }
 
-void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
+void CUIWebTabBar::OnChildMoving(CUIView *pItem, CPoint point)
 {
-	CRect rect = pCtrl->GetRect();
+	CRect rect = pItem->GetRect();
 
 	if (point.x < m_rect.left)
 		point.x = m_rect.left;
@@ -183,9 +179,9 @@ void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
 	// 找出新位置
 	UINT nCurIndex = -1, nNewIndex = -1;
 
-	for (UINT i = 0; (nCurIndex == -1 || nNewIndex == -1) && i != m_vecChilds.size(); i++)
+	for (int i = 0; (nCurIndex == -1 || nNewIndex == -1) && i != m_vecChilds.size(); i++)
 	{
-		if (m_vecChilds[i] == pCtrl)
+		if (m_vecChilds[i] == pItem)
 		{
 			nCurIndex = i;
 			continue;
@@ -207,15 +203,15 @@ void CUIWebTabBar::OnChildMoving(CUIControl *pCtrl, CPoint point)
 		else
 			memmove(&m_vecChilds[nNewIndex + 1], &m_vecChilds[nNewIndex], (nCurIndex - nNewIndex) * 4);
 
-		m_vecChilds[nNewIndex] = pCtrl;
+		m_vecChilds[nNewIndex] = pItem;
 	}
 
-	pCtrl->SetLeft(point.x);
+	pItem->SetLeft(point.x);
 }
 
-void CUIWebTabBar::OnChildMoved(CUIControl *pCtrl, CPoint point)
+void CUIWebTabBar::OnChildMoved(CUIView *pItem, CPoint point)
 {
-	pCtrl->SetLeft(MAXINT16);
+	pItem->SetLeft(MAXINT16);
 }
 
 void CUIWebTabBar::OnLoad(const IUIXmlAttrs &attrs)
@@ -226,6 +222,6 @@ void CUIWebTabBar::OnLoad(const IUIXmlAttrs &attrs)
 	if (attrs.GetInt(L"tabWidth", &nValue))
 		SetTabWidth(nValue);
 
-	if (attrs.GetInt(L"tabSpace", &nValue))
-		SetTabSpace(nValue);
+	if (attrs.GetInt(L"spacing", &nValue))
+		SetSpacing(nValue);
 }

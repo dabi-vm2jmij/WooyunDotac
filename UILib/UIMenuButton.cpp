@@ -21,11 +21,11 @@ void CUIMenuButton::OnLButtonDown(CPoint point)
 {
 	__super::OnLButtonDown(point);
 
-	CRect rect(0, 0, MAXINT16, MAXINT16);
-	GetPopupPos(rect);
+	if (!m_fnOnPopup)
+		return;
 
 	m_bNoLeave = true;
-	m_fnGetUIMenu()->Popup(GetRootView()->GetHwnd(), rect.left, rect.top, rect.right, rect.bottom, true);
+	m_fnOnPopup();
 	m_bNoLeave = false;
 
 	// 检查鼠标是否离开
@@ -41,14 +41,4 @@ void CUIMenuButton::OnLButtonDown(CPoint point)
 		m_bLButtonDown = false;
 		OnLButtonUp(point);
 	}
-}
-
-void CUIMenuButton::GetPopupPos(LPRECT lpRect)
-{
-	CRect rect = GetWindowRect();
-
-	lpRect->left = rect.left;
-	lpRect->top = rect.bottom;
-//	lpRect->right = rect.right;
-	lpRect->bottom = rect.top;
 }

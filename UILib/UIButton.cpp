@@ -3,36 +3,63 @@
 
 CUIButton::CUIButton(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_btnState(Normal)
 {
-	if (lpFileName == NULL)
-		return;
-
-	Fill4States(m_imagexs, SplitImage(lpFileName, m_imagexs));
-	SetCurImage(m_imagexs[m_btnState]);
-	SetSize(m_imagexs[0].Rect().Size());
+	if (lpFileName)
+	{
+		SetImage(GetImage(lpFileName));
+		SetSize(m_imagexs[1].Rect().Size());
+	}
 }
 
 CUIButton::~CUIButton()
 {
 }
 
-void CUIButton::ResetImages(const CImagex imagexs[], int nCount)
+// 不足4态的图片扩展成4态
+static void Fill4Images(CImagex imagexs[], int nCount)
 {
-	for (int i = 0; i < nCount && i < 4; i++)
-		m_imagexs[i] = imagexs[i];
+	switch (nCount)
+	{
+	case 1:
+		imagexs[1] = imagexs[0];
+		imagexs[0] = nullptr;
 
-	Fill4States(m_imagexs, nCount);
-	SetCurImage(m_imagexs[m_btnState]);
-	SetSize(m_imagexs[0].Rect().Size());
+	case 2:
+		imagexs[2] = imagexs[1];
+
+	case 3:
+		imagexs[3] = imagexs[0];
+	}
 }
 
-// 不足4态的图片扩展成4态：3态为（0、1、2、0），2态为（0、1、1、0）
-void CUIButton::Fill4States(CImagex imagexs[], int nCount)
+void CUIButton::SetImage(const CImagex &imagex)
 {
-	for (int i = max(1, nCount); i < 4; i++)
-		imagexs[i] = imagexs[0];
+	int nCount = imagex.GetFrameCount();
 
-	if (nCount == 2)
-		imagexs[2] = imagexs[1];
+	for (int i = 0; i < _countof(m_imagexs) && i < nCount; i++)
+	{
+		m_imagexs[i] = imagex;
+		m_imagexs[i].SetFrameIndex(i);
+	}
+
+	Fill4Images(m_imagexs, nCount);
+	InvalidateRect();
+}
+
+void CUIButton::SetImages(const CImagex imagexs[], int nCount)
+{
+	for (int i = 0; i < _countof(m_imagexs) && i < nCount; i++)
+		m_imagexs[i] = imagexs[i];
+
+	Fill4Images(m_imagexs, nCount);
+	InvalidateRect();
+}
+
+void CUIButton::OnPaint(CUIDC &dc) const
+{
+	__super::OnPaint(dc);
+
+	if (m_imagexs[m_btnState])
+		m_imagexs[m_btnState].Scale9Draw(dc, m_rect);
 }
 
 void CUIButton::OnEnable(bool bEnable)
@@ -76,5 +103,8 @@ void CUIButton::OnLButtonUp(CPoint point)
 
 void CUIButton::OnButtonState(ButtonState btnState)
 {
-	SetCurImage(m_imagexs[m_btnState = btnState]);
+	if (m_imagexs[m_btnState] != m_imagexs[btnState])
+		InvalidateRect();
+
+	m_btnState = btnState;
 }

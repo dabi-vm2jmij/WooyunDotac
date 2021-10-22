@@ -5,7 +5,7 @@
 #define BRACE_L		2
 #define BRACE_R		3
 
-CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0)
+CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0), m_nMaxWidth(MAXINT16)
 {
 }
 
@@ -23,29 +23,21 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
 		CRect rect(lpRect);
 
 		if (nFormat & DT_CENTER)
-		{
-			rect.left = (rect.left + rect.right - m_sizeText.cx) / 2;
-		}
+			rect.left = (rect.left + rect.right - m_textSize.cx) / 2;
 		else if (nFormat & DT_RIGHT)
-		{
-			rect.left = rect.right - m_sizeText.cx;
-		}
+			rect.left = rect.right - m_textSize.cx;
 
 		if (nFormat & DT_VCENTER)
-		{
-			rect.bottom = (rect.top + rect.bottom + m_sizeText.cy) / 2;
-		}
+			rect.bottom = (rect.top + rect.bottom + m_textSize.cy) / 2;
 		else if ((nFormat & DT_BOTTOM) == 0)	// DT_TOP
-		{
-			rect.bottom = rect.top + m_sizeText.cy;
-		}
+			rect.bottom = rect.top + m_textSize.cy;
 
 		OnDrawTextEx(dc, rect, NULL);
 	}
 	else
 	{
-		dc.SelectFont(m_hFont);
-		dc.SetTextColor(m_color);
+		SelectObject(dc, m_hFont);
+		::SetTextColor(dc, m_color);
 		DrawTextW(dc, m_strText.c_str(), -1, lpRect, nFormat | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
 	}
 
@@ -75,12 +67,12 @@ struct DrawInfo
 	DrawInfo(HFONT hFont, COLORREF color) : m_fontKey(hFont), m_color(color) {}
 };
 
-void MyDrawText(const DrawInfo &drawInfo, CUIDC &dc, LPCWSTR lpText, int nSize, LPRECT lpRect, LPSIZE lpSize)
+void MyDrawText(const DrawInfo &drawInfo, HDC hDC, LPCWSTR lpText, int nSize, LPRECT lpRect, LPSIZE lpSize)
 {
-	dc.SelectFont(g_theApp.GetFontMgr().GetCachedFont(drawInfo.m_fontKey));
+	SelectObject(hDC, g_theApp.GetFontMgr().GetCachedFont(drawInfo.m_fontKey));
 
 	CRect rect;
-	DrawTextW(dc, lpText, nSize, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+	DrawTextW(hDC, lpText, nSize, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
 
 	if (lpSize)
 	{
@@ -91,8 +83,8 @@ void MyDrawText(const DrawInfo &drawInfo, CUIDC &dc, LPCWSTR lpText, int nSize, 
 	}
 	else
 	{
-		dc.SetTextColor(drawInfo.m_color);
-		DrawTextW(dc, lpText, nSize, lpRect, DT_NOPREFIX | DT_SINGLELINE | DT_BOTTOM);
+		::SetTextColor(hDC, drawInfo.m_color);
+		DrawTextW(hDC, lpText, nSize, lpRect, DT_NOPREFIX | DT_SINGLELINE | DT_BOTTOM);
 		lpRect->left += rect.Width();
 	}
 }
@@ -202,11 +194,10 @@ bool Transcode(LPCWSTR lpSrc, LPWSTR lpDst)
 
 }	// namespace
 
-void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
+void CUITextImpl::OnDrawTextEx(HDC hDC, LPRECT lpRect, LPSIZE lpSize) const
 {
-	dc.SelectFont(m_hFont);
 	vector<DrawInfo> vecDrawInfos;
-	DrawInfo drawInfo((HFONT)GetCurrentObject(dc, OBJ_FONT), m_color);
+	DrawInfo drawInfo(m_hFont, m_color);
 
 	for (LPCWSTR lpHead = m_strText.c_str(), lpTail; *lpHead; lpHead = lpTail + 1)
 	{
@@ -216,13 +207,13 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 		if ((lpTail = wcschr(lpHead, BRACE_L)) == NULL)
 		{
 			ATLASSERT(vecDrawInfos.empty());
-			MyDrawText(drawInfo, dc, lpHead, -1, lpRect, lpSize);
+			MyDrawText(drawInfo, hDC, lpHead, -1, lpRect, lpSize);
 			break;
 		}
 
 		if (lpHead != lpTail)
 		{
-			MyDrawText(drawInfo, dc, lpHead, lpTail - lpHead, lpRect, lpSize);
+			MyDrawText(drawInfo, hDC, lpHead, lpTail - lpHead, lpRect, lpSize);
 			lpHead = lpTail;
 		}
 
@@ -334,21 +325,30 @@ void CUITextImpl::OnDrawTextEx(CUIDC &dc, LPRECT lpRect, LPSIZE lpSize) const
 void CUITextImpl::SetFont(HFONT hFont)
 {
 	ATLASSERT(hFont);
-	if (m_hFont == hFont || hFont == NULL)
-		return;
-
-	m_hFont = hFont;
-	RecalcSize();
-	Invalidate();
+	if (m_hFont != hFont && hFont)
+	{
+		m_hFont = hFont;
+		RecalcSize();
+		Invalidate();
+	}
 }
 
 void CUITextImpl::SetTextColor(COLORREF color)
 {
-	if (m_color == color)
-		return;
+	if (m_color != color)
+	{
+		m_color = color;
+		Invalidate();
+	}
+}
 
-	m_color = color;
-	Invalidate();
+void CUITextImpl::SetMaxWidth(int nWidth)
+{
+	if (m_nMaxWidth != nWidth)
+	{
+		m_nMaxWidth = nWidth;
+		RecalcSize();
+	}
 }
 
 void CUITextImpl::SetText(LPCWSTR lpText)
@@ -364,22 +364,22 @@ void CUITextImpl::SetText(LPCWSTR lpText)
 			lpText = szText;
 	}
 
-	if (m_strText == lpText)
-		return;
-
-	m_strText = lpText;
-	RecalcSize();
-	Invalidate();
+	if (m_strText != lpText)
+	{
+		m_strText = lpText;
+		RecalcSize();
+		Invalidate();
+	}
 }
 
 void CUITextImpl::Invalidate()
 {
-	if (m_sizeText.cx == 0 || m_sizeText.cy == 0)
-		return;
-
-	auto pCtrl = dynamic_cast<CUIControl *>(this);
-	ATLASSERT(pCtrl);
-	pCtrl->InvalidateRect(NULL);
+	if (m_textSize.cx && m_textSize.cy)
+	{
+		auto pCtrl = dynamic_cast<CUIControl *>(this);
+		ATLASSERT(pCtrl);
+		pCtrl->InvalidateRect();
+	}
 }
 
 void CUITextImpl::RecalcSize()
@@ -390,7 +390,7 @@ void CUITextImpl::RecalcSize()
 	{
 		if (wcschr(m_strText.c_str(), BRACE_L))
 		{
-			OnDrawTextEx(CUIDC(CUIComDC(NULL), NULL, false), NULL, &size);
+			OnDrawTextEx(CUIComDC(NULL), NULL, &size);
 		}
 		else
 		{
@@ -398,10 +398,13 @@ void CUITextImpl::RecalcSize()
 			DrawTextW(CUIComDC(m_hFont), m_strText.c_str(), -1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
 			size = rect.Size();
 		}
+
+		if (size.cx > m_nMaxWidth)
+			size.cx = m_nMaxWidth;
 	}
 
-	if (m_sizeText != size)
-		OnTextSize(m_sizeText = size);
+	if (m_textSize != size)
+		OnTextSize(m_textSize = size);
 }
 
 void CUITextImpl::OnLoadText(const IUIXmlAttrs &attrs)
@@ -416,6 +419,10 @@ void CUITextImpl::OnLoadText(const IUIXmlAttrs &attrs)
 		ATLVERIFY(StrToColor(lpStr, color));
 		SetTextColor(color);
 	}
+
+	int nWidth;
+	if (attrs.GetInt(L"maxWidth", &nWidth))
+		SetMaxWidth(nWidth);
 
 	if (lpStr = attrs.GetStr(L"text"))
 		SetText(lpStr);

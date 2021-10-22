@@ -3,8 +3,11 @@
 
 CUIWebTab::CUIWebTab(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, lpFileName), m_bSelect(false), m_pTabPage(NULL)
 {
-	SetStretch(true);
 	SetDraggable(true);
+
+	// Í¼Æ¬Ö»ÓÐ2Ì¬Ê±£¬Hover = Normal
+	if (m_imagexs[1] == m_imagexs[2])
+		m_imagexs[1] = m_imagexs[0];
 }
 
 CUIWebTab::~CUIWebTab()

@@ -1,30 +1,27 @@
 #include "stdafx.h"
-#include "TabDemoWnd.h"
+#include "DemoWnd1.h"
+#include "UIMoreTools.h"
 
-CTabDemoWnd::CTabDemoWnd() : m_pWebTabBar(NULL), m_pTabView(NULL)
+CDemoWnd1::CDemoWnd1() : m_pWebTabBar(NULL), m_pTabView(NULL)
 {
+	m_borderImage = UILib::GetImage(L"例子1\\主背景.png");
 	m_nBorderSize = 4;
-	m_nCaptionHeight = 36;
-
-	m_bgImagex = UILib::GetImage(L"例子1\\主背景.png");
-	m_bgImagex2 = UILib::GetImage(L"例子1\\工具栏bg.png");
+	m_nCaptionSize = 36;
 }
 
-CTabDemoWnd::~CTabDemoWnd()
+CDemoWnd1::~CDemoWnd1()
 {
 }
 
-int CTabDemoWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
+void CDemoWnd1::OnCreate()
 {
-	if (__super::OnCreate(lpCreateStruct) == -1)
-		return -1;
+	__super::OnCreate();
 
 	InitUI();
 	CenterWindow();
-	return 0;
 }
 
-void CTabDemoWnd::InitUI()
+void CDemoWnd1::InitUI()
 {
 	CUIView *pView = m_rootView.AddView();
 	pView->SetTop(0, true);
@@ -33,27 +30,28 @@ void CTabDemoWnd::InitUI()
 	CUIButton *pButton = pView->AddButton(L"例子1\\关闭.png:4");
 	pButton->SetRight(1, true);
 	pButton->SetTop(0);
-	pButton->BindClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_CLOSE); });
+	pButton->BindClick([this]{ this->PostMessage(WM_SYSCOMMAND, SC_CLOSE); });
 	pButton->SetToolTip(L"关闭");
 
-	m_pBtnMax = pView->AddStateButton();
-	m_pBtnMax->SetRight(0, true);
-	m_pBtnMax->SetTop(0);
-	m_pBtnMax->AddButton(L"例子1\\最大化.png:4")->SetToolTip(L"最大化");
-	m_pBtnMax->AddButton(L"例子1\\还原.png:4")->SetToolTip(L"向下还原");
-	m_pBtnMax->EndAddChild();
-	m_pBtnMax->BindClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
+	auto pBtnMax = pView->AddStateButton();
+	pBtnMax->SetRight(0, true);
+	pBtnMax->SetTop(0);
+	pBtnMax->SetId(L"最大化");
+	pBtnMax->AddButton(L"例子1\\最大化.png:4")->SetToolTip(L"最大化");
+	pBtnMax->AddButton(L"例子1\\还原.png:4")->SetToolTip(L"向下还原");
+	pBtnMax->EndAddChild();
+	pBtnMax->BindClick([this](int nState){ this->SendMessage(WM_SYSCOMMAND, nState == 0 ? SC_MAXIMIZE : SC_RESTORE); });
 
 	pButton = pView->AddButton(L"例子1\\最小化.png:4");
 	pButton->SetRight(0, true);
 	pButton->SetTop(0);
-	pButton->BindClick([this]{ this->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
+	pButton->BindClick([this]{ this->PostMessage(WM_SYSCOMMAND, SC_MINIMIZE); });
 	pButton->SetToolTip(L"最小化");
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 标签例子
 	m_pWebTabBar = pView->AddWebTabBar(L"例子1\\标签栏\\标签.png:4");
-	m_pWebTabBar->SetLeft(m_nBorderSize - 2, true);
+	m_pWebTabBar->SetLeft(-2, true);
 	m_pWebTabBar->SetRight(40);
 	m_pWebTabBar->SetTabWidth(180);
 
@@ -66,12 +64,31 @@ void CTabDemoWnd::InitUI()
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 工具栏例子
-	CUIToolBar *pToolBar = m_rootView.AddToolBar(L"主菜单.png:3");
+	CUIToolBar *pToolBar = m_rootView.AddToolBar();
 	UILib::LoadFromXml(L"例子1\\工具栏.xml", pToolBar);
+
+	if (pButton = pToolBar->SearchCast(L"更多工具"))
+	{
+		pButton->BindClick([this, pToolBar, pButton]
+		{
+			vector<CUIView *> vecItems;
+			pToolBar->GetMoreItems(vecItems);
+
+			if (vecItems.size())
+			{
+				CRect rect = pButton->GetWindowRect();
+				CUIMoreTools *pWnd = new CUIMoreTools;
+				pToolBar->SetMoreWnd(pWnd->Popup(vecItems, m_hWnd, CPoint(rect.left, rect.bottom)));
+			}
+		});
+	}
+
+	CUIView *pClient = m_rootView.AddView();
+	pClient->SetBgColor(RGB(255, 255, 255));
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 滑块例子
-	pView = m_rootView.AddView();
+	pView = pClient->AddView();
 	pView->SetLeft(300);
 	pView->SetRight(300);
 	pView->SetTop(10, true);
@@ -80,11 +97,11 @@ void CTabDemoWnd::InitUI()
 	CUISlider *pSlider = pView->AddSlider(L"例子1\\滑块.png:3", L"例子1\\滑块bg.png:2");
 	pSlider->SetMaxPos(200);
 	pSlider->SetCurPos(50);
-	pSlider->BindChange([](int nPos){ ATLTRACE(_T("Slider: %d\n"), nPos); });
+	pSlider->BindChange([pSlider]{ ATLTRACE(_T("Slider: %d\n"), pSlider->GetCurPos()); });
 
 	////////////////////////////////////////////////////////////////////////////////
 	// 滚动条例子
-	pView = m_rootView.AddView();
+	pView = pClient->AddView();
 	pView->SetRight(30, true);
 	pView->SetWidth(200);
 	pView->SetTop(10);
@@ -103,7 +120,7 @@ void CTabDemoWnd::InitUI()
 	pBtnDel->SetTop(0);
 	pBtnDel->SetText(L"删除");
 
-	CUIVScroll *pVScroll = pView->AddVScroll(L"例子1\\滚动条.png:3", L"例子1\\滚动条bg.png");
+	CUIScrollBar *pVScroll = pView->AddScrollBar(L"例子1\\滚动条.png:3", L"例子1\\滚动条bg.png");
 	pVScroll->SetRight(10, true);
 	pVScroll->SetTop(40);
 
@@ -148,7 +165,7 @@ void CTabDemoWnd::InitUI()
 	});
 
 	// 客户区
-	pView = m_pTabView = m_rootView.AddView();
+	pView = m_pTabView = pClient->AddView();
 	pView->SetLeft(50);
 	pView->SetRight(50);
 	pView->SetTop(50);
@@ -160,7 +177,7 @@ void CTabDemoWnd::InitUI()
 		AddWebTab();
 }
 
-void CTabDemoWnd::AddWebTab()
+void CDemoWnd1::AddWebTab()
 {
 	static int s_nTestId;
 	wchar_t szText[64];
@@ -184,7 +201,7 @@ void CTabDemoWnd::AddWebTab()
 	m_pWebTabBar->SelectTab(pWebTab);
 }
 
-void CTabDemoWnd::DelWebTab(CUIWebTab *pWebTab)
+void CDemoWnd1::DelWebTab(CUIWebTab *pWebTab)
 {
 	if (m_pWebTabBar->GetChilds().size() < 2)
 		return;
@@ -194,59 +211,44 @@ void CTabDemoWnd::DelWebTab(CUIWebTab *pWebTab)
 	pTabPage->GetParent()->DeleteChild(pTabPage);
 }
 
-void CTabDemoWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
+void CDemoWnd1::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
 {
-	CRect rect(lpRect);
-	m_bgImagex.StretchBlt(dc, rect);
-
-	rect.DeflateRect(m_nBorderSize, 36);
-	rect.bottom = rect.top + m_bgImagex2.Rect().Height();
-	m_bgImagex2.Draw(dc, rect);
-
-	rect.top = rect.bottom;
-	rect.bottom = lpRect->bottom - m_nBorderSize;
-	dc.FillSolidRect(rect, RGB(255, 255, 255));
-}
-
-void CTabDemoWnd::OnSize(UINT nType, CSize size)
-{
-	__super::OnSize(nType, size);
-
-	if (m_bgSize.cx != size.cx)
-	{
-		CRect rect(m_bgSize.cx, 0, size.cx, size.cy);
-		rect.NormalizeRect();
-		rect.left -= m_nBorderSize;
-		InvalidateRect(rect);
-	}
-
-	if (m_bgSize.cy != size.cy)
-	{
-		CRect rect(0, m_bgSize.cy, size.cx, size.cy);
-		rect.NormalizeRect();
-		rect.top -= m_nBorderSize;
-		InvalidateRect(rect);
-	}
-
-	m_bgSize = size;
-}
-
-void CTabDemoWnd::OnGetMinMaxInfo(MINMAXINFO *lpMMI)
-{
-	lpMMI->ptMinTrackSize.x = 800;
-	lpMMI->ptMinTrackSize.y = 450;
+	lpMMI->ptMinTrackSize.x = 500;
+	lpMMI->ptMinTrackSize.y = 300;
 
 	__super::OnGetMinMaxInfo(lpMMI);
 }
 
-void CTabDemoWnd::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP)
+void CDemoWnd1::OnSize(UINT nType, CSize size)
 {
-	if (!IsZoomed())
+	if (nType != SIZE_MINIMIZED)
+	{
+		auto pBtnMax = dynamic_cast<CUIStateButton *>(m_rootView.Search(L"最大化", 2));
+		if (pBtnMax)
+			pBtnMax->SetState(nType != SIZE_RESTORED);
+	}
+
+	CRect rect1 = m_rootView.GetRect();
+	__super::OnSize(nType, size);
+	CRect rect2 = m_rootView.GetRect();
+
+	if (rect1.IsRectEmpty())
 		return;
 
-	// 有 WS_CAPTION 时需要
-	LPRECT lpRect = lpNCSP->rgrc;
-	long nSum = lpRect->top + lpRect->bottom;
-	DefWindowProc();
-	lpRect->top = nSum - lpRect->bottom;
+	// 无效右、下边框
+	if (rect1.right != rect2.right)
+	{
+		CRect rect(rect1.right, 0, rect2.right, size.cy);
+		rect.NormalizeRect();
+		rect.right += m_nBorderSize;
+		InvalidateRect(rect);
+	}
+
+	if (rect1.bottom != rect2.bottom)
+	{
+		CRect rect(0, rect1.bottom, size.cx, rect2.bottom);
+		rect.NormalizeRect();
+		rect.bottom += m_nBorderSize;
+		InvalidateRect(rect);
+	}
 }

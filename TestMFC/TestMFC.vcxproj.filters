@@ -30,10 +30,10 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIWnd.h">
+    <ClInclude Include="UIWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIAboutWnd.h">
+    <ClInclude Include="UIDialog.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,10 +47,10 @@
     <ClCompile Include="MainFrm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIWnd.cpp">
+    <ClCompile Include="UIWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIAboutWnd.cpp">
+    <ClCompile Include="UIDialog.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

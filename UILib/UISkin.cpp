@@ -95,13 +95,9 @@ static LPCSTR DoFind(LPCSTR lpBase, int *lpData, LPCWSTR lpFileName)
 		int nCmp = _wcsicmp((LPCWSTR)(lpBase + lpData[nIndex * 2]), lpFileName);
 
 		if (nCmp == 0)
-		{
 			return lpBase + lpData[nIndex * 2 + 1];
-		}
 		else if (nCmp < 0)
-		{
 			nBegin = nIndex + 1;
-		}
 		else
 			nEnd = nIndex;
 	}

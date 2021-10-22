@@ -7,7 +7,7 @@ class UILIB_API CUIScrollView : public CUIView
 public:
 	CUIScrollView(CUIView *pParent);
 
-	void SetVScroll(CUIVScroll *pVScroll);
+	void SetVScroll(CUIScrollBar *pVScroll);
 	void CheckVScroll();
 
 protected:
@@ -17,5 +17,5 @@ protected:
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual int  CalcHeight() const;
 
-	CUIVScroll *m_pVScroll;
+	CUIScrollBar *m_pVScroll;
 };

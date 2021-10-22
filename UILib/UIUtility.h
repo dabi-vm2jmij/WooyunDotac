@@ -11,10 +11,7 @@ UILIB_API CImagex GetImage(LPCWSTR lpFileName);
 UILIB_API CUIStream *GetStream(LPCWSTR lpFileName);
 UILIB_API bool HasAlphaChannel(const CImage &image);
 UILIB_API void AlphaPng(CImage &image);
-UILIB_API UINT SplitImage(LPCWSTR lpFileName, CImagex imagexs[], UINT nCount);
-template<size_t nCount>
-inline UINT SplitImage(LPCWSTR lpFileName, CImagex (&imagexs)[nCount]) { return SplitImage(lpFileName, imagexs, nCount); }
-UILIB_API void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int));
+UILIB_API void Scale9Draw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int));
 UILIB_API void SetDefaultFont(LPCWSTR lpszName);
 UILIB_API HFONT GetDefaultFont();
 UILIB_API HFONT GetCachedFont(LPCWSTR lpszName, int nWeight = FW_NORMAL, BYTE bItalic = FALSE, BYTE bUnderline = FALSE);

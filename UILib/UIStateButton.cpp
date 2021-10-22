@@ -43,11 +43,11 @@ void CUIStateButton::SetState(UINT nState)
 {
 	nState %= m_vecChilds.size();
 
-	if (m_nState == nState)
-		return;
-
-	m_nState = nState;
-	InvalidateLayout();
+	if (m_nState != nState)
+	{
+		m_nState = nState;
+		InvalidateLayout();
+	}
 }
 
 HCURSOR CUIStateButton::GetCursor() const
@@ -74,6 +74,15 @@ bool CUIStateButton::OnHitTest(UIHitTest &hitTest)
 	return true;
 }
 
+void CUIStateButton::RecalcLayout(LPRECT lpClipRect)
+{
+	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
+		return;
+
+	for (int i = 0; i != m_vecChilds.size(); i++)
+		FRIEND(m_vecChilds[i])->CalcRect(i == m_nState ? &CRect(m_rect) : NULL, lpClipRect);
+}
+
 void CUIStateButton::OnLButtonDown(CPoint point)
 {
 	FRIEND(m_vecChilds[m_nState])->OnLButtonDown(point);
@@ -89,17 +98,6 @@ void CUIStateButton::OnLButtonUp(CPoint point)
 
 	if (m_fnOnClick)
 		m_fnOnClick(nState);
-}
-
-void CUIStateButton::RecalcLayout(LPRECT lpClipRect)
-{
-	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
-		return;
-
-	for (int i = 0; i != m_vecChilds.size(); i++)
-	{
-		FRIEND(m_vecChilds[i])->CalcRect(i == m_nState ? &CRect(m_rect) : NULL, lpClipRect);
-	}
 }
 
 void CUIStateButton::OnLoad(const IUIXmlAttrs &attrs)

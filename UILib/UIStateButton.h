@@ -20,9 +20,9 @@ public:
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
+	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;
-	virtual void RecalcLayout(LPRECT lpClipRect) override;
 
 	UINT m_nState;
 	function<void(int)> m_fnOnClick;

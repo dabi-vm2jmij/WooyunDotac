@@ -17,8 +17,10 @@ public:
 
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
+	virtual void OnPaint(CUIDC &dc) const override;
 	void OnUITimer();
 
+	CImagex  m_imagex;
 	UINT     m_nElapse;
 	bool     m_bLoop;
 	UINT     m_nFrameIdx;

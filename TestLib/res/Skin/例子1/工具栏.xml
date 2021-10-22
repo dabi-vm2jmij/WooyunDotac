@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ToolBar left="50" right="50" top="0*" height="34" moreBg="#3c7bd4">
+<ToolBar top="0*" height="34" bgImage="例子1\工具栏bg.png">
+	<Button left="10" image="主菜单.png:3" id="更多工具" tooltip="更多工具" />
 	<ButtonEx left="25*" image="\按钮.png:3" text="按钮1" />
 	<ButtonEx left="25*" image="\按钮.png:3" text="按钮2" />
 	<ButtonEx left="25*" image="\按钮.png:3" text="按钮3" />

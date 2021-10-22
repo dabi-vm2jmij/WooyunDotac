@@ -3,14 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UILib", "UILib\UILib2.vcxproj", "{1E367F20-5B9B-4282-BC25-8B712681EFC5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UILib2", "UILib\UILib2.vcxproj", "{1E367F20-5B9B-4282-BC25-8B712681EFC5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MakeSkin", "MakeSkin\MakeSkin.vcxproj", "{D5CE3D7A-A3E1-4BD7-9E87-6E1FCB189DAA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLib", "TestLib\TestLib2.vcxproj", "{BBDE13F6-CAB2-49CC-B389-3EE14B59CA2E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1E367F20-5B9B-4282-BC25-8B712681EFC5} = {1E367F20-5B9B-4282-BC25-8B712681EFC5}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLib2", "TestLib\TestLib2.vcxproj", "{BBDE13F6-CAB2-49CC-B389-3EE14B59CA2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

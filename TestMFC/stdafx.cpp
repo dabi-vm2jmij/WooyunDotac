@@ -4,9 +4,3 @@
 // stdafx.obj 将包含预编译类型信息
 
 #include "stdafx.h"
-
-#ifdef _DEBUG
-#pragma comment(lib, "..\\Debug\\UILib.lib")
-#else
-#pragma comment(lib, "..\\Release\\UILib.lib")
-#endif

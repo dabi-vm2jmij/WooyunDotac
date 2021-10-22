@@ -34,9 +34,9 @@ protected:
 	virtual CUIMenu *NewUIMenu() const { return new CUIMenu; }
 	virtual bool IsDropShadow() const { return true; }
 	virtual void GetMargins(LPRECT lpRect) const;
-	virtual BYTE GetWndAlpha() const { return 0; }		// 0：不透明，1-255：透明度
-	virtual int  GetHoriSpace() const { return 0; }		// 子菜单的水平间距
-	virtual UINT GetShowDelay() const { return 400; }	// 子菜单延迟显示毫秒
+	virtual int  GetSpacing() const { return 0; }	// 子菜单的水平间距
+	virtual BYTE GetWndAlpha() const { return 0; }	// 0：不透明，1-255：透明度
+	virtual UINT GetShowDelay() const;
 	virtual void MeasureItem(UINT nIndex, LPSIZE lpSize) const;
 	virtual void DrawBg(CUIDC &dc, LPCRECT lpRect);
 	virtual void DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected);

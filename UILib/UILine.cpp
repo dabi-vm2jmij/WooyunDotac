@@ -17,8 +17,10 @@ void CUILine::SetLineStyle(COLORREF color, int nStyle)
 	m_nStyle = (WORD)nStyle;
 }
 
-void CUILine::DoPaint(CUIDC &dc) const
+void CUILine::OnPaint(CUIDC &dc) const
 {
+	__super::OnPaint(dc);
+
 	if (m_color == -1)
 		return;
 

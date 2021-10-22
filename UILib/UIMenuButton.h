@@ -10,13 +10,12 @@ public:
 	CUIMenuButton(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIMenuButton();
 
-	void BindGetUIMenu(function<CUIMenu *()> &&fnGetUIMenu) { m_fnGetUIMenu = std::move(fnGetUIMenu); }
+	void BindPopup(function<void()> &&fnOnPopup) { m_fnOnPopup = std::move(fnOnPopup); }
 
 protected:
 	virtual void OnMouseLeave() override;
 	virtual void OnLButtonDown(CPoint point) override;
-	virtual void GetPopupPos(LPRECT lpRect);
 
 	bool m_bNoLeave;
-	function<CUIMenu *()> m_fnGetUIMenu;
+	function<void()> m_fnOnPopup;
 };

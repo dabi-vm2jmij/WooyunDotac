@@ -1,41 +1,18 @@
 #include "stdafx.h"
 #include "UISlider.h"
 
-CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_pProgress(NULL), m_nMaxPos(100), m_fCurPos(0)
+CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_nMaxPos(100), m_fCurPos(0)
 {
-	if (lpBgFileName)
-	{
-		CImagex imagex = GetImage(lpBgFileName);
-
-		if (imagex.GetFrameCount() < 2)
-		{
-			CUIImage *pImage = AddImage(lpBgFileName);
-			pImage->SetWidth(0);
-			pImage->SetStretch(true);
-		}
-		else
-		{
-			m_pProgress = AddProgress(lpBgFileName);
-			m_pProgress->SetWidth(0);
-		}
-	}
-
 	m_pButton = AddButton(lpFileName);
 	m_pButton->SetLeft(0);
 	m_pButton->SetDraggable(true);
 
+	if (lpBgFileName)
+		SetBgImage(GetImage(lpBgFileName));
+
 	// 设置最大高度
-	int nMaxHeight = 0;
-
-	for (auto pItem : m_vecChilds)
-	{
-		CSize size = pItem->GetSize();
-
-		if (nMaxHeight < size.cy)
-			nMaxHeight = size.cy;
-	}
-
-	SetHeight(nMaxHeight);
+	int nHeight1 = m_pButton->GetSize().cy, nHeight2 = m_bgImagex.Rect().Height();
+	SetHeight(max(nHeight1, nHeight2));
 }
 
 CUISlider::~CUISlider()
@@ -44,7 +21,7 @@ CUISlider::~CUISlider()
 
 void CUISlider::SetMaxPos(int nMaxPos)
 {
-	if (nMaxPos <= 0 || nMaxPos == m_nMaxPos)
+	if (nMaxPos <= 0 || m_nMaxPos == nMaxPos)
 		return;
 
 	bool bChange = false;
@@ -58,7 +35,7 @@ void CUISlider::SetMaxPos(int nMaxPos)
 	ResetOffset(0, false);
 
 	if (m_fnOnChange && bChange)
-		m_fnOnChange(GetCurPos());
+		m_fnOnChange();
 }
 
 void CUISlider::SetCurPos(int nCurPos)
@@ -68,31 +45,57 @@ void CUISlider::SetCurPos(int nCurPos)
 	else if (nCurPos > m_nMaxPos)
 		nCurPos = m_nMaxPos;
 
-	if (nCurPos == GetCurPos())
+	if (GetCurPos() == nCurPos)
 		return;
 
 	m_fCurPos = nCurPos;
 	ResetOffset(0, false);
 
 	if (m_fnOnChange)
-		m_fnOnChange(GetCurPos());
+		m_fnOnChange();
+}
+
+void CUISlider::OnPaint(CUIDC &dc) const
+{
+	if (m_bgColor != -1)
+		dc.FillSolidRect(m_rect, m_bgColor);
+
+	if (m_bgImagex)
+	{
+		// 画背景上下居中
+		CRect rect(m_rect);
+		rect.top = (rect.top + rect.bottom - m_bgImagex.Rect().Height()) / 2;
+		rect.bottom = rect.top + m_bgImagex.Rect().Height();
+		m_bgImagex.Scale9Draw(dc, rect);
+
+		if (m_bgImagex.GetFrameCount() > 1)
+		{
+			// 画进度到按钮中心
+			CImagex imagex(m_bgImagex);
+			imagex.SetFrameIndex(1);
+			rect.right = rect.left + m_pButton->GetOffset().left + m_pButton->GetSize().cx / 2;
+			imagex.Scale9Draw(dc, rect);
+		}
+	}
 }
 
 void CUISlider::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	if (m_rect.Size() != ((CRect *)lpOldRect)->Size())
-	{
 		ResetOffset(0, false);
-	}
 
 	__super::OnRectChange(lpOldRect, lpClipRect);
+}
+
+void CUISlider::OnChildMoving(CUIView *, CPoint point)
+{
+	ResetOffset(point.x - m_rect.left, true);
 }
 
 void CUISlider::OnLButtonDown(CPoint point)
 {
 	// 移动滑块中心到点击处
-	CSize size = m_pButton->GetSize();
-	ResetOffset(point.x - m_rect.left - size.cx / 2, true);
+	ResetOffset(point.x - m_rect.left - m_pButton->GetSize().cx / 2, true);
 
 	// 鼠标消息转给滑块
 	GetRootView()->UpdateLayout();
@@ -102,16 +105,9 @@ void CUISlider::OnLButtonDown(CPoint point)
 	m_bLButtonDown = false;
 }
 
-void CUISlider::OnChildMoving(CUIControl *, CPoint point)
-{
-	ResetOffset(point.x - m_rect.left, true);
-}
-
 void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 {
-	CSize size = m_pButton->GetSize();
-
-	int nWidth = m_rect.Width() - size.cx;
+	int nWidth = m_rect.Width() - m_pButton->GetSize().cx;
 	if (nWidth <= 0)
 		return;
 
@@ -124,9 +120,6 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 
 	m_pButton->SetLeft(nOffset);
 
-	if (m_pProgress)
-		m_pProgress->SetValue(nOffset + size.cx / 2, nWidth + size.cx);
-
 	if (!bSetPos)
 		return;
 
@@ -134,7 +127,7 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 	m_fCurPos = nOffset * m_nMaxPos / (double)nWidth;
 
 	if (m_fnOnChange && GetCurPos() != nOldPos)
-		m_fnOnChange(GetCurPos());
+		m_fnOnChange();
 }
 
 void CUISlider::OnLoad(const IUIXmlAttrs &attrs)

@@ -32,8 +32,8 @@ CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_pI
 
 	for (int i = 0; i != nCount; i++)
 	{
-		UINT nDelay = ((UINT *)pPropItem->value)[i] * 10;
-		m_vecElapses.push_back(nDelay ? nDelay : 100);
+		UINT nElapse = ((UINT *)pPropItem->value)[i] * 10;
+		m_vecElapses.push_back(nElapse ? nElapse : 100);
 	}
 }
 
@@ -43,8 +43,10 @@ CUIGif::~CUIGif()
 		delete m_pImage;
 }
 
-void CUIGif::DoPaint(CUIDC &dc) const
+void CUIGif::OnPaint(CUIDC &dc) const
 {
+	__super::OnPaint(dc);
+
 	Gdiplus::Graphics graphics(dc);
 	graphics.DrawImage(m_pImage, m_rect.left, m_rect.top);
 }
@@ -63,7 +65,7 @@ void CUIGif::OnUITimer()
 	}
 
 	m_pImage->SelectActiveFrame(&Gdiplus::FrameDimensionTime, m_nFrameIdx);
-	InvalidateRect(NULL);
+	InvalidateRect();
 	m_uiTimer.Start(m_vecElapses[m_nFrameIdx]);
 }
 
@@ -93,4 +95,12 @@ void CUIGif::Reset()
 	}
 
 	Stop();
+}
+
+void CUIGif::OnLoad(const IUIXmlAttrs &attrs)
+{
+	__super::OnLoad(attrs);
+
+	if (attrs.GetInt(L"start"))
+		Start();
 }

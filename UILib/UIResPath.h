@@ -9,7 +9,7 @@ public:
 	CUIResPath(LPCWSTR lpCurPath = L"\\");
 	~CUIResPath();
 
-	void CombinePath(LPWSTR lpDstPath, LPCWSTR lpSrcPath, LPUINT = NULL) const;
+	void CombinePath(LPWSTR lpDstPath, LPCWSTR lpSrcPath, UINT *pnSubCnt = NULL) const;
 
 private:
 	CUIResPath *GetResPath() const;

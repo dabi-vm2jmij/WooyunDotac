@@ -11,20 +11,23 @@ public:
 	CUIButtonEx(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIButtonEx();
 
-	void SetIconImage(LPCWSTR lpFileName, int nIconLeft);
-	void SetTextColors(COLORREF *colors, int nCount);
+	void SetIcon(const CImagex &imagex);
+	void SetIcons(const CImagex imagexs[], int nCount);
+	CImagex GetIcon(UINT nIndex = 0) const;
+	void SetIconLeft(int nIconLeft);
 	void SetTextLeft(int nTextLeft);
+	void SetTextColors(const COLORREF colors[], int nCount);
 	void SetUnderline(bool bUnderline) { m_bUnderline = bUnderline; }
 
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
-	virtual void DoPaint(CUIDC &dc) const override;
-	virtual void OnTextSize(CSize size) override;
+	virtual void OnPaint(CUIDC &dc) const override;
 	virtual void OnButtonState(ButtonState btnState) override;
+	virtual void OnTextSize(CSize size) override;
 
-	CImagex  m_imgxIcons[4];
+	CImagex  m_iconxs[4];
 	COLORREF m_colors[4];
-	int      m_nIconLeft;
-	int      m_nTextLeft;
+	int      m_nIconLeft;	// icon ¾àÀë×ó±ßµÄÆ«ÒÆ
+	int      m_nTextLeft;	// text ¾àÀë×ó±ßµÄÆ«ÒÆ
 	bool     m_bUnderline;
 };

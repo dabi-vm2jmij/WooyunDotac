@@ -1,13 +1,8 @@
 #include "stdafx.h"
 #include "UIToolBar.h"
-#include "UIMoreWnd.h"
 
-CUIToolBar::CUIToolBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent), m_moreBg(0x767676), m_hMoreWnd(NULL)
+CUIToolBar::CUIToolBar(CUIView *pParent) : CUIView(pParent), m_hMoreWnd(NULL)
 {
-	CUIButton *pButton = AddButton(lpFileName);
-	pButton->SetRight(0, true);
-	pButton->SetToolTip(L"更多工具");
-	pButton->BindClick([this]{ OnMoreBtn(); });
 }
 
 CUIToolBar::~CUIToolBar()
@@ -19,19 +14,36 @@ CUIToolBar::~CUIToolBar()
 	}
 }
 
+void CUIToolBar::GetMoreItems(vector<CUIView *> &vecItems)
+{
+	vecItems.reserve(m_vecMoreItems.size());
+
+	for (auto pItem : m_vecMoreItems)
+	{
+		if (pItem->IsVisible())
+			vecItems.push_back(pItem);
+	}
+}
+
 void CUIToolBar::CloseMoreWnd()
 {
-	if (m_hMoreWnd == NULL)
-		return;
+	if (m_hMoreWnd)
+	{
+		if (IsWindow(m_hMoreWnd))
+			DestroyWindow(m_hMoreWnd);
 
-	if (IsWindow(m_hMoreWnd))
-		DestroyWindow(m_hMoreWnd);
-
-	m_hMoreWnd = NULL;
+		m_hMoreWnd = NULL;
+	}
 }
 
 void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 {
+	if (m_vecChilds.empty() || _wcsicmp(m_vecChilds[0]->GetId(), L"更多工具"))
+	{
+		__super::RecalcLayout(lpClipRect);
+		return;
+	}
+
 	if (m_vecMoreItems.size())
 	{
 		CloseMoreWnd();
@@ -39,51 +51,39 @@ void CUIToolBar::RecalcLayout(LPRECT lpClipRect)
 		m_vecMoreItems.clear();
 	}
 
-	if (m_rect.left == MAXINT16 || m_vecChilds.size() <= 1)
+	if (m_rect.left == MAXINT16 || m_vecChilds.size() < 2)
 		return;
 
 	CRect rect(m_rect);
 
 	if (int nIndex = GetMoreIndex())
 	{
-		auto itm = m_vecChilds.begin() + nIndex;
+		for (int i = 1; i != nIndex; i++)
+			FRIEND(m_vecChilds[i])->CalcRect(rect, lpClipRect);
 
-		for (auto it = m_vecChilds.begin(); it != itm; ++it)
-		{
-			FRIEND(*it)->CalcRect(rect, lpClipRect);
-		}
+		for (int i = nIndex; i != m_vecChilds.size(); i++)
+			m_vecChilds[i]->SetRect(NULL, lpClipRect);
 
-		for (auto it = itm; it != m_vecChilds.end(); ++it)
-		{
-			FRIEND(*it)->SetRect(NULL, lpClipRect);
-		}
+		FRIEND(m_vecChilds[0])->CalcRect(rect, lpClipRect);
 
-		m_vecMoreItems.insert(m_vecMoreItems.end(), itm, m_vecChilds.end());
-		m_vecChilds.erase(itm, m_vecChilds.end());
+		auto it = m_vecChilds.begin() + nIndex;
+		m_vecMoreItems.insert(m_vecMoreItems.end(), it, m_vecChilds.end());
+		m_vecChilds.erase(it, m_vecChilds.end());
 	}
 	else
 	{
-		FRIEND(m_vecChilds[0])->SetRect(NULL, lpClipRect);
-
 		for (int i = 1; i != m_vecChilds.size(); i++)
-		{
 			FRIEND(m_vecChilds[i])->CalcRect(rect, lpClipRect);
-		}
+
+		m_vecChilds[0]->SetRect(NULL, lpClipRect);
 	}
-}
-
-void CUIToolBar::OnMoreBtn()
-{
-	CRect rect = m_vecChilds[0]->GetWindowRect();
-
-	CUIMoreWnd *pWnd = new CUIMoreWnd(m_moreBg);
-	m_hMoreWnd = pWnd->Init(GetRootView()->GetHwnd(), CPoint(rect.left, rect.bottom + 1), m_vecMoreItems);
 }
 
 int CUIToolBar::GetMoreIndex() const
 {
+	ATLASSERT(m_vecChilds[0]->GetOffset().left != MAXINT16);
+	int nBtnWidth = (short)m_vecChilds[0]->GetOffset().left + m_vecChilds[0]->GetSize().cx;
 	int nAllWidth = 0, nIndex = 0;
-	int nBtnWidth = m_vecChilds[0]->GetSize().cx;
 
 	for (int i = 1; i != m_vecChilds.size(); i++)
 	{
@@ -92,10 +92,8 @@ int CUIToolBar::GetMoreIndex() const
 		if (!pItem->IsVisible())
 			continue;
 
-		ATLASSERT(FRIEND(pItem)->m_offset.left >> 16);
-		ATLASSERT(pItem->GetSize().cx >= 0);
-
-		nAllWidth += (short)FRIEND(pItem)->m_offset.left + pItem->GetSize().cx;
+		ATLASSERT(pItem->GetOffset().left >> 16);
+		nAllWidth += (short)pItem->GetOffset().left + pItem->GetSize().cx;
 
 		if (nAllWidth > m_rect.Width())
 			return nIndex + 1;
@@ -105,17 +103,4 @@ int CUIToolBar::GetMoreIndex() const
 	}
 
 	return 0;
-}
-
-void CUIToolBar::OnLoad(const IUIXmlAttrs &attrs)
-{
-	__super::OnLoad(attrs);
-
-	LPCWSTR lpStr;
-	if (lpStr = attrs.GetStr(L"moreBg"))
-	{
-		COLORREF color = 0;
-		ATLVERIFY(StrToColor(lpStr, color));
-		SetMoreBg(color);
-	}
 }

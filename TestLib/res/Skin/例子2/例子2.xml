@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RootView style="0x82cf0000" exStyle="0x80000" width="1000" height="600" border="例子2\背景.png|9" caption="39" title="Demo2">
+	<!--标题栏-->
+	<View top="0*" height="38">
+		<Button right="0*" top="0" image="例子2\关闭.png:3" tooltip="关闭" id="关闭" />
+		<StateButton right="0*" top="0" id="最大化">
+			<Button image="例子2\最大化.png:3" tooltip="最大化" />
+			<Button image="例子2\还原.png:3" tooltip="向下还原" />
+		</StateButton>
+		<Button right="0*" top="0" image="例子2\最小化.png:3" tooltip="最小化" id="最小化" />
+	</View>
+	<!--工具栏-->
+	<View top="1*" height="34">
+	</View>
+	<!--状态栏-->
+	<View bottom="0*" height="24">
+		<Carousel left="0*" width="-50" dir="toBottom" elapse="5000" start="1">
+			<Label left="8" text="1111111111" />
+			<Label left="8" text="22222222222" />
+			<Label left="8" text="3333333333333" />
+		</Carousel>
+		<Line left="0*" width="1" color="#bbbbbb" />
+		<Label right="8" text="Windows" />
+	</View>
+	<!--客户区-->
+	<View top="1" bottom="1">
+	</View>
+</RootView>

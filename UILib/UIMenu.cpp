@@ -10,13 +10,13 @@ CUIMenu::Item::Item(UINT nId, LPCWSTR lpText) : m_nId(nId), m_bCheck(false), m_b
 
 void CUIMenu::Item::SetSubMenu(CUIMenu *pUIMenu)
 {
-	if (m_pSubMenu == pUIMenu)
-		return;
+	if (m_pSubMenu != pUIMenu)
+	{
+		if (m_pSubMenu)
+			delete m_pSubMenu;
 
-	if (m_pSubMenu)
-		delete m_pSubMenu;
-
-	m_pSubMenu = pUIMenu;
+		m_pSubMenu = pUIMenu;
+	}
 }
 
 CUIMenu::CUIMenu()
@@ -26,9 +26,7 @@ CUIMenu::CUIMenu()
 CUIMenu::~CUIMenu()
 {
 	for (auto &item : m_vecItems)
-	{
 		item.SetSubMenu(NULL);
-	}
 }
 
 void CUIMenu::CreateFromMenu(HMENU hMenu)
@@ -94,6 +92,13 @@ void CUIMenu::GetMargins(LPRECT lpRect) const
 	SetRect(lpRect, 1, 3, 1, 3);
 }
 
+UINT CUIMenu::GetShowDelay() const
+{
+	DWORD dwDelay = 0;
+	SystemParametersInfo(SPI_GETMENUSHOWDELAY, 0, &dwDelay, 0);
+	return dwDelay;
+}
+
 void CUIMenu::MeasureItem(UINT nIndex, LPSIZE lpSize) const
 {
 	if (m_vecItems[nIndex].m_nId)
@@ -127,9 +132,9 @@ void CUIMenu::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
 			dc.FillSolidRect(rect, RGB(235, 235, 235));
 
 		if (item.m_bEnable)
-			dc.SetTextColor(RGB(0, 0, 0));
+			SetTextColor(dc, RGB(0, 0, 0));
 		else
-			dc.SetTextColor(RGB(161, 161, 161));
+			SetTextColor(dc, RGB(161, 161, 161));
 
 		if (item.m_bCheck)
 		{
@@ -152,7 +157,7 @@ void CUIMenu::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
 	}
 	else
 	{
-		rect.top = (rect.top + rect.bottom) / 2;
+		rect.top = (rect.top + rect.bottom - 1) / 2;
 		rect.bottom = rect.top + 1;
 		rect.DeflateRect(1, 0);
 		dc.FillSolidRect(rect, RGB(233, 233, 233));

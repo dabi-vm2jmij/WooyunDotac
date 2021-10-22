@@ -126,22 +126,22 @@ CUITheme::CUITheme()
 
 CUITheme::~CUITheme()
 {
-	if (m_hModule == NULL)
-		return;
-
-	m_pBufferedPaintUnInit();
-	FreeLibrary(m_hModule);
+	if (m_hModule)
+	{
+		m_pBufferedPaintUnInit();
+		FreeLibrary(m_hModule);
+	}
 }
 
-CUIMemDC::CUIMemDC(HDC hDC, LPCRECT lpClipRect, bool bImage) : m_hDC(hDC), m_hMemDC(NULL), m_hBufferedPaint(NULL), m_clipRect(*lpClipRect)
+CUIMemDC::CUIMemDC(HDC hDC, LPCRECT lpClipRect) : m_hDC(hDC), m_hMemDC(NULL), m_hBufferedPaint(NULL), m_clipRect(*lpClipRect)
 {
-	if (!bImage && g_theme.m_pBeginBufferedPaint && g_theme.m_pEndBufferedPaint)
+	if (g_theme.m_pBeginBufferedPaint && g_theme.m_pEndBufferedPaint)
 	{
 		if (m_hBufferedPaint = g_theme.m_pBeginBufferedPaint(hDC, m_clipRect, BPBF_TOPDOWNDIB, NULL, &m_hMemDC))
 			return;
 	}
 
-	if (bImage || (m_hBitmap = CreateCompatibleBitmap(m_hDC, m_clipRect.Width(), m_clipRect.Height())) == NULL)
+	if ((m_hBitmap = CreateCompatibleBitmap(m_hDC, m_clipRect.Width(), m_clipRect.Height())) == NULL)
 	{
 		CImage image;
 		image.Create(m_clipRect.Width(), m_clipRect.Height(), 32, CImage::createAlphaChannel);
@@ -169,85 +169,21 @@ CUIMemDC::~CUIMemDC()
 	g_cache.ReleaseDC(m_hMemDC);
 }
 
-CUIDC::CUIDC(HDC hDC, LPCRECT lpClipRect, bool bLayered) : m_hDC(hDC), m_lpClipRect(lpClipRect), m_bLayered(bLayered), m_hCurFont(NULL), m_curColor(-1)
+CUIDC::CUIDC(HDC hDC, CPoint point, CImage *pImage) : m_hDC(hDC), m_point(point), m_pImage(pImage)
 {
 	ATLASSERT(hDC);
-	m_hOldFont = SelectFont(NULL);
+	SetBkMode(hDC, TRANSPARENT);
+	m_hOldFont = (HFONT)SelectObject(hDC, GetDefaultFont());
 }
 
 CUIDC::~CUIDC()
 {
-	Delete();
-}
-
-void CUIDC::Delete()
-{
-	if (m_hDC == NULL)
-		return;
-
-	SelectFont(m_hOldFont);
-	m_hDC = NULL;
-}
-
-bool CUIDC::GetRealRect(LPRECT lpRect) const
-{
-	if (IsRectEmpty(lpRect))
-		return false;
-
-	return m_lpClipRect == NULL || IntersectRect(lpRect, lpRect, m_lpClipRect) && OffsetRect(lpRect, -m_lpClipRect->left, -m_lpClipRect->top);
-}
-
-bool CUIDC::IsLayered() const
-{
-	return m_bLayered;
-}
-
-HFONT CUIDC::SelectFont(HFONT hFont)
-{
-	if (hFont == NULL)
-		hFont = GetDefaultFont();
-
-	if (m_hCurFont == hFont)
-		return hFont;
-
-	return (HFONT)SelectObject(m_hDC, m_hCurFont = hFont);
-}
-
-COLORREF CUIDC::SetTextColor(COLORREF color)
-{
-	ATLASSERT(color >> 24 == 0);
-	color &= 0xffffff;
-
-	if (m_curColor == color)
-		return color;
-
-	return ::SetTextColor(m_hDC, m_curColor = color);
+	SelectObject(m_hDC, m_hOldFont);
 }
 
 void CUIDC::FillSolidRect(LPCRECT lpRect, COLORREF color)
 {
-	if (IsRectEmpty(lpRect))
-		return;
-
-	CRect rect;
-
-	if (m_lpClipRect)
-	{
-		if (!rect.IntersectRect(lpRect, m_lpClipRect))
-			return;
-
-		lpRect = rect;
-	}
-
-	if (IsLayered())
-	{
-		if (m_image.IsNull())
-			m_image.Create(1, 1, 32, CImage::createAlphaChannel);
-
-		*(int *)m_image.GetPixelAddress(0, 0) = BswapRGB(color) | 0xff000000;
-		m_image.StretchBlt(m_hDC, *lpRect);
-	}
-	else
+	if (m_pImage == NULL)
 	{
 		COLORREF oldColor = SetBkColor(m_hDC, color);
 
@@ -256,30 +192,34 @@ void CUIDC::FillSolidRect(LPCRECT lpRect, COLORREF color)
 			ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, lpRect, NULL, 0, NULL);
 			SetBkColor(m_hDC, oldColor);
 		}
+		return;
+	}
+
+	CRect rect;
+	if (GetClipBox(m_hDC, rect) == NULLREGION || !rect.IntersectRect(rect, lpRect))
+		return;
+
+	rect += m_point;
+	DWORD dwColor = BswapRGB(color) | 0xff000000;
+
+	for (int x = rect.left; x < rect.right; x++)
+	{
+		for (int y = rect.top; y < rect.bottom; y++)
+			*(DWORD *)m_pImage->GetPixelAddress(x, y) = dwColor;
 	}
 }
 
 void CUIDC::FillAlpha(LPCRECT lpRect, BYTE nAlpha)
 {
-	if (!IsLayered())
-		return;
-
 	CRect rect;
-	GetClipBox(m_hDC, rect);
-
-	if (!rect.IntersectRect(rect, lpRect) || !GetRealRect(rect))
+	if (m_pImage == NULL || GetClipBox(m_hDC, rect) == NULLREGION || !rect.IntersectRect(rect, lpRect))
 		return;
 
-	CImage image;
-	image.Attach((HBITMAP)GetCurrentObject(m_hDC, OBJ_BITMAP));
+	rect += m_point;
 
 	for (int x = rect.left; x < rect.right; x++)
 	{
 		for (int y = rect.top; y < rect.bottom; y++)
-		{
-			LPBYTE(image.GetPixelAddress(x, y))[3] = nAlpha;
-		}
+			((BYTE *)m_pImage->GetPixelAddress(x, y))[3] = nAlpha;
 	}
-
-	image.Detach();
 }

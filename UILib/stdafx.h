@@ -10,8 +10,6 @@
 #define WIN32_LEAN_AND_MEAN             //  从 Windows 头文件中排除极少使用的信息
 
 // TODO:  在此处引用程序需要的其他头文件
-#include <windows.h>
-#include <shellapi.h>
 #include <deque>
 #include <map>
 #include "UILib.h"

@@ -1,39 +1,29 @@
 #include "stdafx.h"
-#include "UIVScroll.h"
+#include "UIScrollBar.h"
 
-CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_nWheelRate(20), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
+CUIScrollBar::CUIScrollBar(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_nWheelSize(-10), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
 {
-	if (lpBgFileName)
-	{
-		CUIImage *pImage = AddImage(lpBgFileName);
-		pImage->SetHeight(0);
-		pImage->SetStretch(true);
-	}
+	// 根据滚动条图片确定方向（暂未实现横向）
+	CImagex imagex = GetImage(lpFileName);
+	m_bVertical = imagex.Rect().Width() <= imagex.Rect().Height();
 
 	m_pButton = AddButton(lpFileName);
 	m_pButton->SetTop(0);
-	m_pButton->SetStretch(true);
 	m_pButton->SetDraggable(true);
 
+	if (lpBgFileName)
+		SetBgImage(GetImage(lpBgFileName));
+
 	// 设置最大宽度
-	int nMaxWidth = 0;
-
-	for (auto pItem : m_vecChilds)
-	{
-		CSize size = pItem->GetSize();
-
-		if (nMaxWidth < size.cx)
-			nMaxWidth = size.cx;
-	}
-
-	SetWidth(nMaxWidth);
+	int nWidth1 = m_pButton->GetSize().cx, nWidth2 = m_bgImagex.Rect().Width();
+	SetWidth(max(nWidth1, nWidth2));
 }
 
-CUIVScroll::~CUIVScroll()
+CUIScrollBar::~CUIScrollBar()
 {
 }
 
-void CUIVScroll::SetRange(int nMinPos, int nMaxPos)
+void CUIScrollBar::SetRange(int nMinPos, int nMaxPos)
 {
 	if (nMinPos <= 0)
 	{
@@ -60,10 +50,10 @@ void CUIVScroll::SetRange(int nMinPos, int nMaxPos)
 	ResetOffset(0, false);
 
 	if (m_fnOnChange && bChange)
-		m_fnOnChange(GetCurPos());
+		m_fnOnChange();
 }
 
-void CUIVScroll::SetCurPos(int nCurPos)
+void CUIScrollBar::SetCurPos(int nCurPos)
 {
 	if (nCurPos < 0)
 		nCurPos = 0;
@@ -77,22 +67,26 @@ void CUIVScroll::SetCurPos(int nCurPos)
 	ResetOffset(0, false);
 
 	if (m_fnOnChange)
-		m_fnOnChange(GetCurPos());
+		m_fnOnChange();
 }
 
-bool CUIVScroll::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool CUIScrollBar::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_MOUSEWHEEL)
 	{
-		short zDelta = (short)HIWORD(wParam);
-		SetCurPos(GetCurPos() - zDelta / WHEEL_DELTA * m_nMinPos * m_nWheelRate / 100);
+		int nWheelSize = m_nWheelSize;
+		if (nWheelSize < 0)	// -nWheelSize 为百分比
+			nWheelSize = m_nMinPos * -nWheelSize / 100;
+
+		int zDelta = (short)HIWORD(wParam);
+		SetCurPos(GetCurPos() - nWheelSize * zDelta / WHEEL_DELTA);
 		return true;
 	}
 
 	return __super::OnMessage(uMsg, wParam, lParam);
 }
 
-void CUIVScroll::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
+void CUIScrollBar::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 {
 	if (m_rect.Size() != ((CRect *)lpOldRect)->Size())
 	{
@@ -103,7 +97,12 @@ void CUIVScroll::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
 	__super::OnRectChange(lpOldRect, lpClipRect);
 }
 
-void CUIVScroll::OnLButtonDown(CPoint point)
+void CUIScrollBar::OnChildMoving(CUIView *, CPoint point)
+{
+	ResetOffset(point.y - m_rect.top, true);
+}
+
+void CUIScrollBar::OnLButtonDown(CPoint point)
 {
 	CRect rect = m_pButton->GetRect();
 
@@ -117,12 +116,7 @@ void CUIVScroll::OnLButtonDown(CPoint point)
 	m_bLButtonDown = false;
 }
 
-void CUIVScroll::OnChildMoving(CUIControl *, CPoint point)
-{
-	ResetOffset(point.y - m_rect.top, true);
-}
-
-void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
+void CUIScrollBar::ResetOffset(int nOffset, bool bSetPos)
 {
 	int nHeight = m_rect.Height() - m_pButton->GetSize().cy;
 	if (nHeight <= 0)
@@ -144,15 +138,15 @@ void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
 	m_fCurPos = nOffset * (m_nMaxPos - m_nMinPos) / (double)nHeight;
 
 	if (m_fnOnChange && GetCurPos() != nOldPos)
-		m_fnOnChange(GetCurPos());
+		m_fnOnChange();
 }
 
-void CUIVScroll::OnLoad(const IUIXmlAttrs &attrs)
+void CUIScrollBar::OnLoad(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoad(attrs);
 
-	if (int nRate = attrs.GetInt(L"wheelRate"))
-		SetWheelRate(nRate);
+	if (int nSize = attrs.GetInt(L"wheelSize"))
+		SetWheelSize(nSize);
 
 	int nMinPos, nMaxPos;
 	if (attrs.GetInt(L"minPos", &nMinPos) && attrs.GetInt(L"maxPos", &nMaxPos))

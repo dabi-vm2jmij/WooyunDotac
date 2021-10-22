@@ -1,10 +1,9 @@
 #include "stdafx.h"
 #include "UIControl.h"
 
-CUIControl::CUIControl(CUIView *pParent) : CUIView(pParent), m_bStretch(false), m_bClickable(true), m_bDraggable(false), m_hCursor(NULL)
-	, m_bLButtonDown(false), m_bRButtonDown(false), m_ptClick(MAXINT16, MAXINT16)
+CUIControl::CUIControl(CUIView *pParent) : CUIView(pParent), m_bClickable(true), m_bDraggable(false), m_hCursor(NULL), m_bLButtonDown(false), m_bRButtonDown(false)
+	, m_ptClick(MAXINT16, MAXINT16)
 {
-	m_bControl = true;
 }
 
 CUIControl::~CUIControl()
@@ -13,12 +12,15 @@ CUIControl::~CUIControl()
 
 bool CUIControl::OnHitTest(UIHitTest &hitTest)
 {
-	__super::OnHitTest(hitTest);
+	bool bRet = __super::OnHitTest(hitTest);
 
 	if (m_bClickable)
+	{
 		hitTest.Add(this);
+		bRet = true;
+	}
 
-	return true;
+	return bRet;
 }
 
 bool CUIControl::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -87,21 +89,6 @@ bool CUIControl::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return false;
 }
 
-void CUIControl::OnPaint(CUIDC &dc) const
-{
-	if (m_curImagex)
-	{
-		if (!m_bStretch)
-			m_curImagex.Draw(dc, m_rect);
-		else
-			m_curImagex.StretchDraw(dc, m_rect);
-	}
-
-	DoPaint(dc);
-
-	__super::OnPaint(dc);
-}
-
 void CUIControl::OnEnable(bool bEnable)
 {
 	__super::OnEnable(bEnable);
@@ -114,11 +101,11 @@ void CUIControl::OnEnable(bool bEnable)
 	}
 }
 
-void CUIControl::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
+void CUIControl::OnVisible(bool bVisible)
 {
-	__super::OnRectChange(lpOldRect, lpClipRect);
+	__super::OnVisible(bVisible);
 
-	if (m_rect.IsRectEmpty())
+	if (!bVisible)
 	{
 		auto pRootView = GetRootView();
 		if (pRootView->GetFocus() == this)
@@ -131,6 +118,12 @@ void CUIControl::OnMouseLeave()
 	m_bLButtonDown = m_bRButtonDown = false;
 
 	__super::OnMouseLeave();
+}
+
+void CUIControl::OnRButtonUp(CPoint point)
+{
+	auto pRootView = GetRootView();
+	FRIEND(pRootView)->OnMessage(WM_CONTEXTMENU, (WPARAM)pRootView->GetHwnd(), MAKELPARAM(point.x, point.y));
 }
 
 void CUIControl::OnLostCapture()
@@ -146,22 +139,9 @@ void CUIControl::OnLostCapture()
 	}
 }
 
-void CUIControl::SetCurImage(const CImagex &imagex)
-{
-	if (m_curImagex != imagex)
-	{
-		m_curImagex = imagex;
-		InvalidateRect(NULL);
-	}
-}
-
 void CUIControl::OnLoad(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoad(attrs);
-
-	int nValue;
-	if (attrs.GetInt(L"stretch", &nValue) && nValue)
-		SetStretch(true);
 
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"tooltip"))
@@ -173,11 +153,5 @@ void CUIControl::OnLoad(const IUIXmlAttrs &attrs)
 			SetCursor(LoadCursor(NULL, IDC_HAND));
 		else if (_wcsicmp(lpStr, L"ibeam") == 0)
 			SetCursor(LoadCursor(NULL, IDC_IBEAM));
-	}
-
-	if (lpStr = attrs.GetStr(L"curImage"))
-	{
-		ATLASSERT(!m_curImagex);
-		SetCurImage(GetImage(lpStr));
 	}
 }

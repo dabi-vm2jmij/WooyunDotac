@@ -5,54 +5,76 @@ CUIProgress::CUIProgress(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pPar
 {
 	m_bClickable = false;
 
-	SplitImage(lpFileName, m_imagexs);
-	SetSize(m_imagexs[0].Rect().Size());
+	m_imagex = GetImage(lpFileName);
+	SetSize(m_imagex.Rect().Size());
+
+	if (m_imagex.GetFrameCount() > 1)
+	{
+		SetBgImage(m_imagex);
+		m_imagex.SetFrameIndex(1);
+	}
 }
 
 CUIProgress::~CUIProgress()
 {
 }
 
-void CUIProgress::DoPaint(CUIDC &dc) const
+void CUIProgress::OnPaint(CUIDC &dc) const
 {
-	CRect rect(m_rect);
-	rect.right = rect.left + rect.Width() * m_nCurPos / m_nMaxPos;
+	__super::OnPaint(dc);
 
-	if (m_imagexs[1])
+	int nWidth = m_rect.Width() * m_nCurPos / m_nMaxPos;
+	if (nWidth && m_imagex)
 	{
-		m_imagexs[0].StretchDraw(dc, m_rect);
-		m_imagexs[1].StretchDraw(dc, rect);
-	}
-	else if (m_imagexs[0])
-	{
-		m_imagexs[0].StretchDraw(dc, rect);
+		CRect rect(m_rect);
+		rect.right = rect.left + nWidth;
+
+		if (m_imagex.Rect().Size() == m_rect.Size())
+		{
+			// 图片大小相同，不缩放
+			CRect rcImg = m_imagex.Rect();
+			rcImg.right = rcImg.left + nWidth;
+			m_imagex.Draw(dc, rect, rcImg);
+		}
+		else
+			m_imagex.Scale9Draw(dc, rect);
 	}
 }
 
-void CUIProgress::SetValue(int nCurPos, int nMaxPos)
+void CUIProgress::SetMaxPos(int nMaxPos)
+{
+	if (nMaxPos <= 0 || m_nMaxPos == nMaxPos)
+		return;
+
+	if (m_nCurPos > nMaxPos)
+		m_nCurPos = nMaxPos;
+
+	m_nMaxPos = nMaxPos;
+	InvalidateRect();
+}
+
+void CUIProgress::SetCurPos(int nCurPos)
 {
 	if (nCurPos < 0)
 		nCurPos = 0;
+	else if (nCurPos > m_nMaxPos)
+		nCurPos = m_nMaxPos;
 
-	if (nMaxPos <= 0)
-		nMaxPos = m_nMaxPos;
-
-	if (nCurPos > nMaxPos)
-		nCurPos = nMaxPos;
-
-	if (m_nCurPos == nCurPos && m_nMaxPos == nMaxPos)
+	if (m_nCurPos == nCurPos)
 		return;
 
 	m_nCurPos = nCurPos;
-	m_nMaxPos = nMaxPos;
-	InvalidateRect(NULL);
+	InvalidateRect();
 }
 
 void CUIProgress::OnLoad(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoad(attrs);
 
-	int nCurPos, nMaxPos;
-	if (attrs.GetInt(L"curPos", &nCurPos) && attrs.GetInt(L"maxPos", &nMaxPos))
-		SetValue(nCurPos, nMaxPos);
+	int nValue;
+	if (attrs.GetInt(L"maxPos", &nValue))
+		SetMaxPos(nValue);
+
+	if (attrs.GetInt(L"curPos", &nValue))
+		SetCurPos(nValue);
 }

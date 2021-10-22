@@ -213,8 +213,7 @@ void CImagex::StretchBlt(HDC hdcDst, const CRect &rcDst, DWORD dwROP) const
 	StretchBlt(hdcDst, rcDst.left, rcDst.top, rcDst.Width(), rcDst.Height(), dwROP);
 }
 
-// «–≥…æ≈π¨∏ÒªÊ÷∆
-void CImagex::StretchDraw(HDC hdcDst, const CRect &rcDst, bool bAlpha) const
+void CImagex::Scale9Draw(HDC hdcDst, const CRect &rcDst, bool bAlpha) const
 {
 	void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int);
 
@@ -234,5 +233,5 @@ void CImagex::StretchDraw(HDC hdcDst, const CRect &rcDst, bool bAlpha) const
 		};
 	}
 
-	::StretchDraw(hdcDst, rcDst, CUIComDC(Image()), Rect(), fnDraw);
+	::Scale9Draw(hdcDst, rcDst, CUIComDC(Image()), Rect(), fnDraw);
 }

@@ -30,7 +30,13 @@
     <ClInclude Include="UIMenu2.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TabDemoWnd.h">
+    <ClInclude Include="DemoWnd1.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DemoWnd2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIMoreTools.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,7 +53,13 @@
     <ClCompile Include="UIMenu2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="TabDemoWnd.cpp">
+    <ClCompile Include="DemoWnd1.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DemoWnd2.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIMoreTools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

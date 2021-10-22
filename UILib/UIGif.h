@@ -13,7 +13,8 @@ public:
 	void Reset();
 
 protected:
-	virtual void DoPaint(CUIDC &dc) const override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
+	virtual void OnPaint(CUIDC &dc) const override;
 	void OnUITimer();
 
 	Gdiplus::Image *m_pImage;

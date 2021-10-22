@@ -5,26 +5,34 @@ CUIScrollView::CUIScrollView(CUIView *pParent) : CUIView(pParent), m_pVScroll(NU
 {
 }
 
-void CUIScrollView::SetVScroll(CUIVScroll *pVScroll)
+void CUIScrollView::SetVScroll(CUIScrollBar *pVScroll)
 {
-	ATLASSERT(pVScroll->GetParent() != this);
+	ATLASSERT(pVScroll->IsVertical() && !IsChild(pVScroll));
 	m_pVScroll = pVScroll;
-	m_pVScroll->BindChange([this](int){ InvalidateLayout(); });
+	m_pVScroll->BindChange([this]{ InvalidateLayout(); });
+	CheckVScroll();
 }
 
 void CUIScrollView::CheckVScroll()
 {
+	if (m_pVScroll == NULL)
+		return;
+
 	int nHeight;
 
-	if (!m_rect.IsRectEmpty() && m_rect.Height() < (nHeight = CalcHeight()))
+	if (m_rect.IsRectEmpty())
 	{
-		m_pVScroll->SetRange(m_rect.Height(), nHeight);
-		m_pVScroll->SetVisible(true);
+		m_pVScroll->SetVisible(false);
 	}
-	else
+	else if ((nHeight = CalcHeight()) <= m_rect.Height())
 	{
 		m_pVScroll->SetVisible(false);
 		m_pVScroll->SetCurPos(0);
+	}
+	else
+	{
+		m_pVScroll->SetRange(m_rect.Height(), nHeight);
+		m_pVScroll->SetVisible(true);
 	}
 }
 
@@ -63,9 +71,7 @@ void CUIScrollView::RecalcLayout(LPRECT lpClipRect)
 		rect.top -= m_pVScroll->GetCurPos();
 
 	for (auto pItem : m_vecChilds)
-	{
 		FRIEND(pItem)->CalcRect(rect, lpClipRect);
-	}
 }
 
 int CUIScrollView::CalcHeight() const
@@ -76,14 +82,10 @@ int CUIScrollView::CalcHeight() const
 	{
 		CSize size = pItem->GetSize();
 
-		if (FRIEND(pItem)->m_offset.top >> 16)
-		{
-			nHeight += size.cy + (short)FRIEND(pItem)->m_offset.top;
-		}
-		else if (FRIEND(pItem)->m_offset.bottom >> 16)
-		{
-			nHeight += size.cy + (short)FRIEND(pItem)->m_offset.bottom;
-		}
+		if (pItem->GetOffset().top >> 16)
+			nHeight += size.cy + (short)pItem->GetOffset().top;
+		else if (pItem->GetOffset().bottom >> 16)
+			nHeight += size.cy + (short)pItem->GetOffset().bottom;
 	}
 
 	return nHeight;

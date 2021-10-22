@@ -52,7 +52,7 @@ public:
 	void StretchBlt(HDC hdcDst, const CRect &rcDst, const CRect &rcSrc, DWORD dwROP = SRCCOPY) const;
 	void StretchBlt(HDC hdcDst, int xDst, int yDst, int nDstWidth, int nDstHeight, DWORD dwROP = SRCCOPY) const;
 	void StretchBlt(HDC hdcDst, const CRect &rcDst, DWORD dwROP = SRCCOPY) const;
-	void StretchDraw(HDC hdcDst, const CRect &rcDst, bool bAlpha = true) const;
+	void Scale9Draw(HDC hdcDst, const CRect &rcDst, bool bAlpha = true) const;	// 使用九宫格缩放
 
 private:
 	void SetRect();

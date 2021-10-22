@@ -95,15 +95,16 @@ UINT CUIMenuWnd::Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostM
 		}
 
 		if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST)
-		{
 			msg.hwnd = m_hWnd;
-		}
 
 		if ((msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN) && msg.wParam == VK_MENU)
 		{
 			DestroyWindow();
 			break;
 		}
+
+		if (msg.message == WM_MOUSEWHEEL)
+			continue;
 
 		if (msg.message >= WM_MOUSEMOVE && msg.message <= WM_RBUTTONDBLCLK)
 		{
@@ -187,8 +188,10 @@ LRESULT CUIMenuWnd::OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHa
 
 LRESULT CUIMenuWnd::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
-	CUIPaintDC dc(m_hWnd);
-	m_imageWnd.BitBlt(dc, *dc.PaintRect(), *(POINT *)dc.PaintRect());
+	PAINTSTRUCT ps;
+	HDC hDC = BeginPaint(&ps);
+	m_imageWnd.BitBlt(hDC, ps.rcPaint, (CPoint &)ps.rcPaint);
+	EndPaint(&ps);
 	return 0;
 }
 
@@ -398,16 +401,14 @@ void CUIMenuWnd::OnTimeOut(bool bReset)
 
 		CRect rcMargin;
 		m_pUIMenu->GetMargins(rcMargin);
-		int nSpace = m_pUIMenu->GetHoriSpace();
+		int nSpacing = m_pUIMenu->GetSpacing();
 
 		// 计算选中项的矩形
 		CRect rect;
 		GetWindowRect(rect);
 
 		for (int i = 0; i != m_nCurSel; i++)
-		{
 			rect.top += m_pUIMenu->m_vecItems[i].m_nHeight;
-		}
 
 		rect.bottom = rect.top + m_pUIMenu->m_vecItems[m_nCurSel].m_nHeight + rcMargin.top + rcMargin.bottom;
 
@@ -419,7 +420,7 @@ void CUIMenuWnd::OnTimeOut(bool bReset)
 		m_pChild->m_pParent = this;
 		m_pChild->m_nItemId = m_nCurSel;
 
-		m_pChild->Init(m_hWnd, rect.right + nSpace, rect.top, rect.left - nSpace, rect.bottom);
+		m_pChild->Init(m_hWnd, rect.right + nSpacing, rect.top, rect.left - nSpacing, rect.bottom);
 	}
 	else if (m_pChild && *m_pChild)
 	{
@@ -461,47 +462,62 @@ void CUIMenuWnd::OnSelChange(UINT nCurSel, bool bInit)
 	m_pUIMenu->GetMargins(rcMargin);
 	BYTE nAlpha = m_pUIMenu->GetWndAlpha();
 
-	int nWidth = m_imageWnd.GetWidth(), nHeight = m_imageWnd.GetHeight();
-	CImage image;
-	image.Create(nWidth, nHeight, 32, CImage::createAlphaChannel);
+	HDC hImgDC = m_imageWnd.GetDC();
+	CRect rcImg(0, 0, m_imageWnd.GetWidth(), m_imageWnd.GetHeight());
 
-	CUIDC dc(image.GetDC(), NULL, true);
-	SetBkMode(dc, TRANSPARENT);
-
-	CRect rect(0, 0, nWidth, nHeight);
-	m_pUIMenu->DrawBg(dc, rect);
-	rect.DeflateRect(rcMargin);
-
-	for (int i = 0; i != m_pUIMenu->m_vecItems.size(); i++)
+	if (!bInit)
 	{
-		rect.bottom = rect.top + m_pUIMenu->m_vecItems[i].m_nHeight;
+		// 计算无效区域
+		CRect rect(rcImg), rcPaint;
+		rect.DeflateRect(rcMargin);
 
-		if (bInit)
+		for (int i = 0; i != m_pUIMenu->m_vecItems.size(); i++)
 		{
-			m_pUIMenu->DrawItem(dc, rect, i, false);
-		}
-		else if (i == m_nCurSel || i == nCurSel)
-		{
-			m_pUIMenu->DrawItem(dc, rect, i, i == nCurSel);
-			BitBlt(CImageDC(m_imageWnd), rect.left, rect.top, rect.Width(), rect.Height(), dc, rect.left, rect.top, SRCCOPY);
+			rect.bottom = rect.top + m_pUIMenu->m_vecItems[i].m_nHeight;
 
-			if (nAlpha == 0)
-				InvalidateRect(rect);
+			if (i == m_nCurSel || i == nCurSel)
+			{
+				rcPaint |= rect;
+
+				if (nAlpha == 0)
+					InvalidateRect(rect);
+			}
+
+			rect.top = rect.bottom;
 		}
 
-		rect.top = rect.bottom;
+		m_nCurSel = nCurSel;
+		IntersectClipRect(hImgDC, rcPaint.left, rcPaint.top, rcPaint.right, rcPaint.bottom);
 	}
 
-	if (bInit)
-		BitBlt(CImageDC(m_imageWnd), 0, 0, nWidth, nHeight, dc, 0, 0, SRCCOPY);
+	{
+		// 重绘无效区域
+		CUIDC dc(hImgDC, CPoint(), &m_imageWnd);
+		CRect rect(rcImg);
+		m_pUIMenu->DrawBg(dc, rect);
+		rect.DeflateRect(rcMargin);
 
-	dc.Delete();
-	image.ReleaseDC();
-	m_nCurSel = nCurSel;
+		for (int i = 0; i != m_pUIMenu->m_vecItems.size(); i++)
+		{
+			rect.bottom = rect.top + m_pUIMenu->m_vecItems[i].m_nHeight;
+
+			if (RectVisible(dc, rect))
+				m_pUIMenu->DrawItem(dc, rect, i, i == nCurSel);
+
+			rect.top = rect.bottom;
+		}
+	}
+
+	if (!bInit)
+		SelectClipRgn(hImgDC, NULL);
 
 	if (nAlpha)
 	{
+		HDC hDC = GetDC();
 		BLENDFUNCTION bf = { AC_SRC_OVER, 0, nAlpha, AC_SRC_ALPHA };
-		UpdateLayeredWindow(m_hWnd, CUIClientDC(m_hWnd), NULL, &CSize(nWidth, nHeight), CImageDC(m_imageWnd), &CPoint(), 0, &bf, ULW_ALPHA);
+		UpdateLayeredWindow(m_hWnd, hDC, NULL, (SIZE *)&rcImg + 1, hImgDC, &CPoint(), 0, &bf, ULW_ALPHA);
+		ReleaseDC(hDC);
 	}
+
+	m_imageWnd.ReleaseDC();
 }

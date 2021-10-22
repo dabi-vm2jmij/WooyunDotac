@@ -3,38 +3,26 @@
 
 #pragma once
 
-class CMainFrame : public CFrameWnd, public IUIWindow
+#include "UIWindow.h"
+
+class CMainFrame : public CUIWindow
 {
 	DECLARE_DYNAMIC(CMainFrame)
 public:
 	CMainFrame();
 	virtual ~CMainFrame();
 
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
-
 	DECLARE_MESSAGE_MAP()
 protected:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;
-	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const override;
-	virtual HWND GetHwnd() const override { return m_hWnd; }
+	virtual void DoPaint(CUIDC &dc) const override;
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg BOOL OnNcActivate(BOOL bActive);
-	afx_msg void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp);
-	afx_msg LRESULT OnNcHitTest(CPoint point);
-	afx_msg LRESULT OnProgress(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnShowAbout();
 	afx_msg void OnTestFunc();
-
-	void ShowBottom(bool bShow);
+	afx_msg LRESULT OnProgress(WPARAM wParam, LPARAM lParam);
 	void DoSetup();
-	static UINT WINAPI WorkThread(LPVOID pParam);
+	void ShowBottom(bool bShow);
 
-	CUIRootView  m_rootView;
 	CImagex      m_bgImagex;
 	CImagex      m_bgImagex2;
 	CUIView     *m_pViews[3];

@@ -2,19 +2,31 @@
 #include "UIRootView.h"
 #include "UILibApp.h"
 
-CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_nWndAlpha(255), m_bLayered(false), m_hImc(NULL), m_hCursor(NULL)
-	, m_hToolTip(NULL), m_pFocus(NULL), m_pCapture(NULL)
+CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_hImc(NULL), m_hCursor(NULL), m_hToolTip(NULL), m_pFocus(NULL), m_pCapture(NULL)
 {
+	ATLASSERT(pOwner);
 	m_vecEnterItems.reserve(8);
 }
 
 CUIRootView::~CUIRootView()
 {
-	for (auto pItem : m_vecChilds)
-		delete pItem;
-
-	m_vecChilds.clear();
+	Destroy();
 	g_theApp.RemoveLayout(this);
+}
+
+void CUIRootView::Destroy()
+{
+	m_pFocus = NULL;
+	m_pCapture = NULL;
+	m_vecEdits.clear();
+	m_vecEnterItems.clear();
+
+	while (m_vecChilds.size())
+	{
+		auto pItem = m_vecChilds.back();
+		m_vecChilds.pop_back();
+		delete pItem;
+	}
 }
 
 BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
@@ -23,33 +35,6 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 	switch (uMsg)
 	{
-	case WM_CREATE:
-		if (GetWindowLong(GetHwnd(), GWL_EXSTYLE) & WS_EX_LAYERED)
-			m_bLayered = true;
-		break;
-
-	case WM_SIZE:
-		if (wParam != SIZE_MINIMIZED)
-		{
-			OnSize(lParam);
-
-			if (m_bLayered)
-				OnPaintLayered(CUIClientDC(GetHwnd()));
-		}
-		break;
-
-	case WM_PAINT:
-		OnPaint();
-
-	case WM_NCPAINT:
-	case 0x00AE:	// WM_NCUAHDRAWCAPTION
-	case 0x00AF:	// WM_NCUAHDRAWFRAME
-		return TRUE;
-
-	case WM_ERASEBKGND:
-		lResult = TRUE;
-		return TRUE;
-
 	case WM_NCHITTEST:
 		if (OnNcHitTest(lParam))
 		{
@@ -131,6 +116,8 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		break;
 
 	case WM_SETFOCUS:
+		EnableImm(m_pFocus && m_pFocus->IsImmEnabled());
+
 		if (m_pFocus)
 			m_pFocus->OnSetFocus();
 		break;
@@ -158,25 +145,11 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		}
 		break;
 
-	case WM_INPUTLANGCHANGE:
-		if (m_pFocus && wParam)
-		{
-			if (auto pEdit = dynamic_cast<CUIEdit *>(m_pFocus))
-			{
-				pEdit->OnInputLangChange(lParam);
-				lResult = TRUE;
-				return TRUE;
-			}
-		}
-		break;
-
 	case WM_CAPTURECHANGED:
-		if (auto pCapture = m_pCapture)
+		if (m_pCapture)
 		{
+			m_pCapture->OnLostCapture();
 			m_pCapture = NULL;
-			pCapture->OnLostCapture();
-			RaiseMouseMove();
-			return TRUE;
 		}
 		break;
 	}
@@ -186,18 +159,9 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 HWND CUIRootView::GetHwnd() const
 {
-	return m_pOwner->GetHwnd();
-}
-
-void CUIRootView::SetWndAlpha(BYTE nWndAlpha)
-{
-	if (m_nWndAlpha == nWndAlpha)
-		return;
-
-	m_nWndAlpha = nWndAlpha;
-
-	if (m_bLayered)
-		OnPaintLayered(CUIClientDC(GetHwnd()));
+	HWND hWnd = m_pOwner->GetHwnd();
+	ATLASSERT(hWnd);
+	return hWnd;
 }
 
 void CUIRootView::UpdateLayout()
@@ -207,10 +171,22 @@ void CUIRootView::UpdateLayout()
 	OnNeedLayout(rect);
 
 	if (!rect.IsRectEmpty())
+	{
 		InvalidateRect(rect);
 
-	if (m_pCapture == NULL)
-		RaiseMouseMove();
+		if (m_pCapture == NULL)
+			DoMouseMove();
+	}
+}
+
+void CUIRootView::OnPaint(CUIDC &dc) const
+{
+	// 画背景
+	if (m_bgColor != -1)
+		dc.FillSolidRect(m_rect, m_bgColor);
+
+	if (m_bgImagex)
+		m_bgImagex.Scale9Draw(dc, m_rect, false);
 }
 
 bool CUIRootView::OnNcHitTest(CPoint point)
@@ -220,86 +196,20 @@ bool CUIRootView::OnNcHitTest(CPoint point)
 	ScreenToClient(&hitTest.point);
 	OnHitTest(hitTest);
 
-	m_hCursor = NULL;	// 用于 WM_SETCURSOR
+	// 用于 WM_SETCURSOR
+	m_hCursor = NULL;
 
 	for (auto hit : hitTest)
 	{
-		if (hit.pItem->IsControl())
+		if (auto pCtrl = dynamic_cast<CUIControl *>(hit.pItem))
 		{
 			if (hit.bEnable)
-				m_hCursor = ((CUIControl *)hit.pItem)->GetCursor();
+				m_hCursor = pCtrl->GetCursor();
 			break;
 		}
 	}
 
 	return hitTest.nCount != 0;
-}
-
-void CUIRootView::OnSize(CSize size)
-{
-	if (m_rect.Width() != size.cx || m_rect.Height() != size.cy)
-	{
-		// 这里不用 CalcRect，而是直接赋值
-		m_rect = m_rcReal = CRect(0, 0, size.cx, size.cy);
-
-		CRect rect;
-		OnRectChange(NULL, rect);
-
-		if (!rect.IsRectEmpty())
-			InvalidateRect(rect);
-
-		m_imageWnd.Destroy();
-	}
-}
-
-void CUIRootView::OnPaint()
-{
-	CUIPaintDC dc(GetHwnd());
-
-	if (m_bLayered)
-		OnPaintLayered(dc);
-	else
-		DoPaint(CUIMemDC(dc, dc.PaintRect()), dc.PaintRect());
-
-	m_clipRect.SetRectEmpty();
-}
-
-void CUIRootView::OnPaintLayered(HDC hDC)
-{
-	if (m_imageWnd.IsNull())
-	{
-		m_imageWnd.Create(m_rect.Width(), m_rect.Height(), 32, CImage::createAlphaChannel);
-		m_clipRect = m_rect;
-	}
-
-	HDC hImgDC = m_imageWnd.GetDC();
-
-	if (!m_clipRect.IsRectEmpty())
-	{
-		DoPaint(CUIMemDC(hImgDC, m_clipRect, true), m_clipRect);
-		m_clipRect.SetRectEmpty();
-	}
-
-	BLENDFUNCTION bf = { AC_SRC_OVER, 0, m_nWndAlpha, AC_SRC_ALPHA };
-	UpdateLayeredWindow(GetHwnd(), hDC, NULL, &m_rect.Size(), hImgDC, &CPoint(), 0, &bf, ULW_ALPHA);
-	m_imageWnd.ReleaseDC();
-}
-
-void CUIRootView::DoPaint(HDC hDC, LPCRECT lpClipRect) const
-{
-	CUIDC dc(hDC, lpClipRect, m_bLayered);
-	SetBkMode(dc, TRANSPARENT);
-
-	if (m_bgColor != -1)
-		dc.FillSolidRect(m_rect, m_bgColor);
-	else
-		m_pOwner->OnDrawBg(dc, m_rect);
-
-	__super::OnPaint(dc);
-
-	// 最后画在最上
-	if (m_pCapture)
-		m_pCapture->MyPaint(dc);
 }
 
 void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -314,9 +224,9 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		for (auto hit : hitTest)
 		{
-			if (hit.pItem->IsControl())
+			if (auto pCtrl = dynamic_cast<CUIControl *>(hit.pItem))
 			{
-				lpTipText = ((CUIControl *)hit.pItem)->GetToolTip();
+				lpTipText = pCtrl->GetToolTip();
 				break;
 			}
 		}
@@ -345,23 +255,29 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	// 最上层 Control 处理消息
+	bool bHandled = false;
+
 	for (auto hit : hitTest)
 	{
-		if (hit.pItem->IsControl())
+		if (auto pCtrl = dynamic_cast<CUIControl *>(hit.pItem))
 		{
 			if (hit.bEnable)
 			{
-				if (m_pFocus && m_pFocus != hit.pItem && (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN))
-					SetFocus(NULL);		// 使输入框失去焦点
+				bHandled = hit.pItem->OnMessage(uMsg, wParam, lParam);
 
-				hit.pItem->OnMessage(uMsg, wParam, lParam);
+				// 使输入框失去焦点
+				if (m_pFocus && m_pFocus != hit.pItem && (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN))
+					SetFocus(NULL);
 			}
 			break;
 		}
 	}
+
+	if (!bHandled && uMsg == WM_RBUTTONUP)
+		OnMessage(WM_CONTEXTMENU, (WPARAM)GetHwnd(), lParam);
 }
 
-void CUIRootView::RaiseMouseMove()
+void CUIRootView::DoMouseMove()
 {
 	if (m_rect.IsRectEmpty())
 		return;
@@ -387,7 +303,7 @@ void CUIRootView::RaiseMouseMove()
 	CheckMouseLeave(hitTest);
 }
 
-void CUIRootView::DoMouseEnter(CUIBase *pItem)
+void CUIRootView::DoMouseEnter(CUIView *pItem)
 {
 	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); ++it)
 	{
@@ -402,7 +318,7 @@ void CUIRootView::DoMouseEnter(CUIBase *pItem)
 
 void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 {
-	vector<CUIBase *> vecLeaveItems;
+	vector<CUIView *> vecLeaveItems;
 
 	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); )
 	{
@@ -443,35 +359,20 @@ void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 void CUIRootView::InvalidateRect(LPCRECT lpRect)
 {
 	CRect rect(m_rect);
-	if (lpRect)
-		rect &= *lpRect;
-
-	if (rect.IsRectEmpty())
+	if (rect.IsRectEmpty() || lpRect && !rect.IntersectRect(rect, lpRect))
 		return;
 
-	::InvalidateRect(GetHwnd(), rect, TRUE);
-	m_clipRect |= rect;
+	m_pOwner->InvalidateRect(rect);
 }
 
-BOOL CUIRootView::ClientToScreen(LPPOINT lpPoint)
+void CUIRootView::ClientToScreen(LPPOINT lpPoint)
 {
-	return ::ClientToScreen(GetHwnd(), lpPoint);
+	::ClientToScreen(GetHwnd(), lpPoint);
 }
 
-BOOL CUIRootView::ScreenToClient(LPPOINT lpPoint)
+void CUIRootView::ScreenToClient(LPPOINT lpPoint)
 {
-	return ::ScreenToClient(GetHwnd(), lpPoint);
-}
-
-void CUIRootView::SetCapture(CUIControl *pCtrl)
-{
-	if (!m_pCapture == !pCtrl)
-		return;
-
-	if (m_pCapture = pCtrl)
-		::SetCapture(GetHwnd());
-	else
-		::ReleaseCapture();
+	::ScreenToClient(GetHwnd(), lpPoint);
 }
 
 void CUIRootView::SetFocus(CUIControl *pCtrl)
@@ -490,8 +391,26 @@ void CUIRootView::SetFocus(CUIControl *pCtrl)
 	else
 		::SetFocus(GetHwnd());
 
-	if (pCtrl)
-		pCtrl->OnSetFocus();
+	EnableImm(m_pFocus && m_pFocus->IsImmEnabled());	// 输入法
+
+	if (m_pFocus)
+		m_pFocus->OnSetFocus();
+}
+
+void CUIRootView::SetCapture(CUIControl *pCtrl)
+{
+	if (m_pCapture == pCtrl)
+		return;
+
+	auto pOldCapture = m_pCapture;
+	m_pCapture = pCtrl;
+
+	if (pOldCapture == NULL)
+		::SetCapture(GetHwnd());
+	else if (pCtrl == NULL)
+		::ReleaseCapture();
+	else
+		pOldCapture->OnLostCapture();
 }
 
 void CUIRootView::EnableImm(bool bEnable)

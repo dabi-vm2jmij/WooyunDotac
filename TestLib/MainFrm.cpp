@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
-#include "TabDemoWnd.h"
+#include "DemoWnd1.h"
+#include "DemoWnd2.h"
 
 CMainFrame::CMainFrame() : m_hThread(NULL)
 {
@@ -28,7 +29,7 @@ void CMainFrame::OnLoadUI(const IUIXmlAttrs &attrs)
 	m_pViews[2] = m_rootView.SearchCast(L"中部2");
 
 	CUIMenuButton *pMenuBtn = m_rootView.SearchCast(L"主菜单");
-	pMenuBtn->BindGetUIMenu([this]
+	pMenuBtn->BindPopup([this, pMenuBtn]
 	{
 		if (m_uiMenu.GetCount() == 0)
 		{
@@ -37,34 +38,51 @@ void CMainFrame::OnLoadUI(const IUIXmlAttrs &attrs)
 			DestroyMenu(hMenu);
 		}
 
-		return &m_uiMenu;
+		CRect rcBtn = pMenuBtn->GetWindowRect();
+		m_uiMenu.Popup(m_hWnd, rcBtn.left, rcBtn.bottom, MAXINT16, rcBtn.top, true);
 	});
 
 	CUIButton *pButton = m_rootView.SearchCast(L"安装");
 	pButton->BindClick([this]{ DoSetup(); });
 
 	CUICheckBox *pChkBox = m_rootView.SearchCast(L"check1");
-	pChkBox->BindClick([pChkBox, pButton]{ pButton->SetEnable(pChkBox->IsChecked()); });
+	pChkBox->BindClick([pChkBox, pButton]{ pButton->SetEnabled(pChkBox->IsChecked()); });
 
 	pButton = m_rootView.SearchCast(L"自定义");
 	pButton->BindClick([this, pButton]{ pButton->SetVisible(false); ShowBottom(true); });
 
 	m_pProgress = m_rootView.SearchCast(L"进度条");
 
+	pButton = m_rootView.SearchCast(L"Demo1");
+	pButton->BindClick([this]{ ShowDemo1(); });
+
+	pButton = m_rootView.SearchCast(L"Demo2");
+	pButton->BindClick([this]{ ShowDemo2(); });
+
 	__super::OnLoadUI(attrs);
 }
 
-int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
+void CMainFrame::DoPaint(CUIDC &dc) const
 {
-	if (__super::OnCreate(lpCreateStruct) == -1)
-		return -1;
+	CRect rect;
+	GetClientRect(rect);
+	m_bgImagex.BitBlt(dc, rect.left, rect.top);
+
+	if (m_pViews[0]->IsRealVisible())
+		m_bgImagex2.BitBlt(dc, rect.left, rect.bottom - m_bgImagex2.Rect().Height());
+
+	__super::DoPaint(dc);
+}
+
+void CMainFrame::OnCreate()
+{
+	__super::OnCreate();
 
 	HICON hIcon = LoadIcon(_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDI_TESTLIB));
 	SetIcon(hIcon, TRUE);
 	SetIcon(hIcon, FALSE);
 
 	CenterWindow();
-	return 0;
 }
 
 void CMainFrame::OnClose()
@@ -75,19 +93,47 @@ void CMainFrame::OnClose()
 	__super::OnClose();
 }
 
-LRESULT CMainFrame::OnThreadResult(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+LRESULT CMainFrame::OnShowAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
 {
+	CUIResPath resPath(L"关于");
+
+	CUIDialog *pWnd = new CUIDialog(true);
+	pWnd->CreateFromXml(L"关于.xml", m_hWnd);
 	return 0;
 }
 
-void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
+LRESULT CMainFrame::OnTestFunc(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
 {
-	m_bgImagex.BitBlt(dc, lpRect->left, lpRect->top);
+	ShowDemo1();
+	return 0;
+}
 
-	if (lpRect->bottom - lpRect->top > m_bgImagex.Rect().Height())
+LRESULT CMainFrame::OnProgress(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+{
+	m_pProgress->SetCurPos(wParam);
+	return 0;
+}
+
+void CMainFrame::DoSetup()
+{
+	m_pViews[1]->SetVisible(false);
+	m_pViews[2]->SetVisible(true);
+	ShowBottom(false);
+
+	auto fnThread = [](LPVOID pParam)
 	{
-		m_bgImagex2.BitBlt(dc, lpRect->left, lpRect->bottom - m_bgImagex2.Rect().Height());
-	}
+		HWND hWnd = (HWND)pParam;
+
+		for (int i = 0; i <= 100; i++)
+		{
+			::PostMessage(hWnd, WM_USER + 1000, i, 0);
+			Sleep(10);
+		}
+
+		return 0u;
+	};
+
+	m_hThread = (HANDLE)_beginthreadex(NULL, 0, fnThread, m_hWnd, 0, NULL);
 }
 
 void CMainFrame::ShowBottom(bool bShow)
@@ -101,43 +147,16 @@ void CMainFrame::ShowBottom(bool bShow)
 	SetWindowPos(NULL, 0, 0, m_bgImagex.Rect().Width(), nHeight, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
 }
 
-LRESULT CMainFrame::OnShowAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
+void CMainFrame::ShowDemo1()
 {
-	CUIResPath resPath(L"关于");
-
-	CUISimpleWnd *pWnd = new CUISimpleWnd(true);
-	pWnd->CreateFromXml(L"关于.xml", m_hWnd);
-
-	return 0;
-}
-
-LRESULT CMainFrame::OnTestFunc(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
-{
-	CTabDemoWnd *pWnd = new CTabDemoWnd;
-	pWnd->Create(NULL, CRect(0, 0, 1000, 600), _T("TabDemo"), WS_OVERLAPPEDWINDOW);
+	CDemoWnd1 *pWnd = new CDemoWnd1;
+	pWnd->Create(NULL, CRect(0, 0, 1000, 600), _T("Demo1"), WS_OVERLAPPEDWINDOW);
 	pWnd->ShowWindow(SW_SHOW);
-	return 0;
 }
 
-void CMainFrame::DoSetup()
+void CMainFrame::ShowDemo2()
 {
-	m_pViews[1]->SetVisible(false);
-	m_pViews[2]->SetVisible(true);
-	ShowBottom(false);
-
-	m_hThread = (HANDLE)_beginthreadex(NULL, 0, WorkThread, this, 0, NULL);
-}
-
-UINT CMainFrame::WorkThread(LPVOID pParam)
-{
-	CMainFrame *pMainFrm = (CMainFrame *)pParam;
-
-	for (int i = 0; i <= 100; i++)
-	{
-		pMainFrm->m_pProgress->SetValue(i);
-		Sleep(10);
-	}
-
-	pMainFrm->PostMessage(WM_USER + 1000, TRUE);
-	return 0;
+	CDemoWnd2 *pWnd = new CDemoWnd2;
+	pWnd->CreateFromXml(L"例子2\\例子2.xml");
+	pWnd->ShowWindow(SW_SHOW);
 }

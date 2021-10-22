@@ -10,13 +10,14 @@ public:
 	CUIProgress(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIProgress();
 
-	void SetValue(int nCurPos, int nMaxPos = 0);
+	void SetMaxPos(int nMaxPos);
+	void SetCurPos(int nCurPos);
 
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
-	virtual void DoPaint(CUIDC &dc) const override;
+	virtual void OnPaint(CUIDC &dc) const override;
 
-	CImagex m_imagexs[2];
+	CImagex m_imagex;
 	int     m_nMaxPos;
 	int     m_nCurPos;
 };

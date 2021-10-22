@@ -84,22 +84,26 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DemoWnd1.h" />
+    <ClInclude Include="DemoWnd2.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="TabDemoWnd.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UIMenu2.h" />
+    <ClInclude Include="UIMoreTools.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DemoWnd1.cpp" />
+    <ClCompile Include="DemoWnd2.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TabDemoWnd.cpp" />
     <ClCompile Include="TestLib.cpp" />
     <ClCompile Include="UIMenu2.cpp" />
+    <ClCompile Include="UIMoreTools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TestLib.rc" />
@@ -109,6 +113,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Skin.skn" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UILib\UILib2.vcxproj">
+      <Project>{1e367f20-5b9b-4282-bc25-8b712681efc5}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

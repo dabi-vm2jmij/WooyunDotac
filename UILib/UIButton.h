@@ -13,18 +13,19 @@ public:
 	enum ButtonState { Normal, Hover, Press, Disable };
 
 	void BindClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
-	void ResetImages(const CImagex imagexs[], int nCount);
+	void SetImage(const CImagex &imagex);
+	void SetImages(const CImagex imagexs[], int nCount);
 
 protected:
+	virtual void OnPaint(CUIDC &dc) const override;
 	virtual void OnEnable(bool bEnable) override;
 	virtual void OnMouseEnter() override;
 	virtual void OnMouseLeave() override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;
 	virtual void OnButtonState(ButtonState btnState);
-	static void Fill4States(CImagex imagexs[], int nCount);
 
-	CImagex m_imagexs[4];
+	CImagex     m_imagexs[4];
 	ButtonState m_btnState;
 	function<void()> m_fnOnClick;
 };

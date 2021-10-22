@@ -25,17 +25,24 @@ CUIEdit::~CUIEdit()
 	GetRootView()->DelTabsEdit(this);
 }
 
-void CUIEdit::SetFont(HFONT hFont, bool bRedraw)
+void CUIEdit::SetFont(HFONT hFont)
 {
 	ATLASSERT(hFont);
-	if (m_hFont == hFont || hFont == NULL)
-		return;
+	if (m_hFont != hFont && hFont)
+	{
+		m_hFont = hFont;
+		CalcFontHeight();
+		InvalidateRect();
+	}
+}
 
-	m_hFont = hFont;
-	CalcFontHeight();
-
-	if (bRedraw)
-		InvalidateRect(NULL);
+void CUIEdit::SetTextColor(COLORREF color)
+{
+	if (m_color != color)
+	{
+		m_color = color;
+		InvalidateRect();
+	}
 }
 
 void CUIEdit::SetText(LPCWSTR lpText)
@@ -45,11 +52,9 @@ void CUIEdit::SetText(LPCWSTR lpText)
 	CopyMemory(szText, lpText, nSize);
 
 	CheckMaxText(L"", szText);
-
-	InvalidateSel(0, -1);
 	m_strText = szText;
 	m_iStart = m_iEnd = m_nLeft = 0;
-	InvalidateSel(0, -1);
+	InvalidateRect();
 
 	m_undo.SetPosLen(-1);
 	m_undo.m_strDiff.clear();
@@ -99,7 +104,7 @@ void CUIEdit::SetPassword(bool bPassword)
 	if (m_bPassword != bPassword)
 	{
 		m_bPassword = bPassword;
-		InvalidateRect(NULL);
+		InvalidateRect();
 	}
 }
 
@@ -135,8 +140,10 @@ bool CUIEdit::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return __super::OnMessage(uMsg, wParam, lParam);
 }
 
-void CUIEdit::DoPaint(CUIDC &dc) const
+void CUIEdit::OnPaint(CUIDC &dc) const
 {
+	__super::OnPaint(dc);
+
 	// 密码显示星号
 	LPCWSTR lpText = m_strText.c_str();
 	if (lpText[0] && m_bPassword)
@@ -152,19 +159,19 @@ void CUIEdit::DoPaint(CUIDC &dc) const
 	}
 
 	CRect rect(m_rect);
-	rect.top = (m_rect.top + m_rect.bottom - m_nHeight) / 2;
+	rect.top = (rect.top + rect.bottom - m_nHeight) / 2;
 	rect.bottom = rect.top + m_nHeight;
 	rect.left -= m_nLeft;
 
-	dc.SelectFont(m_hFont);
-	dc.SetTextColor(IsRealEnabled() ? m_color : RGB(110, 110, 110));
+	SelectObject(dc, m_hFont);
+	::SetTextColor(dc, IsRealEnabled() ? m_color : RGB(110, 110, 110));
 	DrawTextW(dc, lpText, -1, rect, DT_NOPREFIX | DT_SINGLELINE);
 
 	if (m_iStart != m_iEnd && m_bFocus)	// 有焦点时
 	{
 		CalcSelRect(m_iStart, m_iEnd, rect);
 		dc.FillSolidRect(rect, RGB(51, 153, 255));
-		dc.SetTextColor(RGB(255, 255, 255));
+		::SetTextColor(dc, RGB(255, 255, 255));
 		DrawTextW(dc, lpText + min(m_iStart, m_iEnd), abs(m_iStart - m_iEnd), rect, DT_NOPREFIX | DT_SINGLELINE);
 	}
 
@@ -184,7 +191,7 @@ void CUIEdit::OnEnable(bool bEnable)
 {
 	__super::OnEnable(bEnable);
 
-	InvalidateSel(0, -1);
+	InvalidateRect();
 }
 
 void CUIEdit::OnMouseMove(CPoint point)
@@ -232,8 +239,6 @@ void CUIEdit::OnRButtonDown(CPoint point)
 
 void CUIEdit::OnRButtonUp(CPoint point)
 {
-	GetCursorPos(&point);
-
 	CUIMenu *pUIMenu = NewUIMenu();
 	pUIMenu->GetItem(ID_EDIT_UNDO)->m_strText = L"撤销(&U)";
 	pUIMenu->GetItem();
@@ -282,6 +287,7 @@ void CUIEdit::OnRButtonUp(CPoint point)
 
 	// 弹出菜单时光标暂停
 	m_uiTimer.Stop();
+	GetCursorPos(&point);
 	UINT nCmdId = pUIMenu->Popup(GetRootView()->GetHwnd(), point.x, point.y, MAXINT16, point.y);
 	delete pUIMenu;
 	m_uiTimer.Start(GetCaretBlinkTime());
@@ -321,7 +327,6 @@ void CUIEdit::OnSetFocus()
 
 	m_bFocus = true;
 	InvalidateSel(m_iStart, m_iEnd);
-	GetRootView()->EnableImm(!m_bPassword);	// 输入法
 	MyCreateCaret();
 }
 
@@ -333,23 +338,6 @@ void CUIEdit::OnKillFocus()
 	m_bFocus = false;
 	MyDestroyCaret();
 	InvalidateSel(m_iStart, m_iEnd);
-}
-
-void CUIEdit::OnInputLangChange(UINT nLocaleId)
-{
-	HWND hWnd = GetRootView()->GetHwnd();
-	HIMC hImc = ImmGetContext(hWnd);
-
-	if (hImc)
-	{
-		LOGFONTW lf;
-		GetObjectW(m_hFont, sizeof(lf), &lf);
-		ImmSetCompositionFontW(hImc, &lf);
-
-		COMPOSITIONFORM compForm = { CFS_POINT, m_ptCaret + GetBasePoint() };
-		ImmSetCompositionWindow(hImc, &compForm);
-		ImmReleaseContext(hWnd, hImc);
-	}
 }
 
 void CUIEdit::CalcFontHeight()
@@ -369,6 +357,22 @@ void CUIEdit::CalcClickPos(bool bShift, CPoint point)
 
 	CUIComDC dc(m_hFont);
 
+	if (m_bPassword)
+	{
+		CRect rect;
+		DrawTextW(dc, L"*", 1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+
+		int nWidth = point.x - m_rect.left + m_nLeft;
+		int nCount = nWidth / rect.Width();
+
+		if (nCount < m_iEnd)
+			m_iEnd = nWidth % rect.Width() * 2 < rect.Width() ? nCount : nCount + 1;
+
+		if (!bShift)
+			m_iStart = m_iEnd;
+		return;
+	}
+
 	// 二分法查找
 	int nWidth = point.x - m_rect.left + m_nLeft;
 	int nWidthL = 0, nCountL = 0, nCountR = m_iEnd;
@@ -383,7 +387,7 @@ void CUIEdit::CalcClickPos(bool bShift, CPoint point)
 
 		if (nCountM == nCountR)
 		{
-			m_iEnd = nWidth < (nWidthL + nWidthM) / 2 ? nCountL : nCountR;
+			m_iEnd = nWidth * 2 < nWidthL + nWidthM ? nCountL : nCountR;
 			break;
 		}
 
@@ -411,8 +415,17 @@ int CUIEdit::CalcPosLeft(int iPos) const
 	if (iPos == 0)
 		return 0;
 
+	CUIComDC dc(m_hFont);
+
+	if (m_bPassword)
+	{
+		CRect rect;
+		DrawTextW(dc, L"*", 1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+		return rect.Width() * (iPos > 0 ? iPos : m_strText.size());
+	}
+
 	CRect rect;
-	DrawTextW(CUIComDC(m_hFont), m_strText.c_str(), iPos, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+	DrawTextW(dc, m_strText.c_str(), iPos, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
 	return rect.Width();
 }
 
@@ -583,11 +596,11 @@ void CUIEdit::DelStartEnd(int iStart, int iEnd, bool bChange)
 	m_strText.erase(iStart, iEnd - iStart);
 	m_iStart = m_iEnd = iStart;
 
-	if (!bChange)
-		return;
-
-	OnTextChange();
-	MySetCaretPos();
+	if (bChange)
+	{
+		OnTextChange();
+		MySetCaretPos();
+	}
 }
 
 void CUIEdit::OnKeyChar(UINT nChar)
@@ -638,10 +651,7 @@ void CUIEdit::OnCut()
 
 void CUIEdit::OnCopy()
 {
-	if (m_iStart == m_iEnd || m_bPassword)
-		return;
-
-	if (!OpenClipboard(NULL))
+	if (m_iStart == m_iEnd || m_bPassword || !OpenClipboard(NULL))
 		return;
 
 	int iStart = min(m_iStart, m_iEnd);
@@ -718,7 +728,6 @@ void CUIEdit::Insert(LPWSTR lpText)
 	}
 
 	CheckMaxText(m_strText.c_str(), lpText);
-
 	m_strText.insert(m_iEnd, lpText);
 	InvalidateSel(m_iEnd, -1);
 	m_iStart = m_iEnd += wcslen(lpText);
@@ -767,7 +776,7 @@ void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
 			m_nLeft -= nSize;
 		}
 
-		InvalidateRect(NULL);
+		InvalidateRect();
 	}
 	else if (point.x >= m_rect.right)
 	{
@@ -779,7 +788,7 @@ void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
 			m_nLeft += nSize;
 		}
 
-		InvalidateRect(NULL);
+		InvalidateRect();
 	}
 
 	if (m_nLeft > 0)
@@ -790,7 +799,7 @@ void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
 		{
 			point.x += nMore;
 			m_nLeft -= nMore;
-			InvalidateRect(NULL);
+			InvalidateRect();
 		}
 	}
 
@@ -799,7 +808,7 @@ void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
 		// 移除文字左空白
 		point.x += m_nLeft;
 		m_nLeft = 0;
-		InvalidateRect(NULL);
+		InvalidateRect();
 	}
 
 	*lpPoint = point;

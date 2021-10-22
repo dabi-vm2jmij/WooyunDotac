@@ -86,6 +86,9 @@ bool IsNameClass(LPCSTR lpName, LPCVOID pView)
 		return false;
 
 #ifdef _DEBUG
+	if (_stricmp(lpName, "View") == 0)
+		return true;
+
 	char szName[256];
 	sprintf_s(szName, ".?AVCUI%s@@", lpName);
 	return _stricmp(szName, (*(char ****)pView)[-1][3] + 8) == 0;
@@ -127,6 +130,7 @@ bool CUILoader::Load(tinyxml2::XMLElement *pElem, CUIView *pView)
 		return false;
 
 	pView->OnLoad(CUIXmlAttrs(*this, pElem));
+	pView->OnLoaded();
 	return true;
 }
 
@@ -223,13 +227,13 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddProgress(lpFileName);
 	}
-	else if (_stricmp(lpName, "PageView") == 0)
+	else if (_stricmp(lpName, "PageCtrl") == 0)
 	{
-		pView = pParent->AddPageView(lpFileName);
+		pView = pParent->AddPageCtrl(lpFileName);
 	}
-	else if (_stricmp(lpName, "RollView") == 0)
+	else if (_stricmp(lpName, "Carousel") == 0)
 	{
-		pView = pParent->AddRollView();
+		pView = pParent->AddCarousel();
 	}
 	else if (_stricmp(lpName, "ScrollView") == 0)
 	{
@@ -239,19 +243,19 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddSlider(lpFileName, attrs.GetStr(L"bgImage"));
 	}
-	else if (_stricmp(lpName, "VScroll") == 0)
+	else if (_stricmp(lpName, "ScrollBar") == 0)
 	{
-		pView = pParent->AddVScroll(lpFileName, attrs.GetStr(L"bgImage"));
+		pView = pParent->AddScrollBar(lpFileName, attrs.GetStr(L"bgImage"));
 	}
 	else if (_stricmp(lpName, "ToolBar") == 0)
 	{
-		pView = pParent->AddToolBar(lpFileName);
+		pView = pParent->AddToolBar();
 	}
 	else if (_stricmp(lpName, "WebTabBar") == 0)
 	{
 		pView = pParent->AddWebTabBar(lpFileName);
 	}
-	else if (pView = pParent->GetRootView()->OnCustomUI(CA2W(lpName, CP_UTF8), pParent))
+	else if (pView = pParent->OnCustomUI(CA2W(lpName, CP_UTF8), pParent))
 	{
 		pParent->AddChild(pView);
 	}
@@ -265,6 +269,7 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 		return false;
 
 	pView->OnLoad(attrs);
+	pView->OnLoaded();
 	return true;
 }
 

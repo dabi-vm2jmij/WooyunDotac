@@ -27,17 +27,17 @@ CImagex GetImage(LPCWSTR lpFileName)
 	wchar_t szFileName[MAX_PATH];
 	int nCount = 1;
 
-	if (LPCWSTR lpFind = wcschr(lpFileName, ':'))
+	if (LPCWSTR lpNameEnd = wcschr(lpFileName, ':'))
 	{
-		wcsncpy_s(szFileName, lpFileName, lpFind - lpFileName);
+		wcsncpy_s(szFileName, lpFileName, lpNameEnd - lpFileName);
 		lpFileName = szFileName;
-		nCount = _wtoi(lpFind + 1);
+		nCount = _wtoi(lpNameEnd + 1);
 	}
 
 	auto spImage = g_theApp.GetResource().GetImage(lpFileName);
 	ATLASSERT(nCount > 0 && spImage->GetWidth() % nCount == 0);
 
-	if (!spImage || spImage->IsNull() || nCount <= 1)
+	if (!spImage || spImage->IsNull() || nCount < 2)
 		return spImage;
 
 	CImagex imagex;
@@ -74,10 +74,10 @@ void AlphaPng(CImage &image)
 	if (image.GetBPP() != 32 || !HasAlphaChannel(image))
 		return;
 
-	LPBYTE pBegin = (LPBYTE)image.GetPixelAddress(0, image.GetPitch() < 0 ? image.GetHeight() - 1 : 0);
-	LPBYTE pEnd   = pBegin + image.GetWidth() * image.GetHeight() * 4;
+	BYTE *pBegin = (BYTE *)image.GetPixelAddress(0, image.GetPitch() < 0 ? image.GetHeight() - 1 : 0);
+	BYTE *pEnd   = pBegin + image.GetWidth() * image.GetHeight() * 4;
 
-	for (LPBYTE pColor = pBegin; pColor != pEnd; pColor += 4)
+	for (BYTE *pColor = pBegin; pColor != pEnd; pColor += 4)
 	{
 		if (pColor[3] != 255)
 		{
@@ -88,27 +88,7 @@ void AlphaPng(CImage &image)
 	}
 }
 
-UINT SplitImage(LPCWSTR lpFileName, CImagex imagexs[], UINT nCount)
-{
-	if (nCount == 0)
-		return 0;
-
-	imagexs[0] = GetImage(lpFileName);
-	UINT nTotal = imagexs[0].GetFrameCount();
-
-	if (nCount > nTotal)
-		nCount = nTotal;
-
-	for (UINT i = 1; i < nCount; i++)
-	{
-		imagexs[i] = imagexs[0];
-		imagexs[i].SetFrameIndex(i);
-	}
-
-	return nCount;
-}
-
-void StretchDraw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int))
+void Scale9Draw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int))
 {
 	int nWidth = rcDst.Width(), nHeight = rcDst.Height();
 	int nSrcWidth = rcSrc.Width(), nSrcHeight = rcSrc.Height();

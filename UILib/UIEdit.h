@@ -6,13 +6,12 @@
 
 class UILIB_API CUIEdit : public CUIControl
 {
-	friend class CUIRootView;
 public:
 	CUIEdit(CUIView *pParent);
 	virtual ~CUIEdit();
 
-	void SetFont(HFONT hFont, bool bRedraw = false);
-	void SetTextColor(COLORREF color) { m_color = color; }
+	void SetFont(HFONT hFont);
+	void SetTextColor(COLORREF color);
 	void SetText(LPCWSTR lpText);
 	LPCWSTR GetText() const { return m_strText.c_str(); }
 	void SetSel(int iStart, int iEnd);
@@ -27,7 +26,8 @@ public:
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-	virtual void DoPaint(CUIDC &dc) const override;
+	virtual int  IsPaint() const override { return 2; }
+	virtual void OnPaint(CUIDC &dc) const override;
 	virtual void OnEnable(bool bEnable) override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;
@@ -35,7 +35,7 @@ protected:
 	virtual void OnRButtonUp(CPoint point) override;
 	virtual void OnSetFocus() override;
 	virtual void OnKillFocus() override;
-	virtual void OnInputLangChange(UINT nLocaleId);
+	virtual bool IsImmEnabled() const override { return !m_bPassword; }
 	virtual void OnKeyDown(UINT nChar);
 	virtual void OnKeyChar(UINT nChar);
 	virtual void OnTextChange() {}

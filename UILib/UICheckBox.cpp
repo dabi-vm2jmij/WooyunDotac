@@ -1,20 +1,24 @@
 #include "stdafx.h"
 #include "UICheckBox.h"
 
-CUICheckBox::CUICheckBox(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_nTextLeft(6), m_bCheck(false)
+CUICheckBox::CUICheckBox(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_nSpacing(6), m_bCheck(false)
 {
-	SplitImage(lpFileName, m_imagexs);
-	SetSize(m_imagexs[0].Rect().Size());
+	m_imagex = GetImage(lpFileName);
+	SetSize(m_imagex.Rect().Size());
+	ATLASSERT(m_imagex.GetFrameCount() > 1);
 }
 
 CUICheckBox::~CUICheckBox()
 {
 }
 
-void CUICheckBox::SetTextLeft(int nTextLeft)
+void CUICheckBox::SetSpacing(int nSpacing)
 {
-	m_nTextLeft = nTextLeft;
-	OnTextSize(m_sizeText);
+	if (m_nSpacing != nSpacing)
+	{
+		m_nSpacing = nSpacing;
+		OnTextSize(m_textSize);
+	}
 }
 
 void CUICheckBox::SetCheck(bool bCheck)
@@ -26,19 +30,22 @@ void CUICheckBox::SetCheck(bool bCheck)
 		return;
 
 	m_bCheck = bCheck;
-	InvalidateRect(NULL);
+	m_imagex.SetFrameIndex(bCheck);
+	InvalidateRect();
 
 	if (bCheck)
 		OnChecked();
 }
 
-void CUICheckBox::DoPaint(CUIDC &dc) const
+void CUICheckBox::OnPaint(CUIDC &dc) const
 {
-	if (m_imagexs[0])
-		m_imagexs[m_bCheck].Draw(dc, m_rect.left, m_rect.top + (m_rect.Height() - m_imagexs[0].Rect().Height()) / 2);
+	__super::OnPaint(dc);
+
+	if (m_imagex)
+		m_imagex.Draw(dc, m_rect.left, (m_rect.top + m_rect.bottom - m_imagex.Rect().Height()) / 2);
 
 	CRect rect(m_rect);
-	rect.left += m_nTextLeft + m_imagexs[0].Rect().Width();
+	rect.left += m_imagex.Rect().Width() + m_nSpacing;
 	OnDrawText(dc, rect, DT_VCENTER);
 }
 
@@ -52,7 +59,7 @@ void CUICheckBox::OnLButtonUp(CPoint point)
 
 void CUICheckBox::OnTextSize(CSize size)
 {
-	SetSize({ m_imagexs[0].Rect().Width() + m_nTextLeft + size.cx, max(m_imagexs[0].Rect().Height(), size.cy) });
+	SetSize({ m_imagex.Rect().Width() + m_nSpacing + size.cx, max(m_imagex.Rect().Height(), size.cy) });
 }
 
 void CUICheckBox::OnLoad(const IUIXmlAttrs &attrs)
@@ -60,8 +67,8 @@ void CUICheckBox::OnLoad(const IUIXmlAttrs &attrs)
 	__super::OnLoad(attrs);
 
 	int nValue;
-	if (attrs.GetInt(L"textLeft", &nValue))
-		SetTextLeft(nValue);
+	if (attrs.GetInt(L"spacing", &nValue))
+		SetSpacing(nValue);
 
 	if (attrs.GetInt(L"check", &nValue) && nValue)
 		SetCheck(true);

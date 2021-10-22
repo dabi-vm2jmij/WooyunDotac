@@ -30,7 +30,8 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -83,9 +84,9 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="UIAnimation.h" />
-    <ClInclude Include="UIBase.h" />
     <ClInclude Include="UIButton.h" />
     <ClInclude Include="UIButtonEx.h" />
+    <ClInclude Include="UICarousel.h" />
     <ClInclude Include="UICheckBox.h" />
     <ClInclude Include="UICheckButton.h" />
     <ClInclude Include="UIComboButton.h" />
@@ -103,18 +104,15 @@
     <ClInclude Include="UIMenu.h" />
     <ClInclude Include="UIMenuButton.h" />
     <ClInclude Include="UIMenuWnd.h" />
-    <ClInclude Include="UIMoreView.h" />
-    <ClInclude Include="UIMoreWnd.h" />
-    <ClInclude Include="UIPageView.h" />
+    <ClInclude Include="UIPageCtrl.h" />
     <ClInclude Include="UIProgress.h" />
     <ClInclude Include="UIRadioBox.h" />
     <ClInclude Include="UIRadioButton.h" />
     <ClInclude Include="UIResource.h" />
     <ClInclude Include="UIResPath.h" />
-    <ClInclude Include="UIRollView.h" />
     <ClInclude Include="UIRootView.h" />
+    <ClInclude Include="UIScrollBar.h" />
     <ClInclude Include="UIScrollView.h" />
-    <ClInclude Include="UISimpleWnd.h" />
     <ClInclude Include="UISkin.h" />
     <ClInclude Include="UISlider.h" />
     <ClInclude Include="UIStateButton.h" />
@@ -124,10 +122,8 @@
     <ClInclude Include="UIToolBar.h" />
     <ClInclude Include="UIUtility.h" />
     <ClInclude Include="UIView.h" />
-    <ClInclude Include="UIVScroll.h" />
     <ClInclude Include="UIWebTab.h" />
     <ClInclude Include="UIWebTabBar.h" />
-    <ClInclude Include="UIWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Imagex.cpp" />
@@ -137,9 +133,9 @@
     </ClCompile>
     <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="UIAnimation.cpp" />
-    <ClCompile Include="UIBase.cpp" />
     <ClCompile Include="UIButton.cpp" />
     <ClCompile Include="UIButtonEx.cpp" />
+    <ClCompile Include="UICarousel.cpp" />
     <ClCompile Include="UICheckBox.cpp" />
     <ClCompile Include="UICheckButton.cpp" />
     <ClCompile Include="UIComboButton.cpp" />
@@ -156,16 +152,14 @@
     <ClCompile Include="UIMenu.cpp" />
     <ClCompile Include="UIMenuButton.cpp" />
     <ClCompile Include="UIMenuWnd.cpp" />
-    <ClCompile Include="UIMoreView.cpp" />
-    <ClCompile Include="UIMoreWnd.cpp" />
-    <ClCompile Include="UIPageView.cpp" />
+    <ClCompile Include="UIPageCtrl.cpp" />
     <ClCompile Include="UIProgress.cpp" />
     <ClCompile Include="UIRadioBox.cpp" />
     <ClCompile Include="UIRadioButton.cpp" />
     <ClCompile Include="UIResource.cpp" />
     <ClCompile Include="UIResPath.cpp" />
-    <ClCompile Include="UIRollView.cpp" />
     <ClCompile Include="UIRootView.cpp" />
+    <ClCompile Include="UIScrollBar.cpp" />
     <ClCompile Include="UIScrollView.cpp" />
     <ClCompile Include="UISkin.cpp" />
     <ClCompile Include="UISlider.cpp" />
@@ -176,7 +170,6 @@
     <ClCompile Include="UIToolBar.cpp" />
     <ClCompile Include="UIUtility.cpp" />
     <ClCompile Include="UIView.cpp" />
-    <ClCompile Include="UIVScroll.cpp" />
     <ClCompile Include="UIWebTab.cpp" />
     <ClCompile Include="UIWebTabBar.cpp" />
   </ItemGroup>
@@ -184,5 +177,6 @@
     <ResourceCompile Include="UILib.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>

@@ -5,17 +5,13 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UILib", "UILib\UILib.vcxproj", "{1E367F20-5B9B-4282-BC25-8B712681EFC5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UIWnd", "UIWnd\UIWnd.vcxproj", "{25136D7C-8A92-4D49-BEEB-81CBB7BA1110}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MakeSkin", "MakeSkin\MakeSkin.vcxproj", "{D5CE3D7A-A3E1-4BD7-9E87-6E1FCB189DAA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestLib", "TestLib\TestLib.vcxproj", "{BBDE13F6-CAB2-49CC-B389-3EE14B59CA2E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1E367F20-5B9B-4282-BC25-8B712681EFC5} = {1E367F20-5B9B-4282-BC25-8B712681EFC5}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestMFC", "TestMFC\TestMFC.vcxproj", "{59117AB7-4D5F-4E31-A11C-D2710B963D6C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{1E367F20-5B9B-4282-BC25-8B712681EFC5} = {1E367F20-5B9B-4282-BC25-8B712681EFC5}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +23,10 @@ Global
 		{1E367F20-5B9B-4282-BC25-8B712681EFC5}.Debug|Win32.Build.0 = Debug|Win32
 		{1E367F20-5B9B-4282-BC25-8B712681EFC5}.Release|Win32.ActiveCfg = Release|Win32
 		{1E367F20-5B9B-4282-BC25-8B712681EFC5}.Release|Win32.Build.0 = Release|Win32
+		{25136D7C-8A92-4D49-BEEB-81CBB7BA1110}.Debug|Win32.ActiveCfg = Debug|Win32
+		{25136D7C-8A92-4D49-BEEB-81CBB7BA1110}.Debug|Win32.Build.0 = Debug|Win32
+		{25136D7C-8A92-4D49-BEEB-81CBB7BA1110}.Release|Win32.ActiveCfg = Release|Win32
+		{25136D7C-8A92-4D49-BEEB-81CBB7BA1110}.Release|Win32.Build.0 = Release|Win32
 		{D5CE3D7A-A3E1-4BD7-9E87-6E1FCB189DAA}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D5CE3D7A-A3E1-4BD7-9E87-6E1FCB189DAA}.Debug|Win32.Build.0 = Debug|Win32
 		{D5CE3D7A-A3E1-4BD7-9E87-6E1FCB189DAA}.Release|Win32.ActiveCfg = Release|Win32

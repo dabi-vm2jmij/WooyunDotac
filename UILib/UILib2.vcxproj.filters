@@ -33,9 +33,6 @@
     <ClInclude Include="UILibApp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIBase.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="UIView.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -102,22 +99,16 @@
     <ClInclude Include="UIWebTabBar.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIVScroll.h">
+    <ClInclude Include="UIScrollBar.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="UIScrollView.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIMoreView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UIMoreWnd.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="UIToolBar.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIPageView.h">
+    <ClInclude Include="UIPageCtrl.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="UICheckBox.h">
@@ -147,7 +138,7 @@
     <ClInclude Include="UIMenuWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UIRollView.h">
+    <ClInclude Include="UICarousel.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="UIEdit.h">
@@ -162,7 +153,10 @@
     <ClInclude Include="UIWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UISimpleWnd.h">
+    <ClInclude Include="UIDialog.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UIShadowWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -177,9 +171,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UILib.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UIBase.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIView.cpp">
@@ -248,22 +239,16 @@
     <ClCompile Include="UIWebTabBar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIVScroll.cpp">
+    <ClCompile Include="UIScrollBar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIScrollView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIMoreView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UIMoreWnd.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="UIToolBar.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIPageView.cpp">
+    <ClCompile Include="UIPageCtrl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UICheckBox.cpp">
@@ -293,7 +278,7 @@
     <ClCompile Include="UIMenuWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIRollView.cpp">
+    <ClCompile Include="UICarousel.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIEdit.cpp">
@@ -303,6 +288,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UILoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIWindow.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIDialog.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIShadowWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

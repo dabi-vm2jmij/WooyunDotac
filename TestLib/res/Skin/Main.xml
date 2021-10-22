@@ -20,4 +20,6 @@
 	<View top="142" id="中部2" visible="0">
 		<Progress top="71" image="进度条.png:2" width="440" id="进度条" />
 	</View>
+	<ButtonEx right="20" top="120" width="60" image="按钮.png:3" text="Demo1" id="Demo1" />
+	<ButtonEx right="20" top="160" width="60" image="按钮.png:3" text="Demo2" id="Demo2" />
 </RootView>

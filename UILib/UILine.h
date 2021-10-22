@@ -12,7 +12,7 @@ public:
 
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
-	virtual void DoPaint(CUIDC &dc) const override;
+	virtual void OnPaint(CUIDC &dc) const override;
 
 	COLORREF m_color;
 	int      m_nStyle;

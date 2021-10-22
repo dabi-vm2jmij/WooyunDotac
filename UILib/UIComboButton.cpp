@@ -37,7 +37,7 @@ void CUIComboButton::EndAddChild()
 	}
 
 	int  nWidth = 0, nHeight = 0;
-	UINT nAlign = GetAlign(FRIEND(m_vecChilds[0])->m_offset);
+	UINT nAlign = GetAlign(m_vecChilds[0]->GetOffset());
 
 	if (nAlign == 0 || (nAlign & (nAlign - 1)))
 	{
@@ -47,7 +47,7 @@ void CUIComboButton::EndAddChild()
 
 	for (auto pItem : m_vecChilds)
 	{
-		if (dynamic_cast<CUIButton *>(pItem) == NULL || GetAlign(FRIEND(pItem)->m_offset) != nAlign)
+		if (dynamic_cast<CUIButton *>(pItem) == NULL || GetAlign(pItem->GetOffset()) != nAlign)
 		{
 			ATLASSERT(0);
 			return;
@@ -91,12 +91,12 @@ bool CUIComboButton::OnHitTest(UIHitTest &hitTest)
 	{
 		auto hit = hitTest.items[i];
 
-		if (hit.pItem->IsControl())
+		if (auto pCtrl = dynamic_cast<CUIControl *>(hit.pItem))
 		{
 			if (hit.bEnable)
-				m_hCursor = FRIEND(hit.pItem)->m_hCursor;
+				m_hCursor = pCtrl->GetCursor();
 
-			m_strToolTip = FRIEND(hit.pItem)->m_strToolTip;
+			m_strToolTip = pCtrl->GetToolTip();
 			break;
 		}
 	}
@@ -172,10 +172,10 @@ CUIControl *CUIComboButton::GetHitChild(CPoint point)
 
 	for (auto hit : hitTest)
 	{
-		if (hit.pItem->IsControl())
+		if (auto pCtrl = dynamic_cast<CUIControl *>(hit.pItem))
 		{
 			if (hit.bEnable)
-				return (CUIControl *)hit.pItem;
+				return pCtrl;
 			break;
 		}
 	}

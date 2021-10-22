@@ -42,7 +42,7 @@ CUIResPath::~CUIResPath()
 	}
 }
 
-void CUIResPath::CombinePath(LPWSTR lpDstPath, LPCWSTR lpSrcPath, LPUINT pnSubCnt) const
+void CUIResPath::CombinePath(LPWSTR lpDstPath, LPCWSTR lpSrcPath, UINT *pnSubCnt) const
 {
 	UINT nPreCnt = 0;	// 向上目录数
 
