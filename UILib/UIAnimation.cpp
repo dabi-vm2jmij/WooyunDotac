@@ -7,7 +7,6 @@ CUIAnimation::CUIAnimation(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pP
 
 	m_curImagex = GetImage(lpFileName);
 	SetSize(m_curImagex.Rect().Size());
-	ATLASSERT(m_curImagex.GetFrameCount() > 1);
 }
 
 CUIAnimation::~CUIAnimation()
@@ -34,7 +33,10 @@ void CUIAnimation::OnUITimer()
 void CUIAnimation::Start(bool bLoop)
 {
 	if (m_curImagex.GetFrameCount() < 2)
+	{
+		ATLASSERT(0);
 		return;
+	}
 
 	m_bLoop = bLoop;
 	m_uiTimer.Start(m_nElapse);
@@ -56,9 +58,9 @@ void CUIAnimation::Reset()
 	Stop();
 }
 
-void CUIAnimation::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIAnimation::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"elapse", &nValue))

@@ -48,7 +48,7 @@ bool CUIWnd::CreateFromXml(LPCWSTR lpXmlName, HWND hParent)
 	return UILib::LoadFromXml(lpXmlName, &m_rootView);
 }
 
-void CUIWnd::OnLoadedUI(const IUIXmlAttrs &attrs)
+void CUIWnd::OnLoadUI(const IUIXmlAttrs &attrs)
 {
 	m_nBorderSize = attrs.GetInt(L"border");
 	m_nCaptionHeight = attrs.GetInt(L"caption");

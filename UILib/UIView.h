@@ -18,13 +18,13 @@ class CUIGif;
 class CUIImage;
 class CUILabel;
 class CUILine;
-class CUINotice;
 class CUIProgress;
 class CUIPageView;
+class CUIRollView;
 class CUIScrollView;
 class CUISlider;
-class CUIToolBar;
 class CUIVScroll;
+class CUIToolBar;
 class CUIWebTabBar;
 
 class UILIB_API CUIView : public CUIBase
@@ -54,13 +54,13 @@ public:
 	CUIImage *AddImage(LPCWSTR lpFileName);
 	CUILabel *AddLabel();
 	CUILine *AddLine();
-	CUINotice *AddNotice();
 	CUIProgress *AddProgress(LPCWSTR lpFileName);
 	CUIPageView *AddPageView(LPCWSTR lpFileName);
+	CUIRollView *AddRollView();
 	CUIScrollView *AddScrollView();
-	CUISlider *AddSlider(LPCWSTR lpFileName, LPCWSTR lpFileNameBg);
+	CUISlider *AddSlider(LPCWSTR lpFileName, LPCWSTR lpBgFileName);
+	CUIVScroll *AddVScroll(LPCWSTR lpFileName, LPCWSTR lpBgFileName);
 	CUIToolBar *AddToolBar(LPCWSTR lpFileName);
-	CUIVScroll *AddVScroll(LPCWSTR lpFileName, LPCWSTR lpFileNameBg);
 	CUIWebTabBar *AddWebTabBar(LPCWSTR lpFileName);
 
 protected:

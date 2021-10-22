@@ -25,7 +25,7 @@ public:
 	CRect GetRect() const { return m_rect; }
 	CRect GetWindowRect() const;
 	void InvalidateRect(LPCRECT lpRect);
-	void SetBgColor(COLORREF color) { m_colorBg = color; }
+	void SetBgColor(COLORREF color) { m_bgColor = color; }
 	void SetEnable(bool bEnable);
 	void SetVisible(bool bVisible);
 	bool IsEnabled() const { return m_bEnable; }
@@ -70,7 +70,7 @@ protected:
 		}
 	};
 
-	virtual void OnLoaded(const IUIXmlAttrs &attrs);
+	virtual void OnLoad(const IUIXmlAttrs &attrs);
 	virtual bool OnHitTest(UIHitTest &hitTest) { return false; }
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) { return false; }
 	virtual void OnPaint(CUIDC &dc) const {}
@@ -89,7 +89,7 @@ protected:
 	CRect    m_rect;		// 完整区域，包括不可见部分
 	CRect    m_rcReal;		// 实际可见区域
 	wstring  m_strId;
-	COLORREF m_colorBg;
+	COLORREF m_bgColor;
 	bool     m_bEnable;
 	bool     m_bVisible;
 	bool     m_bControl;	// 是否 CUIControl

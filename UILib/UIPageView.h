@@ -18,7 +18,7 @@ public:
 	UINT GetIndex() const;
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 
 	wstring m_strImage;

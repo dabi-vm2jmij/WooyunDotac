@@ -107,9 +107,9 @@ int CUIToolBar::GetMoreIndex() const
 	return 0;
 }
 
-void CUIToolBar::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIToolBar::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"moreBg"))

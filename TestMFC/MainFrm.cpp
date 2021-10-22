@@ -139,13 +139,13 @@ void CMainFrame::OnTestFunc()
 	MessageBox(_T("TestLib 中有测试功能"), NULL, MB_ICONERROR);
 }
 
-void CMainFrame::OnLoadedUI(const IUIXmlAttrs &attrs)
+void CMainFrame::OnLoadUI(const IUIXmlAttrs &attrs)
 {
-	m_imagexBg = UILib::GetImage(attrs.GetStr(L"背景上"));
-	m_imagexBg2 = UILib::GetImage(attrs.GetStr(L"背景下"));
+	m_bgImagex = UILib::GetImage(attrs.GetStr(L"背景上"));
+	m_bgImagex2 = UILib::GetImage(attrs.GetStr(L"背景下"));
 
 	m_pViews[0] = m_rootView.SearchCast(L"底部");
-	m_pViews[0]->SetHeight(m_imagexBg2.Rect().Height());
+	m_pViews[0]->SetHeight(m_bgImagex2.Rect().Height());
 	m_pViews[1] = m_rootView.SearchCast(L"中部");
 	m_pViews[2] = m_rootView.SearchCast(L"中部2");
 
@@ -179,11 +179,11 @@ void CMainFrame::OnLoadedUI(const IUIXmlAttrs &attrs)
 
 void CMainFrame::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
 {
-	m_imagexBg.BitBlt(dc, lpRect->left, lpRect->top);
+	m_bgImagex.BitBlt(dc, lpRect->left, lpRect->top);
 
-	if (lpRect->bottom - lpRect->top > m_imagexBg.Rect().Height())
+	if (lpRect->bottom - lpRect->top > m_bgImagex.Rect().Height())
 	{
-		m_imagexBg2.BitBlt(dc, lpRect->left, lpRect->bottom - m_imagexBg2.Rect().Height());
+		m_bgImagex2.BitBlt(dc, lpRect->left, lpRect->bottom - m_bgImagex2.Rect().Height());
 	}
 }
 
@@ -191,11 +191,11 @@ void CMainFrame::ShowBottom(bool bShow)
 {
 	m_pViews[0]->SetVisible(bShow);
 
-	int nHeight = m_imagexBg.Rect().Height();
+	int nHeight = m_bgImagex.Rect().Height();
 	if (bShow)
-		nHeight += m_imagexBg2.Rect().Height() - 12;
+		nHeight += m_bgImagex2.Rect().Height() - 12;
 
-	SetWindowPos(NULL, 0, 0, m_imagexBg.Rect().Width(), nHeight, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
+	SetWindowPos(NULL, 0, 0, m_bgImagex.Rect().Width(), nHeight, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE);
 }
 
 void CMainFrame::DoSetup()

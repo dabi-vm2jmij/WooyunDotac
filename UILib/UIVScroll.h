@@ -7,7 +7,7 @@
 class UILIB_API CUIVScroll : public CUIControl
 {
 public:
-	CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg);
+	CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName);
 	virtual ~CUIVScroll();
 
 	void BindChange(function<void(int)> &&fnOnChange) { m_fnOnChange = std::move(fnOnChange); }
@@ -17,7 +17,7 @@ public:
 	int  GetCurPos() const { return (int)(m_fCurPos + 0.5); }
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect) override;
 	virtual void OnLButtonDown(CPoint point) override;

@@ -25,7 +25,7 @@ public:
 	void BindKeyReturn(function<void()> &&fnOnReturn) { m_fnOnReturn = std::move(fnOnReturn); }
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void DoPaint(CUIDC &dc) const override;
 	virtual void OnEnable(bool bEnable) override;

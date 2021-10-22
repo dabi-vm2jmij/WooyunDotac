@@ -14,7 +14,7 @@ public:
 	void CloseMoreWnd();
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual void OnMoreBtn();
 	int  GetMoreIndex() const;

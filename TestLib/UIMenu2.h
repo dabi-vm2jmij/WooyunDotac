@@ -9,5 +9,5 @@ private:
 	BYTE GetWndAlpha() const override { return 230; }
 	void DrawBg(CUIDC &dc, LPCRECT lpRect) override;
 
-	CImagex m_imagexBg;
+	CImagex m_bgImagex;
 };

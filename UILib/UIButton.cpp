@@ -6,7 +6,9 @@ CUIButton::CUIButton(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent)
 	if (lpFileName == NULL)
 		return;
 
-	ResetImages(m_imagexs, SplitImage(lpFileName, m_imagexs));
+	Fill4States(m_imagexs, SplitImage(lpFileName, m_imagexs));
+	SetCurImage(m_imagexs[m_btnState]);
+	SetSize(m_imagexs[0].Rect().Size());
 }
 
 CUIButton::~CUIButton()
@@ -19,8 +21,8 @@ void CUIButton::ResetImages(const CImagex imagexs[], int nCount)
 		m_imagexs[i] = imagexs[i];
 
 	Fill4States(m_imagexs, nCount);
-	SetSize(m_imagexs[0].Rect().Size());
 	SetCurImage(m_imagexs[m_btnState]);
+	SetSize(m_imagexs[0].Rect().Size());
 }
 
 // 不足4态的图片扩展成4态：3态为（0、1、2、0），2态为（0、1、1、0）

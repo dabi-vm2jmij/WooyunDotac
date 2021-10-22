@@ -2,13 +2,13 @@
 
 #include "UIView.h"
 
-// 滚动提示，可以滚动任何控件，最常用为从上向下滚动广告文字
+// 可以滚动任何控件，最常用为从上向下滚动广告文字
 
-class UILIB_API CUINotice : public CUIView
+class UILIB_API CUIRollView : public CUIView
 {
 public:
-	CUINotice(CUIView *pParent);
-	virtual ~CUINotice();
+	CUIRollView(CUIView *pParent);
+	virtual ~CUIRollView();
 
 	enum Dir { ToLeft, ToTop, ToRight, ToBottom };
 
@@ -18,7 +18,7 @@ public:
 	void Stop();
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	void OnUITimer();
 

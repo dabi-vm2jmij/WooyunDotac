@@ -18,7 +18,7 @@ public:
 	virtual LPCWSTR GetToolTip() const { return m_strToolTip.c_str(); }
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
 	virtual bool OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	virtual void OnPaint(CUIDC &dc) const override;

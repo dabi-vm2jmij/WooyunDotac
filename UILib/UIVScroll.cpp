@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "UIVScroll.h"
 
-CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg) : CUIControl(pParent), m_nWheelRate(20), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
+CUIVScroll::CUIVScroll(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_nWheelRate(20), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
 {
-	if (lpFileNameBg)
+	if (lpBgFileName)
 	{
-		CUIImage *pImage = AddImage(lpFileNameBg);
+		CUIImage *pImage = AddImage(lpBgFileName);
 		pImage->SetHeight(0);
 		pImage->SetStretch(true);
 	}
@@ -147,9 +147,9 @@ void CUIVScroll::ResetOffset(int nOffset, bool bSetPos)
 		m_fnOnChange(GetCurPos());
 }
 
-void CUIVScroll::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIVScroll::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	if (int nRate = attrs.GetInt(L"wheelRate"))
 		SetWheelRate(nRate);

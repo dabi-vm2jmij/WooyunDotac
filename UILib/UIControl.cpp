@@ -155,9 +155,9 @@ void CUIControl::SetCurImage(const CImagex &imagex)
 	}
 }
 
-void CUIControl::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIControl::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"stretch", &nValue) && nValue)

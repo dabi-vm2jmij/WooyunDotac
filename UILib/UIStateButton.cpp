@@ -102,9 +102,9 @@ void CUIStateButton::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIStateButton::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIStateButton::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	EndAddChild();
 

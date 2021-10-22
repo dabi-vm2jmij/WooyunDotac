@@ -16,7 +16,7 @@ public:
 protected:
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 	virtual void PostNcDestroy();
-	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);

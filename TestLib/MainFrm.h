@@ -18,7 +18,7 @@ private:
 	END_MSG_MAP()
 
 	void OnFinalMessage(HWND hWnd) override;
-	void OnLoadedUI(const IUIXmlAttrs &attrs) override;
+	void OnLoadUI(const IUIXmlAttrs &attrs) override;
 	int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	void OnClose() override;
 	LRESULT OnShowAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled);
@@ -30,8 +30,8 @@ private:
 	void DoSetup();
 	static UINT WINAPI WorkThread(LPVOID pParam);
 
-	CImagex      m_imagexBg;
-	CImagex      m_imagexBg2;
+	CImagex      m_bgImagex;
+	CImagex      m_bgImagex2;
 	CUIView     *m_pViews[3];
 	CUIProgress *m_pProgress;
 	HANDLE       m_hThread;

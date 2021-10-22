@@ -48,9 +48,9 @@ void CUILine::DoPaint(CUIDC &dc) const
 	}
 }
 
-void CUILine::OnLoaded(const IUIXmlAttrs &attrs)
+void CUILine::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	if (LPCWSTR lpStr = attrs.GetStr(L"color"))
 	{

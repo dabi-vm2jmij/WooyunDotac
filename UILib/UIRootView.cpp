@@ -290,8 +290,8 @@ void CUIRootView::DoPaint(HDC hDC, LPCRECT lpClipRect) const
 	CUIDC dc(hDC, lpClipRect, m_bLayered);
 	SetBkMode(dc, TRANSPARENT);
 
-	if (m_colorBg != -1)
-		dc.FillSolidRect(m_rect, m_colorBg);
+	if (m_bgColor != -1)
+		dc.FillSolidRect(m_rect, m_bgColor);
 	else
 		m_pOwner->OnDrawBg(dc, m_rect);
 
@@ -598,9 +598,9 @@ CUIView *CUIRootView::OnCustomUI(LPCWSTR lpName, CUIView *pParent)
 	return m_pOwner->OnCustomUI(lpName, pParent);
 }
 
-void CUIRootView::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIRootView::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
-	m_pOwner->OnLoadedUI(attrs);
+	m_pOwner->OnLoadUI(attrs);
 }

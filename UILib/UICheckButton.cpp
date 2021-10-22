@@ -36,9 +36,9 @@ void CUICheckButton::OnButtonState(ButtonState btnState)
 	__super::OnButtonState(m_bCheck ? Press : btnState);
 }
 
-void CUICheckButton::OnLoaded(const IUIXmlAttrs &attrs)
+void CUICheckButton::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"check", &nValue) && nValue)

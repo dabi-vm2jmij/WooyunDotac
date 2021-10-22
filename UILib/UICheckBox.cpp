@@ -55,9 +55,9 @@ void CUICheckBox::OnTextSize(CSize size)
 	SetSize({ m_imagexs[0].Rect().Width() + m_nTextLeft + size.cx, max(m_imagexs[0].Rect().Height(), size.cy) });
 }
 
-void CUICheckBox::OnLoaded(const IUIXmlAttrs &attrs)
+void CUICheckBox::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"textLeft", &nValue))
@@ -66,5 +66,5 @@ void CUICheckBox::OnLoaded(const IUIXmlAttrs &attrs)
 	if (attrs.GetInt(L"check", &nValue) && nValue)
 		SetCheck(true);
 
-	OnLoadedText(attrs);
+	OnLoadText(attrs);
 }

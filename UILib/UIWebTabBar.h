@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIView.h"
+#include "UIWebTab.h"
 
 // ä¯ÀÀÆ÷±êÇ©À¸
 
@@ -22,7 +22,7 @@ public:
 	void SelectPrev();
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void CalcRect(LPRECT lpRect, LPRECT lpClipRect) override;
 	virtual void RecalcLayout(LPRECT lpClipRect) override;
 	virtual void OnChildMoving(CUIControl *, CPoint point) override;

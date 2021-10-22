@@ -1,15 +1,17 @@
 #include "stdafx.h"
 #include "UIGif.h"
 
-CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_bLoop(false), m_nFrameIdx(0), m_uiTimer([this]{ OnUITimer(); })
+CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_pImage(NULL), m_bLoop(false), m_nFrameIdx(0), m_uiTimer([this]{ OnUITimer(); })
 {
 	m_bClickable = false;
 
-	IStream *pStream = GetStream(lpFileName);
-	m_pImage = new Gdiplus::Image(pStream);
-	pStream->Release();
+	if (auto pStream = GetStream(lpFileName))
+	{
+		m_pImage = new Gdiplus::Image(pStream);
+		pStream->Release();
+	}
 
-	if (m_pImage->GetLastStatus() != Gdiplus::Ok)
+	if (m_pImage == NULL || m_pImage->GetLastStatus() != Gdiplus::Ok)
 		return;
 
 	SetSize(CSize(m_pImage->GetWidth(), m_pImage->GetHeight()));
@@ -17,7 +19,7 @@ CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_bL
 	UINT nCount = m_pImage->GetFrameDimensionsCount();
 	GUID *pDimensionIDs = (GUID *)alloca(sizeof(GUID) * nCount + 1);
 
-	if (nCount == 0 || m_pImage->GetFrameDimensionsList(pDimensionIDs, nCount) != Gdiplus::Ok || (nCount = m_pImage->GetFrameCount(&pDimensionIDs[0])) < 2)
+	if (nCount == 0 || m_pImage->GetFrameDimensionsList(pDimensionIDs, nCount) != Gdiplus::Ok || (nCount = m_pImage->GetFrameCount(&pDimensionIDs[0])) == 0)
 		return;
 
 	UINT nSize = m_pImage->GetPropertyItemSize(PropertyTagFrameDelay);
@@ -37,7 +39,8 @@ CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_bL
 
 CUIGif::~CUIGif()
 {
-	delete m_pImage;
+	if (m_pImage)
+		delete m_pImage;
 }
 
 void CUIGif::DoPaint(CUIDC &dc) const
@@ -66,8 +69,11 @@ void CUIGif::OnUITimer()
 
 void CUIGif::Start(bool bLoop)
 {
-	if (m_vecElapses.empty())
+	if (m_vecElapses.size() < 2)
+	{
+		ATLASSERT(0);
 		return;
+	}
 
 	m_bLoop = bLoop;
 	m_uiTimer.Start(m_vecElapses[m_nFrameIdx]);

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIBase.h"
 
-CUIBase::CUIBase(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0), m_colorBg(-1)
+CUIBase::CUIBase(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0), m_bgColor(-1)
 	, m_bEnable(true), m_bVisible(true), m_bControl(false), m_bMouseEnter(false)
 {
 }
@@ -177,7 +177,7 @@ void CUIBase::MySetRect(CRect &rect, CRect &rcReal, LPRECT lpClipRect)
 
 	if (rcOld != rect || m_rcReal != rcReal)
 	{
-		if (lpClipRect && (IsControl() || m_colorBg != -1))
+		if (lpClipRect && (IsControl() || m_bgColor != -1))
 		{
 			UnionRect(lpClipRect, lpClipRect, m_rcReal);
 			UnionRect(lpClipRect, lpClipRect, rcReal);
@@ -196,8 +196,8 @@ void CUIBase::MyPaint(CUIDC &dc) const
 	if (dc.GetRealRect(rect))
 	{
 		// Ìî³ä±³¾°É«
-		if (m_colorBg != -1)
-			dc.FillSolidRect(m_rcReal, m_colorBg);
+		if (m_bgColor != -1)
+			dc.FillSolidRect(m_rcReal, m_bgColor);
 
 		if (m_rect != m_rcReal || dynamic_cast<const CUIEdit *>(this))
 		{
@@ -317,7 +317,7 @@ static int Str2Offset(LPCWSTR lpStr)
 	return Int2Offset(nValue, *lpEnd == '*');
 }
 
-void CUIBase::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIBase::OnLoad(const IUIXmlAttrs &attrs)
 {
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"id"))

@@ -404,7 +404,7 @@ void CUITextImpl::RecalcSize()
 		OnTextSize(m_sizeText = size);
 }
 
-void CUITextImpl::OnLoadedText(const IUIXmlAttrs &attrs)
+void CUITextImpl::OnLoadText(const IUIXmlAttrs &attrs)
 {
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"font"))

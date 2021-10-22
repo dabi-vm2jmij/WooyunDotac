@@ -112,9 +112,9 @@ void CUIButtonEx::OnButtonState(ButtonState btnState)
 	__super::OnButtonState(btnState);
 }
 
-void CUIButtonEx::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIButtonEx::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	if (LPCWSTR lpFileName = attrs.GetStr(L"icon"))
 		SetIconImage(lpFileName, attrs.GetInt(L"iconLeft", m_nIconLeft));
@@ -126,7 +126,7 @@ void CUIButtonEx::OnLoaded(const IUIXmlAttrs &attrs)
 	if (attrs.GetInt(L"underline", &nValue) && nValue)
 		SetUnderline(true);
 
-	OnLoadedText(attrs);
+	OnLoadText(attrs);
 
 	// ËÄÌ¬ÑÕÉ«£ºcolor0¡¢color1¡¢color2¡¢color3
 	COLORREF colors[4] = {};

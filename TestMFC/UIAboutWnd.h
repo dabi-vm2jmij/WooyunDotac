@@ -13,5 +13,5 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 protected:
-	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;
 };

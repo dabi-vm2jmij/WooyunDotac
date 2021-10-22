@@ -10,7 +10,7 @@ public:
 	void BindInitUI(function<void(const IUIXmlAttrs &)> &&fnInitUI) { m_fnInitUI = std::move(fnInitUI); }
 
 private:
-	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) override;
 	virtual void OnWindowPosChanging(WINDOWPOS *lpWndPos) override;
 
@@ -18,12 +18,12 @@ private:
 	function<void(const IUIXmlAttrs &)> m_fnInitUI;
 };
 
-inline void CUISimpleWnd::OnLoadedUI(const IUIXmlAttrs &attrs)
+inline void CUISimpleWnd::OnLoadUI(const IUIXmlAttrs &attrs)
 {
 	if (m_fnInitUI)
 		m_fnInitUI(attrs);
 
-	__super::OnLoadedUI(attrs);
+	__super::OnLoadUI(attrs);
 }
 
 inline int CUISimpleWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)

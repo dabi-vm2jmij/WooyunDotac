@@ -6,8 +6,8 @@ CTabDemoWnd::CTabDemoWnd() : m_pWebTabBar(NULL), m_pTabView(NULL)
 	m_nBorderSize = 4;
 	m_nCaptionHeight = 36;
 
-	m_imagexBg = UILib::GetImage(L"例子1\\主背景.png");
-	m_imagexBg2 = UILib::GetImage(L"例子1\\工具栏bg.png");
+	m_bgImagex = UILib::GetImage(L"例子1\\主背景.png");
+	m_bgImagex2 = UILib::GetImage(L"例子1\\工具栏bg.png");
 }
 
 CTabDemoWnd::~CTabDemoWnd()
@@ -197,11 +197,11 @@ void CTabDemoWnd::DelWebTab(CUIWebTab *pWebTab)
 void CTabDemoWnd::OnDrawBg(CUIDC &dc, LPCRECT lpRect) const
 {
 	CRect rect(lpRect);
-	m_imagexBg.StretchBlt(dc, rect);
+	m_bgImagex.StretchBlt(dc, rect);
 
 	rect.DeflateRect(m_nBorderSize, 36);
-	rect.bottom = rect.top + m_imagexBg2.Rect().Height();
-	m_imagexBg2.Draw(dc, rect);
+	rect.bottom = rect.top + m_bgImagex2.Rect().Height();
+	m_bgImagex2.Draw(dc, rect);
 
 	rect.top = rect.bottom;
 	rect.bottom = lpRect->bottom - m_nBorderSize;
@@ -212,23 +212,23 @@ void CTabDemoWnd::OnSize(UINT nType, CSize size)
 {
 	__super::OnSize(nType, size);
 
-	if (m_sizeBg.cx != size.cx)
+	if (m_bgSize.cx != size.cx)
 	{
-		CRect rect(m_sizeBg.cx, 0, size.cx, min(m_sizeBg.cy, size.cy));
+		CRect rect(m_bgSize.cx, 0, size.cx, size.cy);
 		rect.NormalizeRect();
 		rect.left -= m_nBorderSize;
 		InvalidateRect(rect);
 	}
 
-	if (m_sizeBg.cy != size.cy)
+	if (m_bgSize.cy != size.cy)
 	{
-		CRect rect(0, m_sizeBg.cy, min(m_sizeBg.cx, size.cx), size.cy);
+		CRect rect(0, m_bgSize.cy, size.cx, size.cy);
 		rect.NormalizeRect();
 		rect.top -= m_nBorderSize;
 		InvalidateRect(rect);
 	}
 
-	m_sizeBg = size;
+	m_bgSize = size;
 }
 
 void CTabDemoWnd::OnGetMinMaxInfo(MINMAXINFO *lpMMI)

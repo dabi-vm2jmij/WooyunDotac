@@ -48,9 +48,9 @@ void CUIProgress::SetValue(int nCurPos, int nMaxPos)
 	InvalidateRect(NULL);
 }
 
-void CUIProgress::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIProgress::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nCurPos, nMaxPos;
 	if (attrs.GetInt(L"curPos", &nCurPos) && attrs.GetInt(L"maxPos", &nMaxPos))

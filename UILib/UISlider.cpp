@@ -1,21 +1,21 @@
 #include "stdafx.h"
 #include "UISlider.h"
 
-CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpFileNameBg) : CUIControl(pParent), m_pProgress(NULL), m_nMaxPos(100), m_fCurPos(0)
+CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_pProgress(NULL), m_nMaxPos(100), m_fCurPos(0)
 {
-	if (lpFileNameBg)
+	if (lpBgFileName)
 	{
-		CImagex imagexBg = GetImage(lpFileNameBg);
+		CImagex imagex = GetImage(lpBgFileName);
 
-		if (imagexBg.GetFrameCount() < 2)
+		if (imagex.GetFrameCount() < 2)
 		{
-			CUIImage *pImage = AddImage(lpFileNameBg);
+			CUIImage *pImage = AddImage(lpBgFileName);
 			pImage->SetWidth(0);
 			pImage->SetStretch(true);
 		}
 		else
 		{
-			m_pProgress = AddProgress(lpFileNameBg);
+			m_pProgress = AddProgress(lpBgFileName);
 			m_pProgress->SetWidth(0);
 		}
 	}
@@ -137,9 +137,9 @@ void CUISlider::ResetOffset(int nOffset, bool bSetPos)
 		m_fnOnChange(GetCurPos());
 }
 
-void CUISlider::OnLoaded(const IUIXmlAttrs &attrs)
+void CUISlider::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"maxPos", &nValue))

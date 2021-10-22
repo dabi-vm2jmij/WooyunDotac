@@ -183,9 +183,9 @@ CUIControl *CUIComboButton::GetHitChild(CPoint point)
 	return NULL;
 }
 
-void CUIComboButton::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIComboButton::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	EndAddChild();
 }

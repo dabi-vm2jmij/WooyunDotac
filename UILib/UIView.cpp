@@ -298,13 +298,6 @@ CUILine *CUIView::AddLine()
 	return pItem;
 }
 
-CUINotice *CUIView::AddNotice()
-{
-	auto pItem = new CUINotice(this);
-	PushBackChild(pItem);
-	return pItem;
-}
-
 CUIProgress *CUIView::AddProgress(LPCWSTR lpFileName)
 {
 	auto pItem = new CUIProgress(this, lpFileName);
@@ -319,6 +312,13 @@ CUIPageView *CUIView::AddPageView(LPCWSTR lpFileName)
 	return pItem;
 }
 
+CUIRollView *CUIView::AddRollView()
+{
+	auto pItem = new CUIRollView(this);
+	PushBackChild(pItem);
+	return pItem;
+}
+
 CUIScrollView *CUIView::AddScrollView()
 {
 	auto pItem = new CUIScrollView(this);
@@ -326,9 +326,16 @@ CUIScrollView *CUIView::AddScrollView()
 	return pItem;
 }
 
-CUISlider *CUIView::AddSlider(LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
+CUISlider *CUIView::AddSlider(LPCWSTR lpFileName, LPCWSTR lpBgFileName)
 {
-	auto pItem = new CUISlider(this, lpFileName, lpFileNameBg);
+	auto pItem = new CUISlider(this, lpFileName, lpBgFileName);
+	PushBackChild(pItem);
+	return pItem;
+}
+
+CUIVScroll *CUIView::AddVScroll(LPCWSTR lpFileName, LPCWSTR lpBgFileName)
+{
+	auto pItem = new CUIVScroll(this, lpFileName, lpBgFileName);
 	PushBackChild(pItem);
 	return pItem;
 }
@@ -336,13 +343,6 @@ CUISlider *CUIView::AddSlider(LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
 CUIToolBar *CUIView::AddToolBar(LPCWSTR lpFileName)
 {
 	auto pItem = new CUIToolBar(this, lpFileName);
-	PushBackChild(pItem);
-	return pItem;
-}
-
-CUIVScroll *CUIView::AddVScroll(LPCWSTR lpFileName, LPCWSTR lpFileNameBg)
-{
-	auto pItem = new CUIVScroll(this, lpFileName, lpFileNameBg);
 	PushBackChild(pItem);
 	return pItem;
 }

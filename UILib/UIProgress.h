@@ -13,7 +13,7 @@ public:
 	void SetValue(int nCurPos, int nMaxPos = 0);
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void DoPaint(CUIDC &dc) const override;
 
 	CImagex m_imagexs[2];

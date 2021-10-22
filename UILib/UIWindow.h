@@ -14,7 +14,7 @@ public:
 
 protected:
 	virtual void OnFinalMessage(HWND hWnd) override { delete this; }
-	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 	virtual void OnClose() { DefWindowProc(); }
 	virtual int  OnCreate(LPCREATESTRUCT lpCreateStruct) { return DefWindowProc(); }
@@ -43,7 +43,7 @@ inline bool CUIWindow::CreateFromXml(LPCWSTR lpXmlName, HWND hParent)
 	return UILib::LoadFromXml(lpXmlName, &m_rootView);
 }
 
-inline void CUIWindow::OnLoadedUI(const IUIXmlAttrs &attrs)
+inline void CUIWindow::OnLoadUI(const IUIXmlAttrs &attrs)
 {
 	m_nBorderSize = attrs.GetInt(L"border");
 	m_nCaptionHeight = attrs.GetInt(L"caption");

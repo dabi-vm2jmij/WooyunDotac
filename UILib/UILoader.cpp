@@ -126,7 +126,7 @@ bool CUILoader::Load(tinyxml2::XMLElement *pElem, CUIView *pView)
 	if (!LoadView(pElem, pView))
 		return false;
 
-	pView->OnLoaded(CUIXmlAttrs(*this, pElem));
+	pView->OnLoad(CUIXmlAttrs(*this, pElem));
 	return true;
 }
 
@@ -219,10 +219,6 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddLine();
 	}
-	else if (_stricmp(lpName, "Notice") == 0)
-	{
-		pView = pParent->AddNotice();
-	}
 	else if (_stricmp(lpName, "Progress") == 0)
 	{
 		pView = pParent->AddProgress(lpFileName);
@@ -231,21 +227,25 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddPageView(lpFileName);
 	}
+	else if (_stricmp(lpName, "RollView") == 0)
+	{
+		pView = pParent->AddRollView();
+	}
 	else if (_stricmp(lpName, "ScrollView") == 0)
 	{
 		pView = pParent->AddScrollView();
 	}
 	else if (_stricmp(lpName, "Slider") == 0)
 	{
-		pView = pParent->AddSlider(lpFileName, attrs.GetStr(L"imageBg"));
+		pView = pParent->AddSlider(lpFileName, attrs.GetStr(L"bgImage"));
+	}
+	else if (_stricmp(lpName, "VScroll") == 0)
+	{
+		pView = pParent->AddVScroll(lpFileName, attrs.GetStr(L"bgImage"));
 	}
 	else if (_stricmp(lpName, "ToolBar") == 0)
 	{
 		pView = pParent->AddToolBar(lpFileName);
-	}
-	else if (_stricmp(lpName, "VScroll") == 0)
-	{
-		pView = pParent->AddVScroll(lpFileName, attrs.GetStr(L"imageBg"));
 	}
 	else if (_stricmp(lpName, "WebTabBar") == 0)
 	{
@@ -264,7 +264,7 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	if (!LoadView(pElem, pView))
 		return false;
 
-	pView->OnLoaded(attrs);
+	pView->OnLoad(attrs);
 	return true;
 }
 
@@ -306,7 +306,7 @@ bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 {
 	bool bRet = false;
 
-	if (CUIStream *pStream = GetStream(lpXmlName))
+	if (auto pStream = GetStream(lpXmlName))
 	{
 		CUILoader loader;
 		bRet = loader.Load(pStream, pView);

@@ -20,9 +20,9 @@ void CUILabel::OnTextSize(CSize size)
 	SetSize(size);
 }
 
-void CUILabel::OnLoaded(const IUIXmlAttrs &attrs)
+void CUILabel::OnLoad(const IUIXmlAttrs &attrs)
 {
-	OnLoadedText(attrs);
+	OnLoadText(attrs);
 
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 }

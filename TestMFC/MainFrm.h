@@ -19,7 +19,7 @@ public:
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
-	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;
 	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const override;
 	virtual HWND GetHwnd() const override { return m_hWnd; }
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -35,8 +35,8 @@ protected:
 	static UINT WINAPI WorkThread(LPVOID pParam);
 
 	CUIRootView  m_rootView;
-	CImagex      m_imagexBg;
-	CImagex      m_imagexBg2;
+	CImagex      m_bgImagex;
+	CImagex      m_bgImagex2;
 	CUIView     *m_pViews[3];
 	CUIProgress *m_pProgress;
 	CUIMenu      m_uiMenu;

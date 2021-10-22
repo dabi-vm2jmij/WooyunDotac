@@ -6,7 +6,7 @@ class IUIWindow
 {
 public:
 	virtual CUIView *OnCustomUI(LPCWSTR lpName, CUIView *pParent) { return NULL; }
-	virtual void OnLoadedUI(const IUIXmlAttrs &attrs) {}
+	virtual void OnLoadUI(const IUIXmlAttrs &attrs) {}
 	virtual void OnDrawBg(CUIDC &dc, LPCRECT lpRect) const {}
 	virtual HWND GetHwnd() const = 0;
 };
@@ -35,7 +35,7 @@ public:
 
 protected:
 	virtual void ShowToolTip(LPCWSTR lpTipText);
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	bool OnNcHitTest(CPoint point);
 	void OnSize(CSize size);
 	void OnPaint();

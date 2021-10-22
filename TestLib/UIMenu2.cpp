@@ -8,8 +8,8 @@ void CUIMenu2::GetMargins(LPRECT lpRect) const
 
 void CUIMenu2::DrawBg(CUIDC &dc, LPCRECT lpRect)
 {
-	if (!m_imagexBg)
-		m_imagexBg = UILib::GetImage(L"²Ëµ¥bg.png");
+	if (!m_bgImagex)
+		m_bgImagex = UILib::GetImage(L"²Ëµ¥bg.png");
 
-	m_imagexBg.StretchDraw(dc, *lpRect, false);
+	m_bgImagex.StretchDraw(dc, *lpRect, false);
 }

@@ -1,15 +1,15 @@
 #include "stdafx.h"
-#include "UINotice.h"
+#include "UIRollView.h"
 
-CUINotice::CUINotice(CUIView *pParent) : CUIView(pParent), m_dir(ToBottom), m_nElapse(2000), m_bRunning(false), m_nCurPos(0), m_uiTimer([this]{ OnUITimer(); })
+CUIRollView::CUIRollView(CUIView *pParent) : CUIView(pParent), m_dir(ToBottom), m_nElapse(2000), m_bRunning(false), m_nCurPos(0), m_uiTimer([this]{ OnUITimer(); })
 {
 }
 
-CUINotice::~CUINotice()
+CUIRollView::~CUIRollView()
 {
 }
 
-void CUINotice::RecalcLayout(LPRECT lpClipRect)
+void CUIRollView::RecalcLayout(LPRECT lpClipRect)
 {
 	if (m_rect.left == MAXINT16 || m_vecChilds.empty())
 		return;
@@ -57,7 +57,7 @@ void CUINotice::RecalcLayout(LPRECT lpClipRect)
 	FRIEND(m_vecChilds[nIndex2])->CalcRect(rect + size, lpClipRect);
 }
 
-void CUINotice::OnUITimer()
+void CUIRollView::OnUITimer()
 {
 	m_nCurPos = (m_nCurPos + 1) % (m_vecChilds.size() * 10);
 	InvalidateLayout();
@@ -70,7 +70,7 @@ void CUINotice::OnUITimer()
 		m_uiTimer.Stop();
 }
 
-void CUINotice::Start()
+void CUIRollView::Start()
 {
 	if (m_vecChilds.size() < 2)
 		return;
@@ -81,14 +81,14 @@ void CUINotice::Start()
 		m_uiTimer.Start(m_nElapse);
 }
 
-void CUINotice::Stop()
+void CUIRollView::Stop()
 {
 	m_bRunning = false;
 }
 
-void CUINotice::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIRollView::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"elapse", &nValue))

@@ -887,9 +887,9 @@ void CUIEdit::CheckMaxText(LPCWSTR lpExist, LPWSTR lpText) const
 	}
 }
 
-void CUIEdit::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIEdit::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"font"))

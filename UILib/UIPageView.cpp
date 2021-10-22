@@ -113,9 +113,9 @@ void CUIPageView::RecalcLayout(LPRECT lpClipRect)
 	}
 }
 
-void CUIPageView::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIPageView::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"space", &nValue))

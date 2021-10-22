@@ -18,7 +18,7 @@ public:
 	virtual LPCWSTR GetToolTip() const override;
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual bool OnHitTest(UIHitTest &hitTest) override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;

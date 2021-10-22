@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "UIWebTabBar.h"
-#include "UIWebTab.h"
 
 CUIWebTabBar::CUIWebTabBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent), m_nTabWidth(100), m_nTabSpace(0)
 {
@@ -219,9 +218,9 @@ void CUIWebTabBar::OnChildMoved(CUIControl *pCtrl, CPoint point)
 	pCtrl->SetLeft(MAXINT16);
 }
 
-void CUIWebTabBar::OnLoaded(const IUIXmlAttrs &attrs)
+void CUIWebTabBar::OnLoad(const IUIXmlAttrs &attrs)
 {
-	__super::OnLoaded(attrs);
+	__super::OnLoad(attrs);
 
 	int nValue;
 	if (attrs.GetInt(L"tabWidth", &nValue))

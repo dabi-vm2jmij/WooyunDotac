@@ -14,7 +14,7 @@ public:
 	bool IsChecked() const { return m_bCheck; }
 
 protected:
-	virtual void OnLoaded(const IUIXmlAttrs &attrs) override;
+	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void OnLButtonUp(CPoint point) override;
 	virtual void OnButtonState(ButtonState btnState) override;
 	virtual void OnChecked() {}

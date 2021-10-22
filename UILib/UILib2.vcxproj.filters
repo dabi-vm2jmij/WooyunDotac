@@ -147,7 +147,7 @@
     <ClInclude Include="UIMenuWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="UINotice.h">
+    <ClInclude Include="UIRollView.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="UIEdit.h">
@@ -293,7 +293,7 @@
     <ClCompile Include="UIMenuWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UINotice.cpp">
+    <ClCompile Include="UIRollView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIEdit.cpp">
