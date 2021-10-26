@@ -8,10 +8,10 @@ class UILIB_API CUIButton : public CUIControl
 {
 public:
 	CUIButton(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIButton();
 
 	enum ButtonState { Normal, Hover, Press, Disable };
 
+	void BindHover(function<void(bool)> &&fnOnHover) { m_fnOnHover = std::move(fnOnHover); }
 	void BindClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 	void SetImage(const CImagex &imagex);
 	void SetImages(const CImagex imagexs[], int nCount);
@@ -27,5 +27,6 @@ protected:
 
 	CImagex     m_imagexs[4];
 	ButtonState m_btnState;
+	function<void(bool)> m_fnOnHover;
 	function<void()> m_fnOnClick;
 };

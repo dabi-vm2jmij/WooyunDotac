@@ -24,11 +24,14 @@ CUITimer::~CUITimer()
 
 bool CUITimer::Start(UINT nElapse)
 {
-	if (m_pThunk == NULL && (m_pThunk = new _stdcallthunk) == NULL)
-		return false;
+	if (m_pThunk == NULL)
+	{
+		if ((m_pThunk = new _stdcallthunk) == NULL)
+			return false;
 
-	auto pfProc = &CUITimer::MyProc;
-	m_pThunk->Init((DWORD &)pfProc, this);
+		auto pfProc = &CUITimer::MyProc;
+		m_pThunk->Init((DWORD &)pfProc, this);
+	}
 
 	if (m_nTimerId = SetTimer(NULL, m_nTimerId, nElapse, (TIMERPROC)m_pThunk->GetCodeAddress()))
 		return true;

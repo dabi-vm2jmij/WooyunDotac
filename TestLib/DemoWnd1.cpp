@@ -9,10 +9,6 @@ CDemoWnd1::CDemoWnd1() : m_pWebTabBar(NULL), m_pTabView(NULL)
 	m_nCaptionSize = 36;
 }
 
-CDemoWnd1::~CDemoWnd1()
-{
-}
-
 void CDemoWnd1::OnCreate()
 {
 	__super::OnCreate();

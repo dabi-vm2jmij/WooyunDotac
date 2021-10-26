@@ -5,10 +5,6 @@ CUIStateButton::CUIStateButton(CUIView *pParent) : CUIControl(pParent), m_nState
 {
 }
 
-CUIStateButton::~CUIStateButton()
-{
-}
-
 void CUIStateButton::EndAddChild()
 {
 	if (m_vecChilds.size() < 2)

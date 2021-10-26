@@ -8,7 +8,6 @@ class UILIB_API CUIAnimation : public CUIControl
 {
 public:
 	CUIAnimation(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIAnimation();
 
 	void SetElapse(UINT nElapse) { m_nElapse = nElapse; }
 	void Start(bool bLoop = true);

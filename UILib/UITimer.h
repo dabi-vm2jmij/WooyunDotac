@@ -9,6 +9,7 @@ public:
 
 	bool Start(UINT nElapse);
 	void Stop();
+	bool Running() const { return m_nTimerId != 0; }
 
 private:
 	void CALLBACK MyProc(UINT, UINT_PTR, DWORD);

@@ -9,10 +9,11 @@ public:
 	virtual ~CUITextImpl();
 
 	void SetFont(HFONT hFont);
+	HFONT GetFont() const { return m_hFont; }
 	void SetTextColor(COLORREF color);
-	void SetMaxWidth(int nWidth);
 	void SetText(LPCWSTR lpText);
 	LPCWSTR GetText() const { return m_strText.c_str(); }
+	void SetMaxWidth(int nWidth);
 	CSize GetTextSize() const { return m_textSize; }
 
 protected:

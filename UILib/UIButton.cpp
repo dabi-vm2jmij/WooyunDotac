@@ -10,10 +10,6 @@ CUIButton::CUIButton(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent)
 	}
 }
 
-CUIButton::~CUIButton()
-{
-}
-
 // 不足4态的图片扩展成4态
 static void Fill4Images(CImagex imagexs[], int nCount)
 {
@@ -78,12 +74,18 @@ void CUIButton::OnMouseEnter()
 
 	if (m_btnState == Normal)
 		OnButtonState(Hover);
+
+	if (m_fnOnHover)
+		m_fnOnHover(true);
 }
 
 void CUIButton::OnMouseLeave()
 {
 	if (m_btnState != Disable)
 		OnButtonState(Normal);
+
+	if (m_fnOnHover)
+		m_fnOnHover(false);
 
 	__super::OnMouseLeave();
 }

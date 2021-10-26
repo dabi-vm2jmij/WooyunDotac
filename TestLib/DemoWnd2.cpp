@@ -5,10 +5,6 @@ CDemoWnd2::CDemoWnd2()
 {
 }
 
-CDemoWnd2::~CDemoWnd2()
-{
-}
-
 void CDemoWnd2::OnLoadUI(const IUIXmlAttrs &attrs)
 {
 	auto pBtnMax = dynamic_cast<CUIStateButton *>(m_rootView.Search(L"×î´ó»¯"));

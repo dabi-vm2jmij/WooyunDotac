@@ -8,7 +8,6 @@ class UILIB_API CUIPageCtrl : public CUIView
 {
 public:
 	CUIPageCtrl(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIPageCtrl();
 
 	void BindChange(function<void(int)> &&fnOnChange) { m_fnOnChange = std::move(fnOnChange); }
 	void SetSpacing(int nSpacing) { m_nSpacing = nSpacing; }

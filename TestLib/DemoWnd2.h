@@ -4,7 +4,6 @@ class CDemoWnd2 : public CUIWindow
 {
 public:
 	CDemoWnd2();
-	~CDemoWnd2();
 
 private:
 	virtual void OnLoadUI(const IUIXmlAttrs &attrs) override;

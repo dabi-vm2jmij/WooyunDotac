@@ -5,10 +5,6 @@ CUIComboButton::CUIComboButton(CUIView *pParent) : CUIControl(pParent), m_bNoLea
 {
 }
 
-CUIComboButton::~CUIComboButton()
-{
-}
-
 static UINT GetAlign(const CRect &offset)
 {
 	UINT nAlign = 0;

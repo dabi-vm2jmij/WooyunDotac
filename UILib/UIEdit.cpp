@@ -10,19 +10,17 @@
 #define ID_EDIT_UNDO			0xE12B
 #endif
 
-CUIEdit::CUIEdit(CUIView *pParent) : CUIControl(pParent), m_bPassword(false), m_bReadonly(false), m_nMaxLen(0), m_iStart(0), m_iEnd(0), m_nLeft(0)
-	, m_bFocus(false), m_bCaret(false), m_hFont(GetDefaultFont()), m_color(0), m_uiTimer([this]{ OnUITimer(); })
+CUIEdit::CUIEdit(CUIView *pParent) : CUIControl(pParent), m_hFont(GetDefaultFont()), m_color(0), m_nTabStop(1), m_chPassword(L'●'), m_bPassword(false), m_bReadonly(false)
+	, m_bImeEnable(true), m_bFocus(false), m_nMaxLen(0), m_iStart(0), m_iEnd(0), m_nLeft(0), m_pUIMenu(NULL)
 {
-	GetRootView()->AddTabsEdit(this);	// 加入到 CUIRootView 以支持 Tab 键
 	CalcFontHeight();
 	SetCursor(LoadCursor(NULL, IDC_IBEAM));
-
 	m_undo.SetPosLen(-1);
 }
 
 CUIEdit::~CUIEdit()
 {
-	GetRootView()->DelTabsEdit(this);
+	SetUIMenu(NULL);
 }
 
 void CUIEdit::SetFont(HFONT hFont)
@@ -60,7 +58,7 @@ void CUIEdit::SetText(LPCWSTR lpText)
 	m_undo.m_strDiff.clear();
 
 	OnTextChange();
-	MySetCaretPos();
+	CalcCaretPos();
 }
 
 void CUIEdit::SetSel(int iStart, int iEnd)
@@ -72,7 +70,7 @@ void CUIEdit::SetSel(int iStart, int iEnd)
 	// 重新选中
 	m_iStart = min(m_strText.size(), (UINT)iStart);
 	m_iEnd   = min(m_strText.size(), (UINT)iEnd);
-	MySetCaretPos();
+	CalcCaretPos();
 
 	if (!m_bFocus)
 		return;
@@ -96,15 +94,66 @@ void CUIEdit::SetSel(int iStart, int iEnd)
 
 void CUIEdit::SetFocus()
 {
-	GetRootView()->SetFocus(this);
+	if (IsRealVisible() && IsRealEnabled())
+		GetRootView()->SetFocus(this);
 }
 
-void CUIEdit::SetPassword(bool bPassword)
+void CUIEdit::NextTabStop(bool bShift)
 {
-	if (m_bPassword != bPassword)
+	// 找出所有可用的 Edit
+	std::vector<CUIEdit *> vecEdits;
+	vecEdits.reserve(4);
+
+	function<void(CUIView *)> fnVisit = [&](CUIView *pView)
 	{
-		m_bPassword = bPassword;
-		InvalidateRect();
+		if (pView->IsRealVisible() && pView->IsEnabled())
+		{
+			CUIEdit *pEdit;
+			if (FRIEND(pView)->IsPaint() == 2 && (pEdit = dynamic_cast<CUIEdit *>(pView)) && pEdit->m_nTabStop)
+				vecEdits.push_back(pEdit);
+
+			for (auto pItem : pView->GetChilds())
+				fnVisit(pItem);
+		}
+	};
+
+	fnVisit(GetRootView());
+
+	int nCount = vecEdits.size();
+	if (nCount < 2)
+		return;
+
+	// 根据 tabStop 稳定排序
+	for (int i = 0; i < nCount - 1; i++)
+	{
+		for (int j = 0; j < nCount - 1 - i; j++)
+		{
+			if (vecEdits[j]->m_nTabStop > vecEdits[j + 1]->m_nTabStop)
+				std::swap(vecEdits[j], vecEdits[j + 1]);
+		}
+	}
+
+	// 切换到上/下一个 Edit
+	for (int i = 0; i != nCount; i++)
+	{
+		if (vecEdits[i] == this)
+		{
+			auto pEdit = vecEdits[(bShift ? i - 1 + nCount : i + 1) % nCount];
+			pEdit->SetSel(0, -1);
+			GetRootView()->SetFocus(pEdit);
+			break;
+		}
+	}
+}
+
+void CUIEdit::SetUIMenu(CUIMenu *pUIMenu)
+{
+	if (m_pUIMenu != pUIMenu)
+	{
+		if (m_pUIMenu)
+			delete m_pUIMenu;
+
+		m_pUIMenu = pUIMenu;
 	}
 }
 
@@ -131,10 +180,6 @@ bool CUIEdit::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 		OnKeyChar(wParam);
 		return true;
-
-	case WM_IME_CHAR:
-		OnKeyChar(wParam);
-		return true;
 	}
 
 	return __super::OnMessage(uMsg, wParam, lParam);
@@ -143,6 +188,9 @@ bool CUIEdit::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CUIEdit::OnPaint(CUIDC &dc) const
 {
 	__super::OnPaint(dc);
+
+	if (m_strText.empty())
+		return;
 
 	// 密码显示星号
 	LPCWSTR lpText = m_strText.c_str();
@@ -153,7 +201,7 @@ void CUIEdit::OnPaint(CUIDC &dc) const
 		lpText = lpData;
 
 		for (int i = 0; i != nSize; i++)
-			lpData[i] = '*';
+			lpData[i] = m_chPassword;
 
 		lpData[nSize] = 0;
 	}
@@ -164,23 +212,15 @@ void CUIEdit::OnPaint(CUIDC &dc) const
 	rect.left -= m_nLeft;
 
 	SelectObject(dc, m_hFont);
-	::SetTextColor(dc, IsRealEnabled() ? m_color : RGB(110, 110, 110));
+	::SetTextColor(dc, IsRealEnabled() ? m_color : GetSysColor(COLOR_GRAYTEXT));
 	DrawTextW(dc, lpText, -1, rect, DT_NOPREFIX | DT_SINGLELINE);
 
 	if (m_iStart != m_iEnd && m_bFocus)	// 有焦点时
 	{
 		CalcSelRect(m_iStart, m_iEnd, rect);
-		dc.FillSolidRect(rect, RGB(51, 153, 255));
-		::SetTextColor(dc, RGB(255, 255, 255));
+		dc.FillSolidRect(rect, GetSysColor(COLOR_HIGHLIGHT));
+		::SetTextColor(dc, GetSysColor(COLOR_HIGHLIGHTTEXT));
 		DrawTextW(dc, lpText + min(m_iStart, m_iEnd), abs(m_iStart - m_iEnd), rect, DT_NOPREFIX | DT_SINGLELINE);
-	}
-
-	if (m_bCaret)	// 自绘光标
-	{
-		int nOldRop = SetROP2(dc, R2_NOT);
-		MoveToEx(dc, m_ptCaret.x, m_ptCaret.y, NULL);
-		LineTo(dc, m_ptCaret.x, m_ptCaret.y + m_nHeight);
-		SetROP2(dc, nOldRop);
 	}
 
 	// DrawText 后填充 alpha
@@ -192,6 +232,25 @@ void CUIEdit::OnEnable(bool bEnable)
 	__super::OnEnable(bEnable);
 
 	InvalidateRect();
+
+	if (!bEnable)
+	{
+		auto pRootView = GetRootView();
+		if (pRootView->GetFocus() == this)
+			pRootView->SetFocus(NULL);
+	}
+}
+
+void CUIEdit::OnVisible(bool bVisible)
+{
+	__super::OnVisible(bVisible);
+
+	if (!bVisible)
+	{
+		auto pRootView = GetRootView();
+		if (pRootView->GetFocus() == this)
+			pRootView->SetFocus(NULL);
+	}
 }
 
 void CUIEdit::OnMouseMove(CPoint point)
@@ -199,7 +258,7 @@ void CUIEdit::OnMouseMove(CPoint point)
 	int iEnd = m_iEnd;
 	CalcClickPos(true, point);
 	InvalidateSel(iEnd, m_iEnd);
-	MySetCaretPos();
+	CalcCaretPos();
 }
 
 void CUIEdit::OnLButtonDown(CPoint point)
@@ -218,12 +277,12 @@ void CUIEdit::OnLButtonDown(CPoint point)
 		if (bShift)
 			InvalidateSel(iEnd, m_iEnd);
 
-		MySetCaretPos();
+		CalcCaretPos();
 	}
 	else
 	{
 		CalcClickPos(bShift, point);
-		SetFocus();
+		GetRootView()->SetFocus(this);
 	}
 }
 
@@ -234,63 +293,34 @@ void CUIEdit::OnLButtonUp(CPoint point)
 
 void CUIEdit::OnRButtonDown(CPoint point)
 {
-	SetFocus();
+	if (!m_bFocus)
+		GetRootView()->SetFocus(this);
 }
 
 void CUIEdit::OnRButtonUp(CPoint point)
 {
-	CUIMenu *pUIMenu = NewUIMenu();
-	pUIMenu->GetItem(ID_EDIT_UNDO)->m_strText = L"撤销(&U)";
-	pUIMenu->GetItem();
-	pUIMenu->GetItem(ID_EDIT_CUT)->m_strText = L"剪切(&T)";
-	pUIMenu->GetItem(ID_EDIT_COPY)->m_strText = L"复制(&C)";
-	pUIMenu->GetItem(ID_EDIT_PASTE)->m_strText = L"粘贴(&P)";
-	pUIMenu->GetItem(ID_EDIT_DELETE)->m_strText = L"删除(&D)";
-	pUIMenu->GetItem();
-	pUIMenu->GetItem(ID_EDIT_SELECT_ALL)->m_strText = L"全选(&A)";
-
-	// 撤销
-	if (m_undo.m_nLen == 0 && m_undo.m_strDiff.empty())
-		pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnable = false;
-
-	// 剪切、复制、删除
-	if (m_iStart == m_iEnd)
+	if (m_pUIMenu == NULL)
 	{
-		pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnable = false;
-		pUIMenu->GetItem(ID_EDIT_COPY)->m_bEnable = false;
-		pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnable = false;
+		m_pUIMenu = new CUIMenu;
+		m_pUIMenu->GetItem(ID_EDIT_UNDO)->m_strText = L"撤销(&U)";
+		m_pUIMenu->GetItem();
+		m_pUIMenu->GetItem(ID_EDIT_CUT)->m_strText = L"剪切(&T)";
+		m_pUIMenu->GetItem(ID_EDIT_COPY)->m_strText = L"复制(&C)";
+		m_pUIMenu->GetItem(ID_EDIT_PASTE)->m_strText = L"粘贴(&P)";
+		m_pUIMenu->GetItem(ID_EDIT_DELETE)->m_strText = L"删除(&D)";
+		m_pUIMenu->GetItem();
+		m_pUIMenu->GetItem(ID_EDIT_SELECT_ALL)->m_strText = L"全选(&A)";
 	}
 
-	// 粘贴
-	BOOL bPaste = FALSE;
-	if (OpenClipboard(NULL))
-	{
-		bPaste = IsClipboardFormatAvailable(CF_UNICODETEXT);
-		CloseClipboard();
-	}
+	m_pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnable = (m_undo.m_nLen || m_undo.m_strDiff.size()) && !m_bReadonly;
+	m_pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnable = m_iStart != m_iEnd && !m_bPassword && !m_bReadonly;
+	m_pUIMenu->GetItem(ID_EDIT_COPY)->m_bEnable = m_iStart != m_iEnd && !m_bPassword;
+	m_pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnable = !m_bReadonly && IsClipboardFormatAvailable(CF_UNICODETEXT);
+	m_pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnable = m_iStart != m_iEnd && !m_bReadonly;
+	m_pUIMenu->GetItem(ID_EDIT_SELECT_ALL)->m_bEnable = abs(m_iStart - m_iEnd) != m_strText.size();
 
-	if (!bPaste)
-		pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnable = false;
-
-	// 全选
-	if (abs(m_iStart - m_iEnd) == m_strText.size())
-		pUIMenu->GetItem(ID_EDIT_SELECT_ALL)->m_bEnable = false;
-
-	// 只读
-	if (m_bReadonly)
-	{
-		pUIMenu->GetItem(ID_EDIT_UNDO)->m_bEnable = false;
-		pUIMenu->GetItem(ID_EDIT_CUT)->m_bEnable = false;
-		pUIMenu->GetItem(ID_EDIT_PASTE)->m_bEnable = false;
-		pUIMenu->GetItem(ID_EDIT_DELETE)->m_bEnable = false;
-	}
-
-	// 弹出菜单时光标暂停
-	m_uiTimer.Stop();
 	GetCursorPos(&point);
-	UINT nCmdId = pUIMenu->Popup(GetRootView()->GetHwnd(), point.x, point.y, MAXINT16, point.y);
-	delete pUIMenu;
-	m_uiTimer.Start(GetCaretBlinkTime());
+	UINT nCmdId = GetRootView()->PopupUIMenu(m_pUIMenu, point.x, point.y, MAXINT16, point.y);
 
 	switch (nCmdId)
 	{
@@ -327,7 +357,7 @@ void CUIEdit::OnSetFocus()
 
 	m_bFocus = true;
 	InvalidateSel(m_iStart, m_iEnd);
-	MyCreateCaret();
+	CalcCaretPos();
 }
 
 void CUIEdit::OnKillFocus()
@@ -336,8 +366,8 @@ void CUIEdit::OnKillFocus()
 		return;
 
 	m_bFocus = false;
-	MyDestroyCaret();
 	InvalidateSel(m_iStart, m_iEnd);
+	GetRootView()->SetCaretPos(CRect());
 }
 
 void CUIEdit::CalcFontHeight()
@@ -360,10 +390,10 @@ void CUIEdit::CalcClickPos(bool bShift, CPoint point)
 	if (m_bPassword)
 	{
 		CRect rect;
-		DrawTextW(dc, L"*", 1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+		DrawTextW(dc, (LPCWSTR)&m_chPassword, 1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
 
 		int nWidth = point.x - m_rect.left + m_nLeft;
-		int nCount = nWidth / rect.Width();
+		int nCount = max(nWidth, 0) / rect.Width();
 
 		if (nCount < m_iEnd)
 			m_iEnd = nWidth % rect.Width() * 2 < rect.Width() ? nCount : nCount + 1;
@@ -420,7 +450,7 @@ int CUIEdit::CalcPosLeft(int iPos) const
 	if (m_bPassword)
 	{
 		CRect rect;
-		DrawTextW(dc, L"*", 1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+		DrawTextW(dc, (LPCWSTR)&m_chPassword, 1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
 		return rect.Width() * (iPos > 0 ? iPos : m_strText.size());
 	}
 
@@ -455,7 +485,7 @@ void CUIEdit::OnKeyDown(UINT nChar)
 	switch (nChar)
 	{
 	case VK_TAB:
-		GetRootView()->NextTabsEdit();
+		NextTabStop(GetKeyState(VK_SHIFT) < 0);
 		break;
 
 	case VK_LEFT:
@@ -494,11 +524,6 @@ void CUIEdit::OnKeyDown(UINT nChar)
 		{
 			DelStartEnd(m_iEnd, m_iEnd + 1);
 		}
-		break;
-
-	case VK_RETURN:
-		if (m_fnOnReturn)
-			m_fnOnReturn();
 		break;
 
 	default:
@@ -565,7 +590,7 @@ void CUIEdit::OnKeyMove(int nMove)
 		m_iStart = m_iEnd = iEnd;
 	}
 
-	MySetCaretPos();
+	CalcCaretPos();
 }
 
 void CUIEdit::DelStartEnd(int iStart, int iEnd, bool bChange)
@@ -599,7 +624,7 @@ void CUIEdit::DelStartEnd(int iStart, int iEnd, bool bChange)
 	if (bChange)
 	{
 		OnTextChange();
-		MySetCaretPos();
+		CalcCaretPos();
 	}
 }
 
@@ -637,7 +662,7 @@ void CUIEdit::OnUndo()
 	m_undo.m_strDiff = strDiff;
 
 	OnTextChange();
-	MySetCaretPos();
+	CalcCaretPos();
 }
 
 void CUIEdit::OnCut()
@@ -669,7 +694,7 @@ void CUIEdit::OnCopy()
 
 void CUIEdit::OnPaste()
 {
-	if (!OpenClipboard(NULL))
+	if (m_bReadonly || !OpenClipboard(NULL))
 		return;
 
 	if (HANDLE hGlobal = GetClipboardData(CF_UNICODETEXT))
@@ -702,7 +727,7 @@ void CUIEdit::OnSelAll()
 
 	m_iStart = 0;
 	m_iEnd   = m_strText.size();
-	MySetCaretPos();
+	CalcCaretPos();
 }
 
 void CUIEdit::Insert(LPWSTR lpText)
@@ -734,36 +759,14 @@ void CUIEdit::Insert(LPWSTR lpText)
 	m_undo.m_nLen = m_iEnd - m_undo.m_nPos;
 
 	OnTextChange();
-	MySetCaretPos();
+	CalcCaretPos();
 }
 
-void CUIEdit::MyCreateCaret()
+void CUIEdit::CalcCaretPos()
 {
-	HWND hWnd = GetRootView()->GetHwnd();
-	HIMC hImc = ImmGetContext(hWnd);
+	if (!m_bFocus || m_rect.IsRectEmpty())
+		return;
 
-	if (hImc)
-	{
-		LOGFONTW lf;
-		GetObjectW(m_hFont, sizeof(lf), &lf);
-		ImmSetCompositionFontW(hImc, &lf);
-		ImmReleaseContext(hWnd, hImc);
-	}
-
-	m_ptCaret.SetPoint(MAXINT16, MAXINT16);
-	MySetCaretPos();
-}
-
-void CUIEdit::MyDestroyCaret()
-{
-	if (m_bCaret)
-		OnUITimer();
-
-	m_uiTimer.Stop();
-}
-
-void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
-{
 	CPoint point(m_rect.left + CalcPosLeft(m_iEnd) - m_nLeft, (m_rect.top + m_rect.bottom - m_nHeight) / 2);
 
 	if (point.x < m_rect.left)
@@ -811,51 +814,8 @@ void CUIEdit::CalcCaretPos(LPPOINT lpPoint)
 		InvalidateRect();
 	}
 
-	*lpPoint = point;
-}
-
-void CUIEdit::MySetCaretPos()
-{
-	if (m_rect.IsRectEmpty())
-		return;
-
-	CPoint point;
-	CalcCaretPos(&point);
-
-	if (m_ptCaret == point || !m_bFocus)
-		return;
-
-	if (m_bCaret)
-		OnUITimer();
-
-	m_uiTimer.Start(GetCaretBlinkTime());
-	m_ptCaret = point;
-	OnUITimer();
-
-	HWND hWnd = GetRootView()->GetHwnd();
-	HIMC hImc = ImmGetContext(hWnd);
-
-	if (hImc)
-	{
-		COMPOSITIONFORM compForm = { CFS_POINT, point + GetBasePoint() };
-		ImmSetCompositionWindow(hImc, &compForm);
-		ImmReleaseContext(hWnd, hImc);
-	}
-}
-
-void CUIEdit::OnUITimer()
-{
-	m_bCaret = !m_bCaret;
-	InvalidateRect(CRect(m_ptCaret, CSize(1, m_nHeight)));
-}
-
-CPoint CUIEdit::GetBasePoint() const
-{
-	CPoint point;
-	auto pRootView = GetRootView();
-	pRootView->ClientToScreen(&point);
-	ScreenToClient(pRootView->GetHwnd(), &point);
-	return point;
+	bool bCaret = point.x >= m_rcReal.left && point.x < m_rcReal.right;
+	GetRootView()->SetCaretPos(CRect(point, CSize(bCaret, m_nHeight)));
 }
 
 void CUIEdit::CheckMaxText(LPCWSTR lpExist, LPWSTR lpText) const
@@ -912,6 +872,9 @@ void CUIEdit::OnLoad(const IUIXmlAttrs &attrs)
 	}
 
 	int nValue;
+	if (attrs.GetInt(L"tabStop", &nValue))
+		SetTabStop(nValue);
+
 	if (attrs.GetInt(L"maxBytes", &nValue))
 		SetMaxBytes(nValue);
 	else if (attrs.GetInt(L"maxChars", &nValue))
@@ -922,6 +885,9 @@ void CUIEdit::OnLoad(const IUIXmlAttrs &attrs)
 
 	if (attrs.GetInt(L"readonly", &nValue) && nValue)
 		SetReadonly(true);
+
+	if (attrs.GetInt(L"imeEnabled", &nValue) && nValue == 0)
+		SetImeEnabled(false);
 
 	if (lpStr = attrs.GetStr(L"text"))
 		SetText(lpStr);

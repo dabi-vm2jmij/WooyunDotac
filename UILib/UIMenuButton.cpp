@@ -5,10 +5,6 @@ CUIMenuButton::CUIMenuButton(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(p
 {
 }
 
-CUIMenuButton::~CUIMenuButton()
-{
-}
-
 void CUIMenuButton::OnMouseLeave()
 {
 	if (m_bNoLeave)

@@ -8,7 +8,6 @@ class UILIB_API CUIMenuButton : public CUIButton
 {
 public:
 	CUIMenuButton(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIMenuButton();
 
 	void BindPopup(function<void()> &&fnOnPopup) { m_fnOnPopup = std::move(fnOnPopup); }
 

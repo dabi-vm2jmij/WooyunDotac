@@ -8,10 +8,6 @@ CUICheckBox::CUICheckBox(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pPar
 	ATLASSERT(m_imagex.GetFrameCount() > 1);
 }
 
-CUICheckBox::~CUICheckBox()
-{
-}
-
 void CUICheckBox::SetSpacing(int nSpacing)
 {
 	if (m_nSpacing != nSpacing)
@@ -45,8 +41,10 @@ void CUICheckBox::OnPaint(CUIDC &dc) const
 		m_imagex.Draw(dc, m_rect.left, (m_rect.top + m_rect.bottom - m_imagex.Rect().Height()) / 2);
 
 	CRect rect(m_rect);
+	rect.top = (rect.top + rect.bottom - m_textSize.cy) / 2;
+	rect.bottom = rect.top + m_textSize.cy;
 	rect.left += m_imagex.Rect().Width() + m_nSpacing;
-	OnDrawText(dc, rect, DT_VCENTER);
+	OnDrawText(dc, rect, DT_END_ELLIPSIS);
 }
 
 void CUICheckBox::OnLButtonUp(CPoint point)

@@ -12,7 +12,10 @@ CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_pI
 	}
 
 	if (m_pImage == NULL || m_pImage->GetLastStatus() != Gdiplus::Ok)
+	{
+		ATLASSERT(0);
 		return;
+	}
 
 	SetSize(CSize(m_pImage->GetWidth(), m_pImage->GetHeight()));
 

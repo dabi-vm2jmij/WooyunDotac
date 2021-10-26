@@ -18,28 +18,14 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
 	if (m_strText.empty() || IsRectEmpty(lpRect))
 		return;
 
-	if (wcschr(m_strText.c_str(), BRACE_L))
-	{
-		CRect rect(lpRect);
-
-		if (nFormat & DT_CENTER)
-			rect.left = (rect.left + rect.right - m_textSize.cx) / 2;
-		else if (nFormat & DT_RIGHT)
-			rect.left = rect.right - m_textSize.cx;
-
-		if (nFormat & DT_VCENTER)
-			rect.bottom = (rect.top + rect.bottom + m_textSize.cy) / 2;
-		else if ((nFormat & DT_BOTTOM) == 0)	// DT_TOP
-			rect.bottom = rect.top + m_textSize.cy;
-
-		OnDrawTextEx(dc, rect, NULL);
-	}
-	else
+	if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
 	{
 		SelectObject(dc, m_hFont);
 		::SetTextColor(dc, m_color);
-		DrawTextW(dc, m_strText.c_str(), -1, lpRect, nFormat | DT_NOPREFIX | DT_SINGLELINE | DT_END_ELLIPSIS);
+		DrawTextW(dc, m_strText.c_str(), -1, lpRect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | nFormat);
 	}
+	else
+		OnDrawTextEx(dc, CRect(lpRect), NULL);
 
 	// DrawText ºóÌî³ä alpha
 	dc.FillAlpha(lpRect, 255);
@@ -329,7 +315,9 @@ void CUITextImpl::SetFont(HFONT hFont)
 	{
 		m_hFont = hFont;
 		RecalcSize();
-		Invalidate();
+
+		if (m_strText.size())
+			Invalidate();
 	}
 }
 
@@ -338,16 +326,9 @@ void CUITextImpl::SetTextColor(COLORREF color)
 	if (m_color != color)
 	{
 		m_color = color;
-		Invalidate();
-	}
-}
 
-void CUITextImpl::SetMaxWidth(int nWidth)
-{
-	if (m_nMaxWidth != nWidth)
-	{
-		m_nMaxWidth = nWidth;
-		RecalcSize();
+		if (m_strText.size())
+			Invalidate();
 	}
 }
 
@@ -356,7 +337,7 @@ void CUITextImpl::SetText(LPCWSTR lpText)
 	if (lpText == NULL)
 		lpText = L"";
 
-	if (wcschr(lpText, '{'))
+	if (wcschr(lpText, '{') && wcschr(lpText, '\n') == NULL)
 	{
 		LPWSTR szText = (LPWSTR)alloca((wcslen(lpText) + 1) * 2);
 
@@ -372,14 +353,20 @@ void CUITextImpl::SetText(LPCWSTR lpText)
 	}
 }
 
+void CUITextImpl::SetMaxWidth(int nWidth)
+{
+	if (m_nMaxWidth != nWidth)
+	{
+		m_nMaxWidth = nWidth;
+		RecalcSize();
+	}
+}
+
 void CUITextImpl::Invalidate()
 {
-	if (m_textSize.cx && m_textSize.cy)
-	{
-		auto pCtrl = dynamic_cast<CUIControl *>(this);
-		ATLASSERT(pCtrl);
-		pCtrl->InvalidateRect();
-	}
+	auto pCtrl = dynamic_cast<CUIControl *>(this);
+	ATLASSERT(pCtrl);
+	pCtrl->InvalidateRect();
 }
 
 void CUITextImpl::RecalcSize()
@@ -388,16 +375,14 @@ void CUITextImpl::RecalcSize()
 
 	if (m_strText.size())
 	{
-		if (wcschr(m_strText.c_str(), BRACE_L))
-		{
-			OnDrawTextEx(CUIComDC(NULL), NULL, &size);
-		}
-		else
+		if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
 		{
 			CRect rect;
-			DrawTextW(CUIComDC(m_hFont), m_strText.c_str(), -1, rect, DT_NOPREFIX | DT_SINGLELINE | DT_CALCRECT);
+			DrawTextW(CUIComDC(m_hFont), m_strText.c_str(), -1, rect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | DT_CALCRECT);
 			size = rect.Size();
 		}
+		else
+			OnDrawTextEx(CUIComDC(NULL), NULL, &size);
 
 		if (size.cx > m_nMaxWidth)
 			size.cx = m_nMaxWidth;

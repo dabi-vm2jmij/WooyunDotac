@@ -9,7 +9,6 @@ class UILIB_API CUIButtonEx : public CUIButton, public CUITextImpl
 {
 public:
 	CUIButtonEx(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIButtonEx();
 
 	void SetIcon(const CImagex &imagex);
 	void SetIcons(const CImagex imagexs[], int nCount);

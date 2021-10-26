@@ -8,7 +8,6 @@ class UILIB_API CUIStateButton : public CUIControl
 {
 public:
 	CUIStateButton(CUIView *pParent);
-	virtual ~CUIStateButton();
 
 	void BindClick(function<void(int)> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 	void EndAddChild();

@@ -4,25 +4,18 @@
 CUILabel::CUILabel(CUIView *pParent) : CUIControl(pParent)
 {
 	m_bClickable = false;
-	SetSize({ 1, 1 });
-}
-
-CUILabel::~CUILabel()
-{
+	SetSize({ 0, 0 });
 }
 
 void CUILabel::OnPaint(CUIDC &dc) const
 {
 	__super::OnPaint(dc);
 
-	OnDrawText(dc, CRect(m_rect), 0);
+	OnDrawText(dc, CRect(m_rect), DT_END_ELLIPSIS);
 }
 
 void CUILabel::OnTextSize(CSize size)
 {
-	if (size.cx == 0)
-		size.SetSize(1, 1);
-
 	SetSize(size);
 }
 

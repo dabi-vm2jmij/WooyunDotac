@@ -5,10 +5,6 @@ CUICheckButton::CUICheckButton(CUIView *pParent, LPCWSTR lpFileName) : CUIButton
 {
 }
 
-CUICheckButton::~CUICheckButton()
-{
-}
-
 void CUICheckButton::SetCheck(bool bCheck)
 {
 	if (bCheck)

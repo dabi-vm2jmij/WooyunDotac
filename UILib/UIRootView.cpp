@@ -2,7 +2,7 @@
 #include "UIRootView.h"
 #include "UILibApp.h"
 
-CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_hImc(NULL), m_hCursor(NULL), m_hToolTip(NULL), m_pFocus(NULL), m_pCapture(NULL)
+CUIRootView::CUIRootView(IUIWindow *pOwner) : CUIView(NULL), m_pOwner(pOwner), m_hCursor(NULL), m_hToolTip(NULL), m_pFocus(NULL), m_pCapture(NULL), m_bComposing(false), m_caretTimer([this]{ OnCaretTimer(); })
 {
 	ATLASSERT(pOwner);
 	m_vecEnterItems.reserve(8);
@@ -18,7 +18,6 @@ void CUIRootView::Destroy()
 {
 	m_pFocus = NULL;
 	m_pCapture = NULL;
-	m_vecEdits.clear();
 	m_vecEnterItems.clear();
 
 	while (m_vecChilds.size())
@@ -32,14 +31,19 @@ void CUIRootView::Destroy()
 BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
 {
 	lResult = 0;
+	BOOL bRet = FALSE;
 
 	switch (uMsg)
 	{
+	case WM_CREATE:
+		ImmAssociateContextEx(hWnd, NULL, 0);
+		break;
+
 	case WM_NCHITTEST:
 		if (OnNcHitTest(lParam))
 		{
 			lResult = HTCLIENT;
-			return TRUE;
+			bRet = TRUE;
 		}
 		break;
 
@@ -48,7 +52,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		{
 			SetCursor(m_hCursor);
 			lResult = TRUE;
-			return TRUE;
+			bRet = TRUE;
 		}
 		break;
 
@@ -61,19 +65,20 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			m_strTipText.clear();
 			ShowToolTip(NULL);
 		}
-		return TRUE;
+		bRet = TRUE;
+		break;
 
 	case WM_MOUSEMOVE:
 		if (!m_bMouseEnter)
 		{
-			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, GetHwnd() };
+			TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, hWnd };
 			m_bMouseEnter = TrackMouseEvent(&tme) != 0;
 		}
 
 		if (m_hToolTip)
 		{
 			MSG msg;
-			msg.hwnd = GetHwnd();
+			msg.hwnd = hWnd;
 			msg.message = uMsg;
 			msg.wParam = wParam;
 			msg.lParam = lParam;
@@ -83,41 +88,68 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	case WM_LBUTTONDOWN:
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
-		if (m_pCapture)
-		{
-			m_pCapture->OnMessage(uMsg, wParam, lParam);
-			return TRUE;
-		}
-
 	case WM_RBUTTONDOWN:
 	case WM_RBUTTONUP:
 	case WM_RBUTTONDBLCLK:
-		OnMouseMessage(uMsg, wParam, lParam);
-		return TRUE;
+		if (m_pCapture)
+			m_pCapture->OnMessage(uMsg, wParam, lParam);
+		else
+			OnMouseMessage(uMsg, wParam, lParam);
+		bRet = TRUE;
+		break;
 
 	case WM_MOUSEWHEEL:
 	case WM_CONTEXTMENU:
+		if (m_pCapture == NULL)
 		{
 			CPoint point(lParam);
 			ScreenToClient(&point);
 			OnMessage(uMsg, wParam, MAKELPARAM(point.x, point.y));
 		}
-		return TRUE;
+		bRet = TRUE;
+		break;
 
 	case WM_KEYDOWN:
 	case WM_KEYUP:
 	case WM_CHAR:
-	case WM_IME_CHAR:
+	case WM_SYSKEYDOWN:
+	case WM_SYSKEYUP:
 		if (m_pFocus)
-		{
 			m_pFocus->OnMessage(uMsg, wParam, lParam);
-			return TRUE;
+		break;
+
+	case WM_SYSCOMMAND:
+		bRet = GET_SC_WPARAM(wParam) == SC_KEYMENU;
+		break;
+
+	case WM_IME_STARTCOMPOSITION:
+		m_bComposing = true;
+		InvalidateRect(m_caretRect);
+		SetCaretPos(m_caretRect);
+		break;
+
+	case WM_IME_ENDCOMPOSITION:
+		m_bComposing = false;
+		InvalidateRect(m_caretRect);
+		break;
+
+	case WM_IME_COMPOSITION:
+		if (lParam & GCS_RESULTSTR)
+		{
+			auto pEdit = dynamic_cast<CUIEdit *>(m_pFocus);
+			HIMC hImc;
+			if (pEdit && (hImc = ImmGetContext(hWnd)))
+			{
+				wchar_t szText[256];
+				szText[ImmGetCompositionStringW(hImc, GCS_RESULTSTR, szText, sizeof(szText) - 2) / 2] = 0;
+				ImmReleaseContext(hWnd, hImc);
+				pEdit->Insert(szText);
+			}
+			bRet = TRUE;
 		}
 		break;
 
 	case WM_SETFOCUS:
-		EnableImm(m_pFocus && m_pFocus->IsImmEnabled());
-
 		if (m_pFocus)
 			m_pFocus->OnSetFocus();
 		break;
@@ -127,7 +159,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		{
 			m_pFocus->OnKillFocus();
 
-			if (wParam && ::IsChild(GetHwnd(), (HWND)wParam))
+			if (wParam && ::IsChild(hWnd, (HWND)wParam))
 				m_pFocus = NULL;
 		}
 		break;
@@ -154,7 +186,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		break;
 	}
 
-	return FALSE;
+	return bRet;
 }
 
 HWND CUIRootView::GetHwnd() const
@@ -179,14 +211,19 @@ void CUIRootView::UpdateLayout()
 	}
 }
 
-void CUIRootView::OnPaint(CUIDC &dc) const
+void CUIRootView::PaintChilds(CUIDC &dc) const
 {
-	// 画背景
-	if (m_bgColor != -1)
-		dc.FillSolidRect(m_rect, m_bgColor);
+	__super::PaintChilds(dc);
 
-	if (m_bgImagex)
-		m_bgImagex.Scale9Draw(dc, m_rect, false);
+	// 自绘光标
+	if (!m_bComposing && m_caretRect.Width() > 0)
+	{
+		int nOldRop = SetROP2(dc, R2_NOT);
+		MoveToEx(dc, m_caretRect.left, m_caretRect.top, NULL);
+		LineTo(dc, m_caretRect.left, m_caretRect.bottom);
+		SetROP2(dc, nOldRop);
+		dc.FillAlpha(m_caretRect, 255);
+	}
 }
 
 bool CUIRootView::OnNcHitTest(CPoint point)
@@ -274,30 +311,23 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	if (!bHandled && uMsg == WM_RBUTTONUP)
-		OnMessage(WM_CONTEXTMENU, (WPARAM)GetHwnd(), lParam);
+		OnMessage(WM_CONTEXTMENU, 0, lParam);
 }
 
 void CUIRootView::DoMouseMove()
 {
-	if (m_rect.IsRectEmpty())
+	if (!m_bMouseEnter)
 		return;
 
 	UIHitTest hitTest;
 	GetCursorPos(&hitTest.point);
+	ScreenToClient(&hitTest.point);
+	OnHitTest(hitTest);
 
-	if (WindowFromPoint(hitTest.point) == GetHwnd())
+	for (auto hit : hitTest)
 	{
-		ScreenToClient(&hitTest.point);
-		OnHitTest(hitTest);
-	}
-
-	if (m_bMouseEnter)
-	{
-		for (auto hit : hitTest)
-		{
-			if (hit.bEnable)
-				DoMouseEnter(hit.pItem);
-		}
+		if (hit.bEnable)
+			DoMouseEnter(hit.pItem);
 	}
 
 	CheckMouseLeave(hitTest);
@@ -375,110 +405,112 @@ void CUIRootView::ScreenToClient(LPPOINT lpPoint)
 	::ScreenToClient(GetHwnd(), lpPoint);
 }
 
-void CUIRootView::SetFocus(CUIControl *pCtrl)
+UINT CUIRootView::PopupUIMenu(CUIMenu *pUIMenu, int x1, int y1, int x2, int y2)
 {
-	if (m_pFocus == pCtrl)
+	// 弹出菜单时关闭输入法、暂停光标
+	HWND hWnd = GetHwnd();
+	HIMC hImc = ImmGetContext(hWnd);
+	if (hImc)
+		ImmSetOpenStatus(hImc, FALSE);
+
+	bool bCaret = m_caretTimer.Running();
+	if (bCaret)
+		m_caretTimer.Stop();
+
+	UINT nCmdId = pUIMenu->Popup(hWnd, x1, y1, x2, y2);
+
+	if (bCaret)
+		m_caretTimer.Start(GetCaretBlinkTime());
+
+	if (hImc)
+	{
+		ImmSetOpenStatus(hImc, TRUE);
+		ImmReleaseContext(hWnd, hImc);
+	}
+
+	return nCmdId;
+}
+
+void CUIRootView::SetCaretPos(LPCRECT lpRect)
+{
+	if (m_caretRect != *lpRect)
+	{
+		InvalidateRect(m_caretRect);
+		m_caretRect = lpRect;
+		InvalidateRect(m_caretRect);
+
+		if (m_caretRect.Width() > 0)
+			m_caretTimer.Start(GetCaretBlinkTime());
+		else
+			m_caretTimer.Stop();
+	}
+
+	// 设置输入法窗口位置
+	HWND hWnd = GetHwnd();
+	HIMC hImc;
+	if (m_bComposing && (hImc = ImmGetContext(hWnd)))
+	{
+		COMPOSITIONFORM compForm = { CFS_POINT, m_caretRect.TopLeft() };
+		ImmSetCompositionWindow(hImc, &compForm);
+		ImmReleaseContext(hWnd, hImc);
+	}
+}
+
+void CUIRootView::SetFocus(CUIControl *pFocus)
+{
+	if (m_pFocus == pFocus || m_rect.IsRectEmpty())
 		return;
+
+	// 开关输入法
+	HWND hWnd = GetHwnd();
+	auto pEdit = dynamic_cast<CUIEdit *>(pFocus);
+	ImmAssociateContextEx(hWnd, NULL, pEdit && pEdit->IsImeEnabled() ? IACE_DEFAULT : 0);
+
+	HIMC hImc;
+	if (pEdit && (hImc = ImmGetContext(hWnd)))
+	{
+		LOGFONTW lf;
+		GetObjectW(pEdit->GetFont(), sizeof(lf), &lf);
+		ImmSetCompositionFontW(hImc, &lf);
+		ImmReleaseContext(hWnd, hImc);
+	}
 
 	auto pOldFocus = m_pFocus;
-	m_pFocus = pCtrl;
-
-	if (m_rect.IsRectEmpty())
-		return;
+	m_pFocus = pFocus;
 
 	if (pOldFocus)
 		pOldFocus->OnKillFocus();
-	else
-		::SetFocus(GetHwnd());
 
-	EnableImm(m_pFocus && m_pFocus->IsImmEnabled());	// 输入法
-
-	if (m_pFocus)
-		m_pFocus->OnSetFocus();
+	if (pFocus && IsWindowVisible(hWnd))
+	{
+		if (::GetFocus() != hWnd)
+			::SetFocus(hWnd);
+		else
+			pFocus->OnSetFocus();
+	}
 }
 
-void CUIRootView::SetCapture(CUIControl *pCtrl)
+void CUIRootView::SetCapture(CUIControl *pCapture)
 {
-	if (m_pCapture == pCtrl)
+	if (m_pCapture == pCapture)
 		return;
 
 	auto pOldCapture = m_pCapture;
-	m_pCapture = pCtrl;
+	m_pCapture = pCapture;
 
 	if (pOldCapture == NULL)
 		::SetCapture(GetHwnd());
-	else if (pCtrl == NULL)
+	else if (pCapture == NULL)
 		::ReleaseCapture();
 	else
 		pOldCapture->OnLostCapture();
 }
 
-void CUIRootView::EnableImm(bool bEnable)
+void CUIRootView::OnCaretTimer()
 {
-	if (!m_hImc == !bEnable)
-		m_hImc = ImmAssociateContext(GetHwnd(), m_hImc);
-}
-
-void CUIRootView::AddTabsEdit(CUIEdit *pEdit)
-{
-	for (auto it = m_vecEdits.begin(); it != m_vecEdits.end(); ++it)
-	{
-		if (*it == pEdit)
-			return;
-	}
-
-	m_vecEdits.push_back(pEdit);
-}
-
-void CUIRootView::DelTabsEdit(CUIEdit *pEdit)
-{
-	for (auto it = m_vecEdits.begin(); it != m_vecEdits.end(); ++it)
-	{
-		if (*it == pEdit)
-		{
-			m_vecEdits.erase(it);
-			break;
-		}
-	}
-}
-
-void CUIRootView::NextTabsEdit()
-{
-	int nSize = m_vecEdits.size();
-	if (nSize < 2)
-		return;
-
-	int iCurId = -1;
-
-	for (int i = 0; i != nSize; i++)
-	{
-		if (m_vecEdits[i] == m_pFocus)
-		{
-			iCurId = i;
-			break;
-		}
-	}
-
-	if (iCurId == -1)
-		return;
-
-	for (int i = iCurId; ; )
-	{
-		if (GetKeyState(VK_SHIFT) < 0)
-			i = (i + nSize - 1) % nSize;
-		else
-			i = (i + 1) % nSize;
-
-		if (i == iCurId)
-			break;
-
-		if (m_vecEdits[i]->IsRealEnabled() && m_vecEdits[i]->IsRealVisible())
-		{
-			m_vecEdits[i]->SetSel(0, -1);
-			SetFocus(m_vecEdits[i]);
-			break;
-		}
-	}
+	InvalidateRect(m_caretRect);
+	m_caretRect.right = m_caretRect.left * 2 - m_caretRect.right;
+	InvalidateRect(m_caretRect);
 }
 
 void CUIRootView::ShowToolTip(LPCWSTR lpTipText)

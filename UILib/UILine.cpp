@@ -6,10 +6,6 @@ CUILine::CUILine(CUIView *pParent) : CUIControl(pParent), m_color(-1), m_nStyle(
 	m_bClickable = false;
 }
 
-CUILine::~CUILine()
-{
-}
-
 // 设置线的颜色，实线或虚线
 void CUILine::SetLineStyle(COLORREF color, int nStyle)
 {

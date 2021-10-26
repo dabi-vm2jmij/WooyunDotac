@@ -141,6 +141,9 @@
     <ClInclude Include="UICarousel.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="UIHotKey.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="UIEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -279,6 +282,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UICarousel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UIHotKey.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="UIEdit.cpp">

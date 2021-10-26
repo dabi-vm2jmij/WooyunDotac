@@ -82,14 +82,14 @@ CUIMenu::Item *CUIMenu::GetItem(UINT nId)
 	return &m_vecItems.back();
 }
 
-UINT CUIMenu::Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostMsg)
+UINT CUIMenu::Popup(HWND hParent, int x1, int y1, int x2, int y2)
 {
-	return CUIMenuWnd(this).Popup(hParent, x1, y1, x2, y2, bPostMsg);
+	return CUIMenuWnd(this).Popup(hParent, x1, y1, x2, y2);
 }
 
 void CUIMenu::GetMargins(LPRECT lpRect) const
 {
-	SetRect(lpRect, 1, 3, 1, 3);
+	SetRect(lpRect, 1, 4, 1, 4);
 }
 
 UINT CUIMenu::GetShowDelay() const
@@ -103,7 +103,7 @@ void CUIMenu::MeasureItem(UINT nIndex, LPSIZE lpSize) const
 {
 	if (m_vecItems[nIndex].m_nId)
 	{
-		lpSize->cx = 160;
+		lpSize->cx = 150;
 		lpSize->cy = 24;
 	}
 	else
@@ -129,27 +129,27 @@ void CUIMenu::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
 	if (item.m_nId)
 	{
 		if (bSelected)
-			dc.FillSolidRect(rect, RGB(235, 235, 235));
+			dc.FillSolidRect(rect, RGB(232, 234, 237));
 
 		if (item.m_bEnable)
 			SetTextColor(dc, RGB(0, 0, 0));
 		else
-			SetTextColor(dc, RGB(161, 161, 161));
+			SetTextColor(dc, RGB(128, 134, 139));
 
 		if (item.m_bCheck)
 		{
 			rect.left += 10;
-			DrawTextW(dc, L"¡Ì", -1, rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+			DrawTextW(dc, L"¡Ì", -1, rect, DT_VCENTER | DT_SINGLELINE);
 			rect.left -= 10;
 		}
 
 		rect.left += 32;
-		DrawTextW(dc, item.m_strText.c_str(), -1, rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+		DrawTextW(dc, item.m_strText.c_str(), -1, rect, DT_VCENTER | DT_SINGLELINE);
 
 		if (item.GetSubMenu())
 		{
 			rect.left = rect.right - 20;
-			DrawTextW(dc, L"¡ú", -1, rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+			DrawTextW(dc, L"¡ú", -1, rect, DT_VCENTER | DT_SINGLELINE);
 		}
 
 		// DrawText ºóÌî³ä alpha
@@ -160,6 +160,6 @@ void CUIMenu::DrawItem(CUIDC &dc, LPCRECT lpRect, UINT nIndex, bool bSelected)
 		rect.top = (rect.top + rect.bottom - 1) / 2;
 		rect.bottom = rect.top + 1;
 		rect.DeflateRect(1, 0);
-		dc.FillSolidRect(rect, RGB(233, 233, 233));
+		dc.FillSolidRect(rect, RGB(232, 234, 237));
 	}
 }

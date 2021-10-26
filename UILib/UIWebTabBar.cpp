@@ -7,10 +7,6 @@ CUIWebTabBar::CUIWebTabBar(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pPare
 		m_strTabImage = lpFileName;
 }
 
-CUIWebTabBar::~CUIWebTabBar()
-{
-}
-
 UINT CUIWebTabBar::GetCurSel() const
 {
 	for (int i = 0; i != m_vecChilds.size(); i++)
@@ -95,7 +91,7 @@ void CUIWebTabBar::PaintChilds(CUIDC &dc) const
 
 void CUIWebTabBar::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 {
-	if (IsVisible() && !IsRectEmpty(lpRect) && m_offset.left >> 16 && m_size.cx == 0)
+	if (IsVisible() && !IsRectEmpty(lpRect) && m_offset.left >> 16 && m_size.cx == MAXINT16)
 	{
 		CRect rect(lpRect);
 		CalcLeftRight(rect.left, rect.right, m_offset.left, m_offset.right, m_size.cx);
@@ -174,8 +170,6 @@ void CUIWebTabBar::OnChildMoving(CUIView *pItem, CPoint point)
 	if (point.x == rect.left)
 		return;
 
-	int nRight = point.x + rect.Width();
-
 	// ÕÒ³öÐÂÎ»ÖÃ
 	UINT nCurIndex = -1, nNewIndex = -1;
 
@@ -188,7 +182,7 @@ void CUIWebTabBar::OnChildMoving(CUIView *pItem, CPoint point)
 		}
 
 		int nCenter = m_vecChilds[i]->GetRect().CenterPoint().x;
-		if (nCenter > point.x && nCenter <= nRight)
+		if (nCenter >= point.x && nCenter < point.x + rect.Width())
 			nNewIndex = i;
 	}
 

@@ -10,10 +10,6 @@ CUIWebTab::CUIWebTab(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pParent, 
 		m_imagexs[1] = m_imagexs[0];
 }
 
-CUIWebTab::~CUIWebTab()
-{
-}
-
 CUIWebTabBar *CUIWebTab::GetWebTabBar() const
 {
 	auto pWebTabBar = dynamic_cast<CUIWebTabBar *>(GetParent());

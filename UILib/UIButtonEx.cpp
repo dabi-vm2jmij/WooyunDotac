@@ -7,10 +7,6 @@ CUIButtonEx::CUIButtonEx(CUIView *pParent, LPCWSTR lpFileName) : CUIButton(pPare
 	FillMemory(m_colors, sizeof(m_colors), -1);
 }
 
-CUIButtonEx::~CUIButtonEx()
-{
-}
-
 // 不足4态的图标扩展成4态
 static void Fill4Icons(CImagex imagexs[], int nCount)
 {
@@ -118,14 +114,15 @@ void CUIButtonEx::OnPaint(CUIDC &dc) const
 
 	// 写文字
 	CRect rect(m_rect);
-	UINT nFormat = DT_VCENTER;
+	rect.top = (rect.top + rect.bottom - m_textSize.cy) / 2;
+	rect.bottom = rect.top + m_textSize.cy;
 
 	if (m_nTextLeft != MAXINT16)
 		rect.left += m_nTextLeft;
-	else
-		nFormat |= DT_CENTER;
+	else if (rect.Width() > m_textSize.cx)
+		rect.left = (rect.left + rect.right - m_textSize.cx) / 2;
 
-	OnDrawText(dc, rect, nFormat);
+	OnDrawText(dc, rect, DT_END_ELLIPSIS);
 }
 
 void CUIButtonEx::OnButtonState(ButtonState btnState)

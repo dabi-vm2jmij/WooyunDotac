@@ -5,10 +5,6 @@ CUIRadioButton::CUIRadioButton(CUIView *pParent, LPCWSTR lpFileName) : CUICheckB
 {
 }
 
-CUIRadioButton::~CUIRadioButton()
-{
-}
-
 void CUIRadioButton::OnLButtonUp(CPoint point)
 {
 	if (m_bCheck)

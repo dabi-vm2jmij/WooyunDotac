@@ -9,7 +9,6 @@ class UILIB_API CUIWebTab : public CUIButton
 	friend class CUIWebTabBar;
 public:
 	CUIWebTab(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIWebTab();
 
 	bool IsSelected() const { return m_bSelect; }
 	void SetTabPage(CUIView *pTabPage) { m_pTabPage = pTabPage; }

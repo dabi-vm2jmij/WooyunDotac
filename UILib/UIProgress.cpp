@@ -15,10 +15,6 @@ CUIProgress::CUIProgress(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pPar
 	}
 }
 
-CUIProgress::~CUIProgress()
-{
-}
-
 void CUIProgress::OnPaint(CUIDC &dc) const
 {
 	__super::OnPaint(dc);

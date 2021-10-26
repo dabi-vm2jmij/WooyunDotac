@@ -39,7 +39,9 @@ void CMainFrame::OnLoadUI(const IUIXmlAttrs &attrs)
 		}
 
 		CRect rcBtn = pMenuBtn->GetWindowRect();
-		m_uiMenu.Popup(m_hWnd, rcBtn.left, rcBtn.bottom, MAXINT16, rcBtn.top, true);
+		UINT nCmdId = m_uiMenu.Popup(m_hWnd, rcBtn.left, rcBtn.bottom, MAXINT16, rcBtn.top);
+		if (nCmdId)
+			PostMessage(WM_COMMAND, nCmdId);
 	});
 
 	CUIButton *pButton = m_rootView.SearchCast(L"°²×°");

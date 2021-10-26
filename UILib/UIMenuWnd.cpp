@@ -68,7 +68,7 @@ bool CUIMenuWnd::Init(HWND hParent, int x1, int y1, int x2, int y2)
 	return true;
 }
 
-UINT CUIMenuWnd::Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostMsg)
+UINT CUIMenuWnd::Popup(HWND hParent, int x1, int y1, int x2, int y2)
 {
 	if (!Init(hParent, x1, y1, x2, y2))
 		return 0;
@@ -87,10 +87,6 @@ UINT CUIMenuWnd::Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostM
 		if (msg.message == WM_SELECT && IsMenuWnd(msg.hwnd))
 		{
 			DestroyWindow();
-
-			if (bPostMsg)
-				::PostMessage(hParent, WM_COMMAND, msg.wParam, 0);
-
 			return msg.wParam;
 		}
 

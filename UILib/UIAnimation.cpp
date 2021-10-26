@@ -9,10 +9,6 @@ CUIAnimation::CUIAnimation(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pP
 	SetSize(m_imagex.Rect().Size());
 }
 
-CUIAnimation::~CUIAnimation()
-{
-}
-
 void CUIAnimation::OnPaint(CUIDC &dc) const
 {
 	__super::OnPaint(dc);

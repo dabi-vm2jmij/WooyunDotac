@@ -12,6 +12,7 @@ class CUIStateButton;
 class CUICheckBox;
 class CUIRadioBox;
 class CUIAnimation;
+class CUIHotKey;
 class CUIEdit;
 class CUIGif;
 class CUIImage;
@@ -97,6 +98,7 @@ public:
 	CUICheckBox *AddCheckBox(LPCWSTR lpFileName);
 	CUIRadioBox *AddRadioBox(LPCWSTR lpFileName);
 	CUIAnimation *AddAnimation(LPCWSTR lpFileName);
+	CUIHotKey *AddHotKey();
 	CUIEdit *AddEdit();
 	CUIGif *AddGif(LPCWSTR lpFileName);
 	CUIImage *AddImage(LPCWSTR lpFileName);
@@ -135,8 +137,8 @@ protected:
 	static void CalcLeftRight(long &nLeft, long &nRight, long nOffsetLeft, long nOffsetRight, long nWidth);
 
 	CUIView *m_pParent;
-	CRect    m_offset;		// 上下左右的偏移
-	CSize    m_size;		// 宽、高 == 0 为填充，< 0 为百分比
+	CRect    m_offset;		// 上下左右的约束
+	CSize    m_size;		// 宽、高的约束，< 0 为百分比
 	CRect    m_rect;		// 完整区域，包括不可见部分
 	CRect    m_rcReal;		// 实际可见区域
 	wstring  m_strId;

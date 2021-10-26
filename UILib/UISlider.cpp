@@ -15,10 +15,6 @@ CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName)
 	SetHeight(max(nHeight1, nHeight2));
 }
 
-CUISlider::~CUISlider()
-{
-}
-
 void CUISlider::SetMaxPos(int nMaxPos)
 {
 	if (nMaxPos <= 0 || m_nMaxPos == nMaxPos)

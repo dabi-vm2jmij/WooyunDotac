@@ -40,6 +40,7 @@ using std::wstring;
 #include "UIRadioBox.h"
 #include "UITimer.h"
 #include "UIAnimation.h"
+#include "UIHotKey.h"
 #include "UIEdit.h"
 #include "UIGif.h"
 #include "UIImage.h"

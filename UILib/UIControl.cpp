@@ -1,12 +1,7 @@
 #include "stdafx.h"
 #include "UIControl.h"
 
-CUIControl::CUIControl(CUIView *pParent) : CUIView(pParent), m_bClickable(true), m_bDraggable(false), m_hCursor(NULL), m_bLButtonDown(false), m_bRButtonDown(false)
-	, m_ptClick(MAXINT16, MAXINT16)
-{
-}
-
-CUIControl::~CUIControl()
+CUIControl::CUIControl(CUIView *pParent) : CUIView(pParent), m_hCursor(NULL), m_bClickable(true), m_bDraggable(false), m_bLButtonDown(false), m_bRButtonDown(false), m_ptClick(MAXINT16, MAXINT16)
 {
 }
 
@@ -89,30 +84,6 @@ bool CUIControl::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return false;
 }
 
-void CUIControl::OnEnable(bool bEnable)
-{
-	__super::OnEnable(bEnable);
-
-	if (!bEnable)
-	{
-		auto pRootView = GetRootView();
-		if (pRootView->GetFocus() == this)
-			pRootView->SetFocus(NULL);
-	}
-}
-
-void CUIControl::OnVisible(bool bVisible)
-{
-	__super::OnVisible(bVisible);
-
-	if (!bVisible)
-	{
-		auto pRootView = GetRootView();
-		if (pRootView->GetFocus() == this)
-			pRootView->SetFocus(NULL);
-	}
-}
-
 void CUIControl::OnMouseLeave()
 {
 	m_bLButtonDown = m_bRButtonDown = false;
@@ -123,7 +94,7 @@ void CUIControl::OnMouseLeave()
 void CUIControl::OnRButtonUp(CPoint point)
 {
 	auto pRootView = GetRootView();
-	FRIEND(pRootView)->OnMessage(WM_CONTEXTMENU, (WPARAM)pRootView->GetHwnd(), MAKELPARAM(point.x, point.y));
+	FRIEND(pRootView)->OnMessage(WM_CONTEXTMENU, 0, MAKELPARAM(point.x, point.y));
 }
 
 void CUIControl::OnLostCapture()
@@ -143,6 +114,10 @@ void CUIControl::OnLoad(const IUIXmlAttrs &attrs)
 {
 	__super::OnLoad(attrs);
 
+	int nValue;
+	if (attrs.GetInt(L"draggable", &nValue) && nValue)
+		SetDraggable(true);
+
 	LPCWSTR lpStr;
 	if (lpStr = attrs.GetStr(L"tooltip"))
 		SetToolTip(lpStr);
@@ -153,5 +128,9 @@ void CUIControl::OnLoad(const IUIXmlAttrs &attrs)
 			SetCursor(LoadCursor(NULL, IDC_HAND));
 		else if (_wcsicmp(lpStr, L"ibeam") == 0)
 			SetCursor(LoadCursor(NULL, IDC_IBEAM));
+		else if (_wcsicmp(lpStr, L"sizewe") == 0)
+			SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+		else if (_wcsicmp(lpStr, L"sizens") == 0)
+			SetCursor(LoadCursor(NULL, IDC_SIZENS));
 	}
 }

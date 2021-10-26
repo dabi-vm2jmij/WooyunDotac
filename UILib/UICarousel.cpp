@@ -7,10 +7,6 @@ CUICarousel::CUICarousel(CUIView *pParent) : CUIView(pParent), m_dir(ToLeft), m_
 {
 }
 
-CUICarousel::~CUICarousel()
-{
-}
-
 void CUICarousel::RecalcLayout(LPRECT lpClipRect)
 {
 	if (m_rect.left == MAXINT16 || m_vecChilds.empty())

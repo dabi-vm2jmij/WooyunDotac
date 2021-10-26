@@ -53,10 +53,6 @@ CUIMoreTools::CUIMoreTools() : m_pToolBar(NULL)
 	m_rootView.SetBgColor(RGB(60, 123, 212));
 }
 
-CUIMoreTools::~CUIMoreTools()
-{
-}
-
 HWND CUIMoreTools::Popup(const vector<CUIView *> &vecItems, HWND hParent, CPoint point)
 {
 	m_pToolBar = vecItems[0]->GetParent();

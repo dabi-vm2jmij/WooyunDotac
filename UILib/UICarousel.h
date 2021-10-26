@@ -8,7 +8,6 @@ class UILIB_API CUICarousel : public CUIView
 {
 public:
 	CUICarousel(CUIView *pParent);
-	virtual ~CUICarousel();
 
 	enum Dir { ToLeft, ToTop, ToRight, ToBottom };
 

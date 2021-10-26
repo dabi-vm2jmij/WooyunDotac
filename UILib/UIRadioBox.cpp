@@ -5,10 +5,6 @@ CUIRadioBox::CUIRadioBox(CUIView *pParent, LPCWSTR lpFileName) : CUICheckBox(pPa
 {
 }
 
-CUIRadioBox::~CUIRadioBox()
-{
-}
-
 void CUIRadioBox::OnLButtonUp(CPoint point)
 {
 	if (m_bCheck)

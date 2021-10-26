@@ -2,8 +2,8 @@
 #include "UIView.h"
 #include "UILibApp.h"
 
-CUIView::CUIView(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0), m_bgColor(-1)
-	, m_bEnable(true), m_bVisible(true), m_bMouseEnter(false), m_bNeedLayout(false)
+CUIView::CUIView(CUIView *pParent) : m_pParent(pParent), m_offset(MAXINT16, MAXINT16, MAXINT16, MAXINT16), m_size(MAXINT16, MAXINT16), m_rect(MAXINT16, 0, MAXINT16, 0)
+	, m_bgColor(-1), m_bEnable(true), m_bVisible(true), m_bMouseEnter(false), m_bNeedLayout(false)
 {
 }
 
@@ -135,10 +135,7 @@ void CUIView::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 
 void CUIView::CalcLeftRight(long &nLeft, long &nRight, long nOffsetLeft, long nOffsetRight, long nWidth)
 {
-	bool bNoWidth = nWidth == 0;
-
-	if (nWidth < 0)	// -nWidth 为百分比
-		nWidth = (nRight - nLeft) * -nWidth / 100;
+	long nOrgWidth = nRight - nLeft;
 
 	// 算左、右偏移
 	if (nOffsetLeft != MAXINT16)
@@ -147,8 +144,11 @@ void CUIView::CalcLeftRight(long &nLeft, long &nRight, long nOffsetLeft, long nO
 	if (nOffsetRight != MAXINT16)
 		nRight -= (short)nOffsetRight;
 
-	if (nOffsetLeft != MAXINT16 && nOffsetRight != MAXINT16 || bNoWidth)
+	if (nOffsetLeft != MAXINT16 && nOffsetRight != MAXINT16 || nWidth == MAXINT16)
 		return;
+
+	if (nWidth < 0)	// -nWidth 为百分比
+		nWidth = nOrgWidth * -nWidth / 100;
 
 	if (nOffsetLeft != MAXINT16)
 	{
@@ -578,6 +578,13 @@ CUIRadioBox *CUIView::AddRadioBox(LPCWSTR lpFileName)
 CUIAnimation *CUIView::AddAnimation(LPCWSTR lpFileName)
 {
 	auto pItem = new CUIAnimation(this, lpFileName);
+	MyAddChild(pItem);
+	return pItem;
+}
+
+CUIHotKey *CUIView::AddHotKey()
+{
+	auto pItem = new CUIHotKey(this);
 	MyAddChild(pItem);
 	return pItem;
 }

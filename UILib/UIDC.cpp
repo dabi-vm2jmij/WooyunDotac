@@ -107,7 +107,7 @@ CUITheme g_theme;
 
 CUITheme::CUITheme()
 {
-	if ((m_hModule = GetModuleHandle(_T("UxTheme.dll"))) == NULL && (m_hModule = LoadLibrary(_T("UxTheme.dll"))) == NULL)
+	if ((m_hModule = GetModuleHandleW(L"UxTheme.dll")) == NULL && (m_hModule = LoadLibraryW(L"UxTheme.dll")) == NULL)
 		return;
 
 	(PVOID &)m_pBufferedPaintInit   = GetProcAddress(m_hModule, "BufferedPaintInit");

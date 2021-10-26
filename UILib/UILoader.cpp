@@ -203,6 +203,10 @@ bool CUILoader::AddChild(tinyxml2::XMLElement *pElem, CUIView *pParent)
 	{
 		pView = pParent->AddAnimation(lpFileName);
 	}
+	else if (_stricmp(lpName, "HotKey") == 0)
+	{
+		pView = pParent->AddHotKey();
+	}
 	else if (_stricmp(lpName, "Edit") == 0)
 	{
 		pView = pParent->AddEdit();

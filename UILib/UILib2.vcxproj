@@ -90,6 +90,7 @@
     <ClInclude Include="UIEdit.h" />
     <ClInclude Include="UIFontMgr.h" />
     <ClInclude Include="UIGif.h" />
+    <ClInclude Include="UIHotKey.h" />
     <ClInclude Include="UIImage.h" />
     <ClInclude Include="UILabel.h" />
     <ClInclude Include="UILib.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="UIEdit.cpp" />
     <ClCompile Include="UIFontMgr.cpp" />
     <ClCompile Include="UIGif.cpp" />
+    <ClCompile Include="UIHotKey.cpp" />
     <ClCompile Include="UIImage.cpp" />
     <ClCompile Include="UILabel.cpp" />
     <ClCompile Include="UILib.cpp" />

@@ -6,7 +6,6 @@ class UILIB_API CUILine : public CUIControl
 {
 public:
 	CUILine(CUIView *pParent);
-	virtual ~CUILine();
 
 	void SetLineStyle(COLORREF color, int nStyle = 0);	// nStyle 默认为实线，否则每画 nStyle 间隔 nStyle
 

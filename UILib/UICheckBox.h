@@ -9,7 +9,6 @@ class UILIB_API CUICheckBox : public CUIControl, public CUITextImpl
 {
 public:
 	CUICheckBox(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUICheckBox();
 
 	void BindClick(function<void()> &&fnOnClick) { m_fnOnClick = std::move(fnOnClick); }
 	void SetSpacing(int nSpacing);

@@ -9,7 +9,6 @@ class UILIB_API CUIComboButton : public CUIControl
 {
 public:
 	CUIComboButton(CUIView *pParent);
-	virtual ~CUIComboButton();
 
 	void EndAddChild();
 

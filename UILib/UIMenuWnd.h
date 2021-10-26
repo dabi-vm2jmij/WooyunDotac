@@ -8,7 +8,7 @@ public:
 	CUIMenuWnd(CUIMenu *pUIMenu);
 	~CUIMenuWnd();
 
-	UINT Popup(HWND hParent, int x1, int y1, int x2, int y2, bool bPostMsg);
+	UINT Popup(HWND hParent, int x1, int y1, int x2, int y2);
 
 private:
 	BEGIN_MSG_MAP(CUIMenuWnd)

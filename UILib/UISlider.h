@@ -8,7 +8,6 @@ class UILIB_API CUISlider : public CUIControl
 {
 public:
 	CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName);
-	virtual ~CUISlider();
 
 	void BindChange(function<void()> &&fnOnChange) { m_fnOnChange = std::move(fnOnChange); }
 	void SetMaxPos(int nMaxPos);

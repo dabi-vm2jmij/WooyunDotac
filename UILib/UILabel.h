@@ -7,7 +7,6 @@ class UILIB_API CUILabel : public CUIControl, public CUITextImpl
 {
 public:
 	CUILabel(CUIView *pParent);
-	virtual ~CUILabel();
 
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;

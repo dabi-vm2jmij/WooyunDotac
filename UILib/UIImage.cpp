@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UIImage.h"
 
-CUIImage::CUIImage(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_bClipRgn(true)
+CUIImage::CUIImage(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_bClipParent(true)
 {
 	m_bClickable = false;
 
@@ -10,10 +10,6 @@ CUIImage::CUIImage(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), 
 		m_imagex = GetImage(lpFileName);
 		SetSize(m_imagex.Rect().Size());
 	}
-}
-
-CUIImage::~CUIImage()
-{
 }
 
 void CUIImage::SetImage(const CImagex &imagex)
@@ -37,7 +33,7 @@ void CUIImage::CalcRect(LPRECT lpRect, LPRECT lpClipRect)
 {
 	__super::CalcRect(lpRect, lpClipRect);
 
-	if (m_bClipRgn || m_rect.IsRectEmpty())
+	if (m_bClipParent || m_rect.IsRectEmpty())
 		return;
 
 	m_rcReal = m_rect;
@@ -51,6 +47,6 @@ void CUIImage::OnLoad(const IUIXmlAttrs &attrs)
 	__super::OnLoad(attrs);
 
 	int nValue;
-	if (attrs.GetInt(L"clipRgn", &nValue) && nValue == 0)
-		SetNoClipRgn();
+	if (attrs.GetInt(L"clipParent", &nValue) && nValue == 0)
+		SetClipParent(false);
 }

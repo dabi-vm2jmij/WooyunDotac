@@ -8,7 +8,6 @@ class UILIB_API CUIScrollBar : public CUIControl
 {
 public:
 	CUIScrollBar(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName);
-	virtual ~CUIScrollBar();
 
 	bool IsVertical() const { return m_bVertical; }
 	void BindChange(function<void()> &&fnOnChange) { m_fnOnChange = std::move(fnOnChange); }

@@ -19,10 +19,6 @@ CUIScrollBar::CUIScrollBar(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFil
 	SetWidth(max(nWidth1, nWidth2));
 }
 
-CUIScrollBar::~CUIScrollBar()
-{
-}
-
 void CUIScrollBar::SetRange(int nMinPos, int nMaxPos)
 {
 	if (nMinPos <= 0)

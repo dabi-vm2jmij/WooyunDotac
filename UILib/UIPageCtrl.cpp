@@ -7,10 +7,6 @@ CUIPageCtrl::CUIPageCtrl(CUIView *pParent, LPCWSTR lpFileName) : CUIView(pParent
 		m_strTabImage = lpFileName;
 }
 
-CUIPageCtrl::~CUIPageCtrl()
-{
-}
-
 void CUIPageCtrl::SetCount(UINT nCount)
 {
 	if (m_vecChilds.size() == nCount)

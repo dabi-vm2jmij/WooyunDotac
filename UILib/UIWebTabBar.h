@@ -8,7 +8,6 @@ class UILIB_API CUIWebTabBar : public CUIView
 {
 public:
 	CUIWebTabBar(CUIView *pParent, LPCWSTR lpFileName);
-	virtual ~CUIWebTabBar();
 
 	void BindSelect(function<void()> &&fnOnSelect) { m_fnOnSelect = std::move(fnOnSelect); }
 	void SetTabWidth(int nWidth) { m_nTabWidth = nWidth; }

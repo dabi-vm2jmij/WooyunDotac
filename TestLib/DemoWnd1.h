@@ -4,7 +4,6 @@ class CDemoWnd1 : public CUIWindow
 {
 public:
 	CDemoWnd1();
-	~CDemoWnd1();
 
 private:
 	virtual void OnCreate() override;
