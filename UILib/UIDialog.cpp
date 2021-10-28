@@ -5,16 +5,32 @@ CUIDialog::CUIDialog(bool bModal) : m_bModal(bModal)
 {
 }
 
+static void SearchButtons(CUIView *pView, LPCWSTR lpszId, vector<CUIButton *> &vecButtons)
+{
+	if (_wcsicmp(pView->GetId(), lpszId) == 0)
+	{
+		if (auto pButton = dynamic_cast<CUIButton *>(pView))
+			vecButtons.push_back(pButton);
+	}
+
+	for (auto pItem : pView->GetChilds())
+		SearchButtons(pItem, lpszId, vecButtons);
+}
+
 void CUIDialog::OnCreate()
 {
 	__super::OnCreate();
 
-	auto pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"确定"));
-	if (pButton)
+	vector<CUIButton *> vecButtons;
+	SearchButtons(GetRootView(), L"确定", vecButtons);
+
+	for (auto pButton : vecButtons)
 		pButton->BindClick([this]{ OnOK(); });
 
-	pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"取消"));
-	if (pButton)
+	vecButtons.clear();
+	SearchButtons(GetRootView(), L"取消", vecButtons);
+
+	for (auto pButton : vecButtons)
 		pButton->BindClick([this]{ OnCancel(); });
 
 	CenterWindow();
@@ -68,9 +84,17 @@ LRESULT CUIDialog::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHan
 
 		if (wParam == VK_RETURN)
 		{
-			auto pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"确定"));
-			if (pButton && pButton->IsRealVisible())
-				OnOK();
+			vector<CUIButton *> vecButtons;
+			SearchButtons(GetRootView(), L"确定", vecButtons);
+
+			for (auto pButton : vecButtons)
+			{
+				if (pButton->IsRealVisible() && pButton->IsRealEnabled())
+				{
+					OnOK();
+					break;
+				}
+			}
 		}
 		else
 			OnCancel();

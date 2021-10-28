@@ -21,22 +21,34 @@ END_MESSAGE_MAP()
 
 // CUIDialog 消息处理程序
 
+static void SearchButtons(CUIView *pView, LPCWSTR lpszId, vector<CUIButton *> &vecButtons)
+{
+	if (_wcsicmp(pView->GetId(), lpszId) == 0)
+	{
+		if (auto pButton = dynamic_cast<CUIButton *>(pView))
+			vecButtons.push_back(pButton);
+	}
+
+	for (auto pItem : pView->GetChilds())
+		SearchButtons(pItem, lpszId, vecButtons);
+}
+
 int CUIDialog::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// TODO:  在此添加您专用的创建代码
-	auto pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"确定"));
-	if (pButton)
+	vector<CUIButton *> vecButtons;
+	SearchButtons(GetRootView(), L"确定", vecButtons);
+
+	for (auto pButton : vecButtons)
 		pButton->BindClick([this]{ OnOK(); });
 
-	pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"取消"));
-	if (pButton)
-		pButton->BindClick([this]{ OnCancel(); });
+	vecButtons.clear();
+	SearchButtons(GetRootView(), L"取消", vecButtons);
 
-	pButton = dynamic_cast<CUIButton *>(m_rootView.Search(L"关闭"));
-	if (pButton)
+	for (auto pButton : vecButtons)
 		pButton->BindClick([this]{ OnCancel(); });
 
 	CenterWindow();
@@ -73,11 +85,23 @@ void CUIDialog::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	{
 	case VK_RETURN:
 	case VK_ESCAPE:
-		if (GetKeyState(VK_CONTROL) < 0 || GetKeyState(VK_MENU) < 0 || GetKeyState(VK_SHIFT) < 0)
+		if (GetKeyState(VK_CONTROL) < 0 || GetKeyState(VK_MENU) < 0 || GetKeyState(VK_LBUTTON) < 0)
 			break;
 
 		if (nChar == VK_RETURN)
-			OnOK();
+		{
+			vector<CUIButton *> vecButtons;
+			SearchButtons(GetRootView(), L"确定", vecButtons);
+
+			for (auto pButton : vecButtons)
+			{
+				if (pButton->IsRealVisible() && pButton->IsRealEnabled())
+				{
+					OnOK();
+					break;
+				}
+			}
+		}
 		else
 			OnCancel();
 	}
