@@ -9,6 +9,7 @@ public:
 	CUIControl(CUIView *pParent);
 
 	void SetDraggable(bool bDraggable) { m_bDraggable = bDraggable; }
+	bool IsDraggable() const { return m_bDraggable; }
 	void SetCursor(HCURSOR hCursor) { m_hCursor = hCursor; }
 	void SetToolTip(LPCWSTR lpText) { m_strToolTip = lpText ? lpText : L""; }
 	virtual HCURSOR GetCursor() const { return m_hCursor; }

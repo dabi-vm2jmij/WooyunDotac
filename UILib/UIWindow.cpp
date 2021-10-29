@@ -265,11 +265,13 @@ void CUIWindow::OnSize(UINT nType, CSize size)
 		GetWindowRect(rcWnd);
 		ScreenToClient(rcWnd);
 
-		// 大小改变后重建缓存图，并记录原点
-		if (m_pLayered->m_imageWnd.IsNull() || m_pLayered->m_imageWnd.GetWidth() != rcWnd.Width() || m_pLayered->m_imageWnd.GetHeight() != rcWnd.Height())
+		// 大小或原点改变后重建缓存图，并记录原点
+		CImage &imageWnd = m_pLayered->m_imageWnd;
+
+		if (imageWnd.IsNull() || imageWnd.GetWidth() != rcWnd.Width() || imageWnd.GetHeight() != rcWnd.Height() || m_pLayered->m_point != -rcWnd.TopLeft())
 		{
-			m_pLayered->m_imageWnd.Destroy();
-			m_pLayered->m_imageWnd.Create(rcWnd.Width(), rcWnd.Height(), 32, CImage::createAlphaChannel);
+			imageWnd.Destroy();
+			imageWnd.Create(rcWnd.Width(), rcWnd.Height(), 32, CImage::createAlphaChannel);
 			m_pLayered->m_clipRect = rcWnd;
 			m_pLayered->m_point = -rcWnd.TopLeft();
 		}
@@ -334,10 +336,12 @@ void CUIWindow::DoPaint(CUIDC &dc) const
 
 void CUIWindow::UpdateLayered(HDC hDC)
 {
-	if (!m_pLayered || m_pLayered->m_imageWnd.IsNull())
+	CImage &imageWnd = m_pLayered->m_imageWnd;
+
+	if (!m_pLayered || imageWnd.IsNull())
 		return;
 
-	HDC hImgDC = m_pLayered->m_imageWnd.GetDC();
+	HDC hImgDC = imageWnd.GetDC();
 
 	if (!m_pLayered->m_clipRect.IsRectEmpty())
 	{
@@ -346,13 +350,20 @@ void CUIWindow::UpdateLayered(HDC hDC)
 		SetViewportOrgEx(hImgDC, m_pLayered->m_point.x, m_pLayered->m_point.y, &point);
 		IntersectClipRect(hImgDC, m_pLayered->m_clipRect.left, m_pLayered->m_clipRect.top, m_pLayered->m_clipRect.right, m_pLayered->m_clipRect.bottom);
 
-		DoPaint(CUIDC(hImgDC, m_pLayered->m_point, &m_pLayered->m_imageWnd));
+		if (!m_borderImage)
+		{
+			// FillSolidRect 擦除背景
+			SetBkColor(hImgDC, 0);
+			ExtTextOut(hImgDC, 0, 0, ETO_OPAQUE, m_pLayered->m_clipRect, NULL, 0, NULL);
+		}
+
+		DoPaint(CUIDC(hImgDC, m_pLayered->m_point, &imageWnd));
 		SelectClipRgn(hImgDC, NULL);
 		SetViewportOrgEx(hImgDC, point.x, point.y, NULL);
 		m_pLayered->m_clipRect.SetRectEmpty();
 	}
 
 	BLENDFUNCTION bf = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
-	UpdateLayeredWindow(m_hWnd, hDC, NULL, &CSize(m_pLayered->m_imageWnd.GetWidth(), m_pLayered->m_imageWnd.GetHeight()), hImgDC, &CPoint(), 0, &bf, ULW_ALPHA);
-	m_pLayered->m_imageWnd.ReleaseDC();
+	UpdateLayeredWindow(m_hWnd, hDC, NULL, &CSize(imageWnd.GetWidth(), imageWnd.GetHeight()), hImgDC, &CPoint(), 0, &bf, ULW_ALPHA);
+	imageWnd.ReleaseDC();
 }

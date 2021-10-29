@@ -185,13 +185,8 @@ void CUIDC::FillSolidRect(LPCRECT lpRect, COLORREF color)
 {
 	if (m_pImage == NULL)
 	{
-		COLORREF oldColor = SetBkColor(m_hDC, color);
-
-		if (oldColor != CLR_INVALID)
-		{
-			ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, lpRect, NULL, 0, NULL);
-			SetBkColor(m_hDC, oldColor);
-		}
+		SetBkColor(m_hDC, color);
+		ExtTextOut(m_hDC, 0, 0, ETO_OPAQUE, lpRect, NULL, 0, NULL);
 		return;
 	}
 

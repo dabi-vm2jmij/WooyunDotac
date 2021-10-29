@@ -75,18 +75,19 @@ void CUIWebTabBar::SelectPrev()
 
 void CUIWebTabBar::PaintChilds(CUIDC &dc) const
 {
-	CUIView *pMoving = NULL;
+	// 最后画选中的标签
+	CUIView *pSelTab = NULL;
 
 	for (auto pItem : m_vecChilds)
 	{
-		if (pItem->GetOffset().left != MAXINT16)
-			pMoving = pItem;
+		if (((CUIWebTab *)pItem)->IsSelected())
+			pSelTab = pItem;
 		else
 			pItem->DoPaint(dc);
 	}
 
-	if (pMoving)
-		pMoving->DoPaint(dc);
+	if (pSelTab)
+		pSelTab->DoPaint(dc);
 }
 
 void CUIWebTabBar::CalcRect(LPRECT lpRect, LPRECT lpClipRect)

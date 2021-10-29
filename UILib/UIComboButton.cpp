@@ -133,9 +133,16 @@ bool CUIComboButton::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// MenuButton ²Ëµ¥¹Ø±Õ
 			UIHitTest hitTest;
 			GetCursorPos(&hitTest.point);
-			GetRootView()->ScreenToClient(&hitTest.point);
+			bool bMouseEnter = false;
+			auto pRootView = GetRootView();
 
-			if (CUIView::OnHitTest(hitTest))
+			if (pRootView->GetHwnd() == WindowFromPoint(hitTest.point))
+			{
+				pRootView->ScreenToClient(&hitTest.point);
+				bMouseEnter = CUIView::OnHitTest(hitTest);
+			}
+
+			if (bMouseEnter)
 				OnMouseEnter();
 			else
 				OnMouseLeave();

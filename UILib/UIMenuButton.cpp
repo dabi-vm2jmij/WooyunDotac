@@ -26,9 +26,16 @@ void CUIMenuButton::OnLButtonDown(CPoint point)
 
 	// 检查鼠标是否离开
 	GetCursorPos(&point);
-	GetRootView()->ScreenToClient(&point);
+	bool bMouseEnter = false;
+	auto pRootView = GetRootView();
 
-	if (!m_rect.PtInRect(point))
+	if (pRootView->GetHwnd() == WindowFromPoint(point))
+	{
+		pRootView->ScreenToClient(&point);
+		bMouseEnter = m_rect.PtInRect(point) != 0;
+	}
+
+	if (!bMouseEnter)
 	{
 		OnMouseLeave();
 	}
