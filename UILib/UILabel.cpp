@@ -11,7 +11,7 @@ void CUILabel::OnPaint(CUIDC &dc) const
 {
 	__super::OnPaint(dc);
 
-	OnDrawText(dc, CRect(m_rect), DT_END_ELLIPSIS);
+	OnDrawText(dc, m_rect, DT_END_ELLIPSIS);
 }
 
 void CUILabel::OnTextSize(CSize size)

@@ -16,6 +16,7 @@ BEGIN_MESSAGE_MAP(CUIDialog, CUIWindow)
 	ON_WM_CREATE()
 	ON_WM_WINDOWPOSCHANGING()
 	ON_WM_CLOSE()
+	ON_WM_DESTROY()
 	ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
@@ -72,10 +73,19 @@ void CUIDialog::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 void CUIDialog::OnClose()
 {
 	// TODO:  在此添加消息处理程序代码和/或调用默认值
-	if (m_fnOnClose)
-		m_fnOnClose();
+	if (m_fnOnClose && !m_fnOnClose())
+		return;
 
 	__super::OnClose();
+}
+
+void CUIDialog::OnDestroy()
+{
+	CUIWindow::OnDestroy();
+
+	// TODO:  在此处添加消息处理程序代码
+	if (m_fnOnDestroy)
+		m_fnOnDestroy();
 }
 
 void CUIDialog::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)

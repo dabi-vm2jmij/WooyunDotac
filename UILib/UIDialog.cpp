@@ -51,10 +51,18 @@ void CUIDialog::OnWindowPosChanging(WINDOWPOS *lpWndPos)
 
 void CUIDialog::OnClose()
 {
-	if (m_fnOnClose)
-		m_fnOnClose();
+	if (m_fnOnClose && !m_fnOnClose())
+		return;
 
 	__super::OnClose();
+}
+
+void CUIDialog::OnDestroy()
+{
+	__super::OnDestroy();
+
+	if (m_fnOnDestroy)
+		m_fnOnDestroy();
 }
 
 void CUIDialog::OnOK()

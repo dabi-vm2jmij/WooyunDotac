@@ -5,7 +5,7 @@
 #define BRACE_L		2
 #define BRACE_R		3
 
-CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0), m_nMaxWidth(MAXINT16)
+CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0), m_bGdiplus(false), m_nMaxWidth(MAXINT16)
 {
 }
 
@@ -13,22 +13,44 @@ CUITextImpl::~CUITextImpl()
 {
 }
 
-void CUITextImpl::OnDrawText(CUIDC &dc, LPRECT lpRect, UINT nFormat) const
+void CUITextImpl::OnDrawText(CUIDC &dc, LPCRECT lpRect, UINT nFormat) const
 {
 	if (m_strText.empty() || IsRectEmpty(lpRect))
 		return;
 
-	if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
+	CRect rect(lpRect);
+
+	if (m_bGdiplus)
+	{
+		using namespace Gdiplus;
+		StringFormat sf = StringFormat::GenericTypographic();
+
+		if (wcschr(m_strText.c_str(), '\n') == NULL)
+			sf.SetFormatFlags(StringFormatFlagsNoWrap);
+
+		if (nFormat & DT_CENTER)
+			sf.SetAlignment(StringAlignmentCenter);
+
+		if (nFormat & DT_VCENTER)
+			sf.SetLineAlignment(StringAlignmentCenter);
+
+		if (nFormat & DT_END_ELLIPSIS)
+			sf.SetTrimming(StringTrimmingEllipsisCharacter);
+
+		Graphics(dc).DrawString(m_strText.c_str(), -1, &Font(dc, m_hFont), RectF((float)rect.left, (float)rect.top, (float)rect.Width(), (float)rect.Height()), &sf, &SolidBrush(Color(254, GetRValue(m_color), GetGValue(m_color), GetBValue(m_color))));
+	}
+	else if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
 	{
 		SelectObject(dc, m_hFont);
 		::SetTextColor(dc, m_color);
-		DrawTextW(dc, m_strText.c_str(), -1, lpRect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | nFormat);
+		DrawTextW(dc, m_strText.c_str(), -1, rect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | nFormat);
 	}
 	else
-		OnDrawTextEx(dc, CRect(lpRect), NULL);
+		OnDrawTextEx(dc, rect, NULL);
 
 	// DrawText 后填充 alpha
-	dc.FillAlpha(lpRect, 255);
+	if (!m_bGdiplus)
+		dc.FillAlpha(lpRect, 255);
 }
 
 /*	格式说明
@@ -337,7 +359,7 @@ void CUITextImpl::SetText(LPCWSTR lpText)
 	if (lpText == NULL)
 		lpText = L"";
 
-	if (wcschr(lpText, '{') && wcschr(lpText, '\n') == NULL)
+	if (!m_bGdiplus && wcschr(lpText, '{') && wcschr(lpText, '\n') == NULL)
 	{
 		LPWSTR szText = (LPWSTR)alloca((wcslen(lpText) + 1) * 2);
 
@@ -375,14 +397,28 @@ void CUITextImpl::RecalcSize()
 
 	if (m_strText.size())
 	{
-		if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
+		CUIComDC dc(m_hFont);
+
+		if (m_bGdiplus)
+		{
+			using namespace Gdiplus;
+			StringFormat sf = StringFormat::GenericTypographic();
+
+			if (wcschr(m_strText.c_str(), '\n') == NULL)
+				sf.SetFormatFlags(StringFormatFlagsNoWrap);
+
+			RectF rect;
+			Graphics(dc).MeasureString(m_strText.c_str(), -1, &Font(dc, m_hFont), PointF(), &sf, &rect);
+			size.SetSize((int)ceil(rect.Width), (int)ceil(rect.Height));
+		}
+		else if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
 		{
 			CRect rect;
-			DrawTextW(CUIComDC(m_hFont), m_strText.c_str(), -1, rect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | DT_CALCRECT);
+			DrawTextW(dc, m_strText.c_str(), -1, rect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | DT_CALCRECT);
 			size = rect.Size();
 		}
 		else
-			OnDrawTextEx(CUIComDC(NULL), NULL, &size);
+			OnDrawTextEx(dc, NULL, &size);
 
 		if (size.cx > m_nMaxWidth)
 			size.cx = m_nMaxWidth;
@@ -405,9 +441,12 @@ void CUITextImpl::OnLoadText(const IUIXmlAttrs &attrs)
 		SetTextColor(color);
 	}
 
-	int nWidth;
-	if (attrs.GetInt(L"maxWidth", &nWidth))
-		SetMaxWidth(nWidth);
+	int nValue;
+	if (attrs.GetInt(L"gdiplus", &nValue) && nValue)
+		SetGdiplus(true);
+
+	if (attrs.GetInt(L"maxWidth", &nValue))
+		SetMaxWidth(nValue);
 
 	if (lpStr = attrs.GetStr(L"text"))
 		SetText(lpStr);

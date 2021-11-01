@@ -109,7 +109,7 @@ void CImagex::BitBlt(HDC hdcDst, int xDst, int yDst, int nDstWidth, int nDstHeig
 	ATLASSERT(!m_spImage->IsNull());
 	ATLASSERT(nDstWidth > 0 && nDstHeight > 0);
 
-	::BitBlt(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CUIComDC(Image()), xSrc, ySrc, dwROP);
+	::BitBlt(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CImageDC(Image()), xSrc, ySrc, dwROP);
 }
 
 void CImagex::BitBlt(HDC hdcDst, const CRect &rcDst, const CPoint &ptSrc, DWORD dwROP) const
@@ -135,10 +135,10 @@ void CImagex::Draw(HDC hdcDst, int xDst, int yDst, int nDstWidth, int nDstHeight
 	if (HasAlphaChannel(Image()))
 	{
 		BLENDFUNCTION bf = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
-		::AlphaBlend(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CUIComDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, bf);
+		::AlphaBlend(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CImageDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, bf);
 	}
 	else
-		::StretchBlt(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CUIComDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, SRCCOPY);
+		::StretchBlt(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CImageDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, SRCCOPY);
 }
 
 void CImagex::Draw(HDC hdcDst, const CRect &rcDst, const CRect &rcSrc) const
@@ -172,7 +172,7 @@ void CImagex::AlphaBlend(HDC hdcDst, int xDst, int yDst, int nDstWidth, int nDst
 	ATLASSERT(nDstWidth > 0 && nDstHeight > 0 && nSrcWidth > 0 && nSrcHeight > 0);
 
 	BLENDFUNCTION bf = { AC_SRC_OVER, 0, nSrcAlpha, AC_SRC_ALPHA };
-	::AlphaBlend(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CUIComDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, bf);
+	::AlphaBlend(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CImageDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, bf);
 }
 
 void CImagex::AlphaBlend(HDC hdcDst, const CRect &rcDst, const CRect &rcSrc, BYTE nSrcAlpha) const
@@ -195,7 +195,7 @@ void CImagex::StretchBlt(HDC hdcDst, int xDst, int yDst, int nDstWidth, int nDst
 	ATLASSERT(!m_spImage->IsNull());
 	ATLASSERT(nDstWidth > 0 && nDstHeight > 0 && nSrcWidth > 0 && nSrcHeight > 0);
 
-	::StretchBlt(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CUIComDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, dwROP);
+	::StretchBlt(hdcDst, xDst, yDst, nDstWidth, nDstHeight, CImageDC(Image()), xSrc, ySrc, nSrcWidth, nSrcHeight, dwROP);
 }
 
 void CImagex::StretchBlt(HDC hdcDst, const CRect &rcDst, const CRect &rcSrc, DWORD dwROP) const
@@ -233,5 +233,5 @@ void CImagex::Scale9Draw(HDC hdcDst, const CRect &rcDst, bool bAlpha) const
 		};
 	}
 
-	::Scale9Draw(hdcDst, rcDst, CUIComDC(Image()), Rect(), fnDraw);
+	::Scale9Draw(hdcDst, rcDst, CImageDC(Image()), Rect(), fnDraw);
 }
