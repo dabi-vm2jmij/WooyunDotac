@@ -18,6 +18,7 @@ public:
 protected:
 	virtual void OnLoad(const IUIXmlAttrs &attrs) override;
 	virtual void OnPaint(CUIDC &dc) const override;
+	virtual void OnEnable(bool bEnable) override;
 	virtual void OnLButtonUp(CPoint point) override;
 	virtual void OnTextSize(CSize size) override;
 	virtual void OnChecked() {}

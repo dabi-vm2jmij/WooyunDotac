@@ -5,7 +5,7 @@
 #define BRACE_L		2
 #define BRACE_R		3
 
-CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0), m_bGdiplus(false), m_nMaxWidth(MAXINT16)
+CUITextImpl::CUITextImpl() : m_hFont(GetDefaultFont()), m_color(0), m_bGdiplus(false), m_bWordBreak(false), m_nMaxWidth(0)
 {
 }
 
@@ -25,7 +25,7 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPCRECT lpRect, UINT nFormat) const
 		using namespace Gdiplus;
 		StringFormat sf = StringFormat::GenericTypographic();
 
-		if (wcschr(m_strText.c_str(), '\n') == NULL)
+		if (!m_bWordBreak)
 			sf.SetFormatFlags(StringFormatFlagsNoWrap);
 
 		if (nFormat & DT_CENTER)
@@ -41,9 +41,14 @@ void CUITextImpl::OnDrawText(CUIDC &dc, LPCRECT lpRect, UINT nFormat) const
 	}
 	else if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
 	{
+		if (m_bWordBreak)
+			nFormat |= DT_WORDBREAK;
+		else if (wcschr(m_strText.c_str(), '\n') == NULL)
+			nFormat |= DT_SINGLELINE;
+
 		SelectObject(dc, m_hFont);
 		::SetTextColor(dc, m_color);
-		DrawTextW(dc, m_strText.c_str(), -1, rect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | nFormat);
+		DrawTextW(dc, m_strText.c_str(), -1, rect, DT_NOPREFIX | nFormat);
 	}
 	else
 		OnDrawTextEx(dc, rect, NULL);
@@ -375,8 +380,21 @@ void CUITextImpl::SetText(LPCWSTR lpText)
 	}
 }
 
+void CUITextImpl::SetGdiplus(bool bGdiplus)
+{
+	ATLASSERT(m_strText.empty());
+	m_bGdiplus = bGdiplus;
+}
+
+void CUITextImpl::SetWordBreak(bool bWordBreak)
+{
+	ATLASSERT(m_strText.empty());
+	m_bWordBreak = bWordBreak;
+}
+
 void CUITextImpl::SetMaxWidth(int nWidth)
 {
+	ATLASSERT(nWidth >= 0);
 	if (m_nMaxWidth != nWidth)
 	{
 		m_nMaxWidth = nWidth;
@@ -404,23 +422,31 @@ void CUITextImpl::RecalcSize()
 			using namespace Gdiplus;
 			StringFormat sf = StringFormat::GenericTypographic();
 
-			if (wcschr(m_strText.c_str(), '\n') == NULL)
+			if (!m_bWordBreak)
 				sf.SetFormatFlags(StringFormatFlagsNoWrap);
 
 			RectF rect;
-			Graphics(dc).MeasureString(m_strText.c_str(), -1, &Font(dc, m_hFont), PointF(), &sf, &rect);
+			Graphics(dc).MeasureString(m_strText.c_str(), -1, &Font(dc, m_hFont), RectF(0, 0, (float)m_nMaxWidth, 0), &sf, &rect);
 			size.SetSize((int)ceil(rect.Width), (int)ceil(rect.Height));
 		}
 		else if (wcschr(m_strText.c_str(), BRACE_L) == NULL)
 		{
+			UINT nFormat = 0;
+
+			if (m_bWordBreak)
+				nFormat |= DT_WORDBREAK;
+			else if (wcschr(m_strText.c_str(), '\n') == NULL)
+				nFormat |= DT_SINGLELINE;
+
 			CRect rect;
-			DrawTextW(dc, m_strText.c_str(), -1, rect, DT_NOPREFIX | (wcschr(m_strText.c_str(), '\n') ? 0 : DT_SINGLELINE) | DT_CALCRECT);
+			rect.right = m_nMaxWidth;
+			DrawTextW(dc, m_strText.c_str(), -1, rect, DT_NOPREFIX | nFormat | DT_CALCRECT);
 			size = rect.Size();
 		}
 		else
 			OnDrawTextEx(dc, NULL, &size);
 
-		if (size.cx > m_nMaxWidth)
+		if (size.cx > m_nMaxWidth && m_nMaxWidth)
 			size.cx = m_nMaxWidth;
 	}
 
@@ -444,6 +470,9 @@ void CUITextImpl::OnLoadText(const IUIXmlAttrs &attrs)
 	int nValue;
 	if (attrs.GetInt(L"gdiplus", &nValue) && nValue)
 		SetGdiplus(true);
+
+	if (attrs.GetInt(L"wordBreak", &nValue) && nValue)
+		SetWordBreak(true);
 
 	if (attrs.GetInt(L"maxWidth", &nValue))
 		SetMaxWidth(nValue);

@@ -26,7 +26,7 @@ void CUICheckBox::SetCheck(bool bCheck)
 		return;
 
 	m_bCheck = bCheck;
-	m_imagex.SetFrameIndex(bCheck);
+	m_imagex.SetFrameIndex((m_imagex.GetFrameCount() >= 4 && !IsRealEnabled()) * 2 + bCheck);
 	InvalidateRect();
 
 	if (bCheck)
@@ -45,6 +45,14 @@ void CUICheckBox::OnPaint(CUIDC &dc) const
 	rect.bottom = rect.top + m_textSize.cy;
 	rect.left += m_imagex.Rect().Width() + m_nSpacing;
 	OnDrawText(dc, rect, DT_END_ELLIPSIS);
+}
+
+void CUICheckBox::OnEnable(bool bEnable)
+{
+	__super::OnEnable(bEnable);
+
+	m_imagex.SetFrameIndex((m_imagex.GetFrameCount() >= 4 && !bEnable) * 2 + m_bCheck);
+	InvalidateRect();
 }
 
 void CUICheckBox::OnLButtonUp(CPoint point)

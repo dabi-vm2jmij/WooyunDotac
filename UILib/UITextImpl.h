@@ -13,7 +13,8 @@ public:
 	void SetTextColor(COLORREF color);
 	void SetText(LPCWSTR lpText);
 	LPCWSTR GetText() const { return m_strText.c_str(); }
-	void SetGdiplus(bool bGdiplus) { m_bGdiplus = bGdiplus; }
+	void SetGdiplus(bool bGdiplus);
+	void SetWordBreak(bool bWordBreak);
 	void SetMaxWidth(int nWidth);
 	CSize GetTextSize() const { return m_textSize; }
 
@@ -28,7 +29,8 @@ protected:
 	wstring  m_strText;
 	HFONT    m_hFont;
 	COLORREF m_color;
-	bool     m_bGdiplus;
-	int      m_nMaxWidth;
+	bool     m_bGdiplus;	// 使用 gdiplus 绘制
+	bool     m_bWordBreak;	// 超过 maxWidth 自动换行
+	int      m_nMaxWidth;	// calcSize 的最大宽度
 	CSize    m_textSize;
 };
