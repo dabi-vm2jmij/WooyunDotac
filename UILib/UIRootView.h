@@ -21,7 +21,7 @@ public:
 	BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
 	HWND GetHwnd() const;
 	void UpdateLayout();
-	void DoMouseMove();
+	void SafeDeleteItems(const vector<CUIView *> &vecItems);
 	void InvalidateRect(LPCRECT lpRect);
 	virtual void ClientToScreen(LPPOINT lpPoint);
 	virtual void ScreenToClient(LPPOINT lpPoint);

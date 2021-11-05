@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<RootView bgImage="背景.png" style="0x90c00000" exStyle="0x80000" width="360" height="240" caption="31">
+<RootView bgImage="背景.png" style="0x80c00000" exStyle="0x80000" width="360" height="240" caption="31">
 	<View top="0" height="31">
 		<Label left="10" text="关于{6}{b}{#ff0000}悟空{f :-16}{i}{10}游戏{///}{#0000ff}{10}宝盒{//}" color="#ffffff" />
 		<Button right="8" image="关闭.png:4" tooltip="关闭" id="关闭" />

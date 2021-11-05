@@ -203,11 +203,22 @@ void CUIRootView::UpdateLayout()
 	OnNeedLayout(rect);
 
 	if (!rect.IsRectEmpty())
-	{
 		InvalidateRect(rect);
 
-		if (m_pCapture == NULL)
-			DoMouseMove();
+	if (m_bMouseEnter && m_pCapture == NULL)
+	{
+		UIHitTest hitTest;
+		GetCursorPos(&hitTest.point);
+		ScreenToClient(&hitTest.point);
+		OnHitTest(hitTest);
+
+		for (auto hit : hitTest)
+		{
+			if (hit.bEnable)
+				DoMouseEnter(hit.pItem);
+		}
+
+		CheckMouseLeave(hitTest);
 	}
 }
 
@@ -314,25 +325,6 @@ void CUIRootView::OnMouseMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		OnMessage(WM_CONTEXTMENU, 0, lParam);
 }
 
-void CUIRootView::DoMouseMove()
-{
-	if (!m_bMouseEnter)
-		return;
-
-	UIHitTest hitTest;
-	GetCursorPos(&hitTest.point);
-	ScreenToClient(&hitTest.point);
-	OnHitTest(hitTest);
-
-	for (auto hit : hitTest)
-	{
-		if (hit.bEnable)
-			DoMouseEnter(hit.pItem);
-	}
-
-	CheckMouseLeave(hitTest);
-}
-
 void CUIRootView::DoMouseEnter(CUIView *pItem)
 {
 	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); ++it)
@@ -384,6 +376,45 @@ void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 		pItem->m_bMouseEnter = false;
 		pItem->OnMouseLeave();
 	}
+}
+
+void CUIRootView::SafeDeleteItems(const vector<CUIView *> &vecItems)
+{
+	CRect rect;
+	for (auto pItem : vecItems)
+		pItem->SetRect(NULL, rect);
+
+	InvalidateRect(rect);
+
+	// 安全处理，防止野指针
+	if (m_pFocus && !m_pFocus->IsRealVisible())
+		SetFocus(NULL);
+
+	if (m_pCapture && !m_pCapture->IsRealVisible())
+		SetCapture(NULL);
+
+	vector<CUIView *> vecLeaveItems;
+
+	for (auto it = m_vecEnterItems.begin(); it != m_vecEnterItems.end(); )
+	{
+		if (!(*it)->IsRealVisible())
+		{
+			vecLeaveItems.push_back(*it);
+			it = m_vecEnterItems.erase(it);
+		}
+		else
+			++it;
+	}
+
+	for (auto pItem : vecLeaveItems)
+	{
+		pItem->m_bMouseEnter = false;
+		pItem->OnMouseLeave();
+	}
+
+	// 最后再删除
+	for (auto pItem : vecItems)
+		delete pItem;
 }
 
 void CUIRootView::InvalidateRect(LPCRECT lpRect)

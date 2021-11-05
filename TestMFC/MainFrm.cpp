@@ -104,8 +104,9 @@ void CMainFrame::OnShowAbout()
 	// TODO:  在此添加命令处理程序代码
 	CUIResPath resPath(L"关于");
 
-	CUIDialog *pWnd = new CUIDialog(true);
-	pWnd->CreateFromXml(L"关于.xml", m_hWnd);
+	CUIDialog *pDlg = new CUIDialog(true);
+	pDlg->CreateFromXml(L"关于.xml", m_hWnd);
+	pDlg->ShowWindow(SW_SHOW);
 }
 
 void CMainFrame::OnTestFunc()

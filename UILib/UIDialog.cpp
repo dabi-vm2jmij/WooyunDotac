@@ -5,6 +5,18 @@ CUIDialog::CUIDialog(bool bModal) : m_bModal(bModal)
 {
 }
 
+void CUIDialog::UpdateDialog()
+{
+	GetRootView()->UpdateLayout();
+
+	if (m_pLayered)
+	{
+		HDC hDC = GetDC();
+		UpdateLayered(hDC);
+		ReleaseDC(hDC);
+	}
+}
+
 static void SearchButtons(CUIView *pView, LPCWSTR lpszId, vector<CUIButton *> &vecButtons)
 {
 	if (_wcsicmp(pView->GetId(), lpszId) == 0)

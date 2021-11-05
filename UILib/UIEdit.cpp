@@ -101,7 +101,7 @@ void CUIEdit::SetFocus()
 void CUIEdit::NextTabStop(bool bShift)
 {
 	// 找出所有可用的 Edit
-	std::vector<CUIEdit *> vecEdits;
+	vector<CUIEdit *> vecEdits;
 	vecEdits.reserve(4);
 
 	function<void(CUIView *)> fnVisit = [&](CUIView *pView)

@@ -16,6 +16,7 @@ public:
 	void BindDestroy(function<void()> &&fnOnDestroy) { m_fnOnDestroy = std::move(fnOnDestroy); }
 	void BindOK(function<void()> &&fnOnOK) { m_fnOnOK = std::move(fnOnOK); }
 	void BindCancel(function<void()> &&fnOnCancel) { m_fnOnCancel = std::move(fnOnCancel); }
+	void UpdateDialog();
 
 protected:
 	virtual void OnCreate() override;

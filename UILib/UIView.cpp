@@ -439,14 +439,7 @@ void CUIView::DeleteChild(CUIView *pItem)
 		{
 			m_vecChilds.erase(it);
 			InvalidateLayout();
-
-			CRect rect;
-			pItem->SetRect(NULL, rect);
-
-			auto pRootView = GetRootView();
-			pRootView->InvalidateRect(rect);
-			pRootView->DoMouseMove();	// ох OnMouseLeave ты delete
-			delete pItem;
+			GetRootView()->SafeDeleteItems({ pItem });
 			break;
 		}
 	}

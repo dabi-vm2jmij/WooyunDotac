@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<RootView style="0x82cf0000" exStyle="0x80000" width="1000" height="600" border="例子2\背景.png|9" caption="39" title="Demo2">
+<RootView style="0x80cf0000" exStyle="0x80000" width="1000" height="600" border="例子2\背景.png|9" caption="39" title="Demo2">
 	<!--标题栏-->
 	<View top="0*" height="38">
 		<Button right="0*" top="0" image="例子2\关闭.png:3" tooltip="关闭" id="关闭" />

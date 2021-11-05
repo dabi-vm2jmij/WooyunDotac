@@ -31,17 +31,7 @@ void CUIPageCtrl::SetCount(UINT nCount)
 		vector<CUIView *> vecChilds(m_vecChilds.begin() + nCount, m_vecChilds.end());
 		m_vecChilds.erase(m_vecChilds.begin() + nCount, m_vecChilds.end());
 		InvalidateLayout();
-
-		CRect rect;
-		for (auto pItem : vecChilds)
-			pItem->SetRect(NULL, rect);
-
-		auto pRootView = GetRootView();
-		pRootView->InvalidateRect(rect);
-		pRootView->DoMouseMove();
-
-		for (auto pItem : vecChilds)
-			delete pItem;
+		GetRootView()->SafeDeleteItems(vecChilds);
 	}
 
 	if (GetIndex() == -1)

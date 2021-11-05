@@ -99,8 +99,9 @@ LRESULT CMainFrame::OnShowAbout(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &
 {
 	CUIResPath resPath(L"关于");
 
-	CUIDialog *pWnd = new CUIDialog(true);
-	pWnd->CreateFromXml(L"关于.xml", m_hWnd);
+	CUIDialog *pDlg = new CUIDialog(true);
+	pDlg->CreateFromXml(L"关于.xml", m_hWnd);
+	pDlg->ShowWindow(SW_SHOW);
 	return 0;
 }
 
