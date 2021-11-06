@@ -12,7 +12,7 @@ public:
 
 	void SetIcon(const CImagex &imagex);
 	void SetIcons(const CImagex imagexs[], int nCount);
-	CImagex GetIcon(UINT nIndex = 0) const;
+	CImagex GetIcon() const { return m_iconxs[0]; }
 	void SetIconLeft(int nIconLeft);
 	void SetTextLeft(int nTextLeft);
 	void SetTextColors(const COLORREF colors[], int nCount);

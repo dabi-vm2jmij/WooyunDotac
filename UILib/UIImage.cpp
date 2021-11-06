@@ -7,7 +7,7 @@ CUIImage::CUIImage(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), 
 
 	if (lpFileName)
 	{
-		m_imagex = GetImage(lpFileName);
+		m_imagex = ::GetImage(lpFileName);
 		SetSize(m_imagex.Rect().Size());
 	}
 }

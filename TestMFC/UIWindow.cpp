@@ -4,6 +4,8 @@
 #include "stdafx.h"
 #include "UIWindow.h"
 
+static UINT g_nMsgId;
+
 // CUIWindow
 
 IMPLEMENT_DYNAMIC(CUIWindow, CWnd)
@@ -14,6 +16,18 @@ CUIWindow::CUIWindow() : m_rootView(this), m_hWndParent(NULL), m_nBorderSize(0),
 
 CUIWindow::~CUIWindow()
 {
+}
+
+CUIWindow *CUIWindow::FromHwnd(HWND hWnd)
+{
+	if (g_nMsgId == 0)
+	{
+		wchar_t szName[64];
+		swprintf_s(szName, L"GetUIWindow_%d", GetCurrentProcessId());
+		g_nMsgId = RegisterWindowMessageW(szName);
+	}
+
+	return (CUIWindow *)::SendMessage(hWnd, g_nMsgId, 0, 0);
 }
 
 BEGIN_MESSAGE_MAP(CUIWindow, CWnd)
@@ -81,6 +95,12 @@ BOOL CUIWindow::PreCreateWindow(CREATESTRUCT& cs)
 BOOL CUIWindow::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
 	// TODO:  在此添加专用代码和/或调用基类
+	if (message && message == g_nMsgId)
+	{
+		*pResult = (LRESULT)this;
+		return TRUE;
+	}
+
 	if (m_rootView.ProcessWindowMessage(m_hWnd, message, wParam, lParam, *pResult))
 		return TRUE;
 

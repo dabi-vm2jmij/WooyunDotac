@@ -5,7 +5,7 @@ CUIProgress::CUIProgress(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pPar
 {
 	m_bClickable = false;
 
-	m_imagex = GetImage(lpFileName);
+	m_imagex = ::GetImage(lpFileName);
 	SetSize(m_imagex.Rect().Size());
 
 	if (m_imagex.GetFrameCount() > 1)

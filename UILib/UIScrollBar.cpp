@@ -4,7 +4,7 @@
 CUIScrollBar::CUIScrollBar(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName) : CUIControl(pParent), m_nWheelSize(-10), m_nMinPos(100), m_nMaxPos(100), m_fCurPos(0)
 {
 	// 根据滚动条图片确定方向（暂未实现横向）
-	CImagex imagex = GetImage(lpFileName);
+	CImagex imagex = ::GetImage(lpFileName);
 	m_bVertical = imagex.Rect().Width() <= imagex.Rect().Height();
 
 	m_pButton = AddButton(lpFileName);
@@ -12,7 +12,7 @@ CUIScrollBar::CUIScrollBar(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFil
 	m_pButton->SetDraggable(true);
 
 	if (lpBgFileName)
-		SetBgImage(GetImage(lpBgFileName));
+		SetBgImage(::GetImage(lpBgFileName));
 
 	// 设置最大宽度
 	int nWidth1 = m_pButton->GetSize().cx, nWidth2 = m_bgImagex.Rect().Width();

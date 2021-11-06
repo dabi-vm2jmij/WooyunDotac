@@ -5,7 +5,7 @@ CUIAnimation::CUIAnimation(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pP
 {
 	m_bClickable = false;
 
-	m_imagex = GetImage(lpFileName);
+	m_imagex = ::GetImage(lpFileName);
 	SetSize(m_imagex.Rect().Size());
 }
 

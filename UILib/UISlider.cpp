@@ -8,7 +8,7 @@ CUISlider::CUISlider(CUIView *pParent, LPCWSTR lpFileName, LPCWSTR lpBgFileName)
 	m_pButton->SetDraggable(true);
 
 	if (lpBgFileName)
-		SetBgImage(GetImage(lpBgFileName));
+		SetBgImage(::GetImage(lpBgFileName));
 
 	// 设置最大高度
 	int nHeight1 = m_pButton->GetSize().cy, nHeight2 = m_bgImagex.Rect().Height();

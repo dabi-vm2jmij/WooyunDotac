@@ -140,14 +140,14 @@ LRESULT CUIShadowWnd::OnWindowPosChanging(UINT uMsg, WPARAM wParam, LPARAM lPara
 {
 	WINDOWPOS *lpWndPos = (WINDOWPOS *)lParam;
 
-	if ((lpWndPos->flags & (SWP_NOMOVE | SWP_NOSIZE)) == 0)
+	if ((lpWndPos->flags & (SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE)) == 0)
 	{
 		CRect rect;
 		GetWindowRect(rect);
 
 		// 防止 y < 0 时自动移到 0
-		if (lpWndPos->cx == rect.Width() && lpWndPos->cy == rect.Height())
-			lpWndPos->y = rect.top;
+		if (rect.top < lpWndPos->y && lpWndPos->y <= 0 && (lpWndPos->cy != rect.Height() || lpWndPos->cx == rect.Width()))
+			lpWndPos->flags |= SWP_NOMOVE | SWP_NOSIZE;
 	}
 
 	if (m_nOwnerType != SIZE_RESTORED || m_bNoUpdate)

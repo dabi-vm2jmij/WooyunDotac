@@ -48,11 +48,6 @@ void CUIButtonEx::SetIcons(const CImagex imagexs[], int nCount)
 	InvalidateRect();
 }
 
-CImagex CUIButtonEx::GetIcon(UINT nIndex) const
-{
-	return m_iconxs[nIndex % _countof(m_iconxs)];
-}
-
 void CUIButtonEx::SetIconLeft(int nIconLeft)
 {
 	if (m_nIconLeft != nIconLeft)
@@ -179,7 +174,7 @@ void CUIButtonEx::OnLoad(const IUIXmlAttrs &attrs)
 	__super::OnLoad(attrs);
 
 	if (LPCWSTR lpFileName = attrs.GetStr(L"icon"))
-		SetIcon(GetImage(lpFileName));
+		SetIcon(::GetImage(lpFileName));
 
 	int nValue;
 	if (attrs.GetInt(L"iconLeft", &nValue))

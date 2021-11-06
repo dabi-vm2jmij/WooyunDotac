@@ -7,6 +7,8 @@ public:
 	CUIWindow();
 	virtual ~CUIWindow();
 
+	static CUIWindow *FromHwnd(HWND hWnd);
+
 	CUIRootView *GetRootView() { return &m_rootView; }
 	bool CreateFromXml(LPCWSTR lpXmlName, HWND hParent = NULL);
 

@@ -378,7 +378,7 @@ void CUIRootView::CheckMouseLeave(const UIHitTest &hitTest)
 	}
 }
 
-void CUIRootView::SafeDeleteItems(const vector<CUIView *> &vecItems)
+void CUIRootView::PostRemoveItems(const vector<CUIView *> &vecItems)
 {
 	CRect rect;
 	for (auto pItem : vecItems)
@@ -411,10 +411,6 @@ void CUIRootView::SafeDeleteItems(const vector<CUIView *> &vecItems)
 		pItem->m_bMouseEnter = false;
 		pItem->OnMouseLeave();
 	}
-
-	// ×îºóÔÙÉ¾³ý
-	for (auto pItem : vecItems)
-		delete pItem;
 }
 
 void CUIRootView::InvalidateRect(LPCRECT lpRect)

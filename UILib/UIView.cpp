@@ -439,7 +439,8 @@ void CUIView::DeleteChild(CUIView *pItem)
 		{
 			m_vecChilds.erase(it);
 			InvalidateLayout();
-			GetRootView()->SafeDeleteItems({ pItem });
+			GetRootView()->PostRemoveItems({ pItem });
+			delete pItem;
 			break;
 		}
 	}
@@ -736,5 +737,5 @@ void CUIView::OnLoad(const IUIXmlAttrs &attrs)
 	}
 
 	if (LPCWSTR lpFileName = attrs.GetStr(L"bgImage"))
-		SetBgImage(GetImage(lpFileName));
+		SetBgImage(::GetImage(lpFileName));
 }

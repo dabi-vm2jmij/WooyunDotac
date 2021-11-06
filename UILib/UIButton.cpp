@@ -5,7 +5,7 @@ CUIButton::CUIButton(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent)
 {
 	if (lpFileName)
 	{
-		SetImage(GetImage(lpFileName));
+		SetImage(::GetImage(lpFileName));
 		SetSize(m_imagexs[1].Rect().Size());
 	}
 }

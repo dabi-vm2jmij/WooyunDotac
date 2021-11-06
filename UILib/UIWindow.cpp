@@ -2,12 +2,26 @@
 #include "UIWindow.h"
 #include "UIShadowWnd.h"
 
+static UINT g_nMsgId;
+
 CUIWindow::CUIWindow() : m_rootView(this), m_hWndParent(NULL), m_nBorderSize(0), m_nCaptionSize(0)
 {
 }
 
 CUIWindow::~CUIWindow()
 {
+}
+
+CUIWindow *CUIWindow::FromHwnd(HWND hWnd)
+{
+	if (g_nMsgId == 0)
+	{
+		wchar_t szName[64];
+		swprintf_s(szName, L"GetUIWindow_%d", GetCurrentProcessId());
+		g_nMsgId = RegisterWindowMessageW(szName);
+	}
+
+	return (CUIWindow *)::SendMessage(hWnd, g_nMsgId, 0, 0);
 }
 
 bool CUIWindow::CreateFromXml(LPCWSTR lpXmlName, HWND hParent)
@@ -23,7 +37,7 @@ void CUIWindow::OnLoadUI(const IUIXmlAttrs &attrs)
 	// 阴影窗口、大小
 	if ((lpFileName = attrs.GetStr(L"shadow")) && (lpNameEnd = wcsrchr(lpFileName, '|')))
 	{
-		m_pShadowWnd = std::make_unique<CUIShadowWnd>(GetImage(wstring(lpFileName, lpNameEnd).c_str()), _wtoi(lpNameEnd + 1));
+		m_pShadowWnd = std::make_unique<CUIShadowWnd>(::GetImage(wstring(lpFileName, lpNameEnd).c_str()), _wtoi(lpNameEnd + 1));
 	}
 	else
 		ATLASSERT(lpFileName == NULL);
@@ -31,7 +45,7 @@ void CUIWindow::OnLoadUI(const IUIXmlAttrs &attrs)
 	// 边框图片、大小
 	if ((lpFileName = attrs.GetStr(L"border")) && (lpNameEnd = wcsrchr(lpFileName, '|')))
 	{
-		m_borderImage = GetImage(wstring(lpFileName, lpNameEnd).c_str());
+		m_borderImage = ::GetImage(wstring(lpFileName, lpNameEnd).c_str());
 		m_nBorderSize = _wtoi(lpNameEnd + 1);
 	}
 	else
@@ -66,6 +80,12 @@ BOOL CUIWindow::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	{
 		ATLASSERT(0);
 		return FALSE;
+	}
+
+	if (uMsg && uMsg == g_nMsgId)
+	{
+		lResult = (LRESULT)this;
+		return TRUE;
 	}
 
 	lResult = 0;

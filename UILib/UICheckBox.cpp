@@ -3,7 +3,7 @@
 
 CUICheckBox::CUICheckBox(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_nSpacing(6), m_bCheck(false)
 {
-	m_imagex = GetImage(lpFileName);
+	m_imagex = ::GetImage(lpFileName);
 	SetSize(m_imagex.Rect().Size());
 	ATLASSERT(m_imagex.GetFrameCount() > 1);
 }

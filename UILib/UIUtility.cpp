@@ -117,7 +117,7 @@ void Scale9Draw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, 
 		return;
 	}
 
-	// 宽带相同
+	// 宽度相同
 	if (nWidth == nSrcWidth)
 	{
 		fnDraw(hdcDst, rcDst.left, rcDst.top, nWidth, nTopH, hdcSrc, rcSrc.left, rcSrc.top, nWidth, nTopH);	// 上

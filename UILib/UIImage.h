@@ -8,6 +8,7 @@ public:
 	CUIImage(CUIView *pParent, LPCWSTR lpFileName);
 
 	void SetImage(const CImagex &imagex);
+	CImagex GetImage() const { return m_imagex; }
 	void SetClipParent(bool bClipParent) { m_bClipParent = bClipParent; }
 
 protected:

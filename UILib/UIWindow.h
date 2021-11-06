@@ -10,6 +10,8 @@ public:
 	CUIWindow();
 	virtual ~CUIWindow();
 
+	static CUIWindow *FromHwnd(HWND hWnd);
+
 	CUIRootView *GetRootView() { return &m_rootView; }
 	bool CreateFromXml(LPCWSTR lpXmlName, HWND hParent = NULL);
 	virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0) override;

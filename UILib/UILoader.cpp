@@ -315,7 +315,7 @@ bool LoadFromXml(LPCWSTR lpXmlName, CUIView *pView)
 {
 	bool bRet = false;
 
-	if (auto pStream = GetStream(lpXmlName))
+	if (auto pStream = ::GetStream(lpXmlName))
 	{
 		CUILoader loader;
 		bRet = loader.Load(pStream, pView);

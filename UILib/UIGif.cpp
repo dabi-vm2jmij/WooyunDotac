@@ -5,7 +5,7 @@ CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_pI
 {
 	m_bClickable = false;
 
-	if (auto pStream = GetStream(lpFileName))
+	if (auto pStream = ::GetStream(lpFileName))
 	{
 		m_pImage = new Gdiplus::Image(pStream);
 		pStream->Release();
