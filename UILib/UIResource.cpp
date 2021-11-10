@@ -9,9 +9,6 @@ CUIResource::CUIResource() : m_dwTlsIndex(TlsAlloc())
 
 CUIResource::~CUIResource()
 {
-	for (auto pSkin : m_vecSkins)
-		pSkin->Release();
-
 	TlsFree(m_dwTlsIndex);
 	DeleteCriticalSection(&m_critSect);
 }
@@ -28,15 +25,15 @@ void CUIResource::SetResPath(CUIResPath *pResPath) const
 
 UINT CUIResource::LoadSkin(LPCWSTR lpSkinName, bool bUpdate)
 {
-	CUISkin *pSkin = new CUISkin(lpSkinName);
+	auto spSkin = std::make_shared<CUISkin>(lpSkinName);
 	EnterCriticalSection(&m_critSect);
-	m_vecSkins.push_back(pSkin);
+	m_vecSkins.push_back(spSkin);
 
 	if (bUpdate)
 		UpdateImages();
 
 	LeaveCriticalSection(&m_critSect);
-	return (UINT)pSkin;
+	return spSkin->GetId();
 }
 
 bool CUIResource::FreeSkin(UINT nSkinId, bool bUpdate)
@@ -45,12 +42,9 @@ bool CUIResource::FreeSkin(UINT nSkinId, bool bUpdate)
 
 	for (auto it = m_vecSkins.begin(); it != m_vecSkins.end(); ++it)
 	{
-		CUISkin *pSkin = *it;
-
-		if ((UINT)pSkin == nSkinId)
+		if ((*it)->GetId() == nSkinId)
 		{
 			m_vecSkins.erase(it);
-			pSkin->Release();
 
 			if (bUpdate)
 				UpdateImages();
@@ -64,17 +58,23 @@ bool CUIResource::FreeSkin(UINT nSkinId, bool bUpdate)
 	return false;
 }
 
-static UINT &SkinIdOfStream(CUIStream *pStream)
+static std::shared_ptr<CUISkin> &SkinOfStream(IUIStream *pStream)
 {
 #if 0
-	return pStream->m_nSkinId;
+	return ((CUIStream *)pStream)->m_spSkin;
 #else
 	__asm
 	{
 		mov eax, pStream
-		add eax, CUIStream::m_nSkinId
+		add eax, CUIStream::m_spSkin
 	}
 #endif
+}
+
+static UINT SkinIdOfStream(IUIStream *pStream)
+{
+	auto &spSkin = SkinOfStream(pStream);
+	return spSkin ? spSkin->GetId() : 0;
 }
 
 CImagePtr CUIResource::GetImage(LPCWSTR lpFileName)
@@ -112,15 +112,18 @@ CImagePtr CUIResource::GetImage(LPCWSTR lpFileName)
 // 加载或释放皮肤后，更新所有相关的图片
 void CUIResource::UpdateImages()
 {
-	for (auto &it : m_mapImages)
+	for (auto it = m_mapImages.begin(); it != m_mapImages.end(); )
 	{
-		auto &imgInfo = it.second;
+		auto &imgInfo = it->second;
 		auto  spImage = imgInfo.wpImage.lock();
 
 		if (!spImage)
+		{
+			++it;
 			continue;
+		}
 
-		if (auto pStream = FindStream(it.first.c_str()))
+		if (auto pStream = FindStream(it->first.c_str()))
 		{
 			// nSkinId 不同才更新
 			if (imgInfo.nSkinId != SkinIdOfStream(pStream))
@@ -136,11 +139,14 @@ void CUIResource::UpdateImages()
 			}
 
 			pStream->Release();
+			++it;
 		}
+		else
+			it = m_mapImages.erase(it);
 	}
 }
 
-CUIStream *CUIResource::GetStream(LPCWSTR lpFileName)
+IUIStream *CUIResource::GetStream(LPCWSTR lpFileName)
 {
 	wchar_t szFileName[MAX_PATH];
 	GetResPath()->CombinePath(szFileName, lpFileName);
@@ -151,16 +157,13 @@ CUIStream *CUIResource::GetStream(LPCWSTR lpFileName)
 	return pStream;
 }
 
-CUIStream *CUIResource::FindStream(LPCWSTR lpFileName) const
+IUIStream *CUIResource::FindStream(LPCWSTR lpFileName) const
 {
 	for (auto it = m_vecSkins.rbegin(); it != m_vecSkins.rend(); ++it)
 	{
-		CUISkin *pSkin = *it;
-
-		if (auto pStream = pSkin->GetStream(lpFileName))
+		if (auto pStream = (*it)->GetStream(lpFileName))
 		{
-			pSkin->AddRef();
-			SkinIdOfStream(pStream) = (UINT)pSkin;
+			SkinOfStream(pStream) = *it;
 			return pStream;
 		}
 	}

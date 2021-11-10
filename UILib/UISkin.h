@@ -8,15 +8,14 @@ public:
 	CUISkin(LPCWSTR lpSkinName);
 	~CUISkin();
 
-	void AddRef();
-	void Release();
-	CUIStream *GetStream(LPCWSTR lpFileName);
+	UINT GetId() const { return m_nId; }
+	IUIStream *GetStream(LPCWSTR lpFileName);
 
 private:
 	void LoadSkin(LPCWSTR lpSkinName);
 	LPCSTR FindFile(LPCSTR lpBase, LPWSTR lpFileName) const;
 
-	ULONG   m_nRefCount;
+	UINT    m_nId;
 	LPVOID  m_lpAlloc;
 	LPCVOID m_lpData;
 	wchar_t m_szSkinPath[MAX_PATH];

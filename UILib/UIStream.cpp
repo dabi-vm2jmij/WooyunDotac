@@ -57,14 +57,11 @@ void CUIStream::operator delete(void *pData)
 }
 
 // for Release
-CUIStream *CUIStream::FromData(LPCVOID lpData, DWORD dwSize, bool bNeedFree)
+IUIStream *IUIStream::FromData(LPCVOID lpData, DWORD dwSize, bool bNeedFree)
 {
-	if (lpData == NULL || dwSize == 0)
-		return NULL;
-
 	CUIStream *pStream = new CUIStream(lpData, dwSize);
 
-	if (bNeedFree)
+	if (lpData && bNeedFree)
 	{
 		if (pStream)
 			pStream->m_dwCapacity = dwSize;		// Îö¹¹Ê± free
@@ -76,7 +73,7 @@ CUIStream *CUIStream::FromData(LPCVOID lpData, DWORD dwSize, bool bNeedFree)
 }
 
 // for Debug
-CUIStream *CUIStream::FromFile(LPCWSTR lpFileName)
+IUIStream *IUIStream::FromFile(LPCWSTR lpFileName)
 {
 	HANDLE hFile = CreateFileW(lpFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
@@ -90,7 +87,7 @@ CUIStream *CUIStream::FromFile(LPCWSTR lpFileName)
 	return FromData(lpData, dwSize, true);
 }
 
-CUIStream::CUIStream(LPCVOID lpData, DWORD dwSize) : m_nRefCount(1), m_dwCurPos(0), m_dwCapacity(0), m_dwSize(dwSize), m_lpData((LPSTR)lpData), m_nSkinId(0)
+CUIStream::CUIStream(LPCVOID lpData, DWORD dwSize) : m_nRefCount(1), m_dwCurPos(0), m_dwCapacity(0), m_dwSize(dwSize), m_lpData((LPSTR)lpData)
 {
 }
 
@@ -98,9 +95,6 @@ CUIStream::~CUIStream()
 {
 	if (m_lpData && m_dwCapacity)
 		free(m_lpData);
-
-	if (m_nSkinId)
-		((CUISkin *)m_nSkinId)->Release();
 }
 
 HRESULT CUIStream::QueryInterface(REFIID riid, void **ppvObject)

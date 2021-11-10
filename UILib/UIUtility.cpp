@@ -45,7 +45,7 @@ CImagex GetImage(LPCWSTR lpFileName)
 	return imagex;
 }
 
-CUIStream *GetStream(LPCWSTR lpFileName)
+IUIStream *GetStream(LPCWSTR lpFileName)
 {
 	if (lpFileName == NULL || *lpFileName == 0)
 	{

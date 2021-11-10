@@ -6,7 +6,7 @@
 class CUILoader
 {
 public:
-	bool Load(CUIStream *pStream, CUIView *pView);
+	bool Load(IUIStream *pStream, CUIView *pView);
 	bool Load(tinyxml2::XMLElement *pElem, CUIView *pView);
 	HFONT GetFont(LPCWSTR lpIdOrName) const;
 
@@ -101,7 +101,7 @@ bool IsNameClass(LPCSTR lpName, LPCVOID pView)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool CUILoader::Load(CUIStream *pStream, CUIView *pView)
+bool CUILoader::Load(IUIStream *pStream, CUIView *pView)
 {
 	// ¼ÓÔØ xml ×Ö·û´®
 	tinyxml2::XMLDocument doc;

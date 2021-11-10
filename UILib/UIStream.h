@@ -1,19 +1,28 @@
 #pragma once
 
-// 快速 IStream，可以直接从数据得到一个 IStream，而不用 GlobalAlloc 申请+拷贝内存
-// 还可以直接在栈上得到一个 IStream，比如：&CUIStream(lpData, dwSize)
+// 快速 IStream，可以直接从数据得到一个 IStream，而不用 GlobalAlloc + CopyMemory
 
-class UILIB_API CUIStream : public IStream
+class IUIStream : public IStream
 {
 public:
+	virtual LPCSTR Data() const = 0;
+	virtual DWORD  Size() const = 0;
+
+	UILIB_API static IUIStream *FromData(LPCVOID lpData, DWORD dwSize, bool bNeedFree = false);
+	UILIB_API static IUIStream *FromFile(LPCWSTR lpFileName);
+};
+
+class CUISkin;
+
+class CUIStream final : public IUIStream
+{
+	friend class IUIStream;
+public:
 	CUIStream(LPCVOID lpData, DWORD dwSize);
-	virtual ~CUIStream();
+	~CUIStream();
 
-	static CUIStream *FromData(LPCVOID lpData, DWORD dwSize, bool bNeedFree = false);
-	static CUIStream *FromFile(LPCWSTR lpFileName);
-
-	LPCSTR Data() const { return m_lpData; }
-	DWORD  Size() const { return m_dwSize; }
+	LPCSTR Data() const override { return m_lpData; }
+	DWORD  Size() const override { return m_dwSize; }
 
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject);
 	ULONG   STDMETHODCALLTYPE AddRef();
@@ -41,7 +50,7 @@ private:
 	DWORD m_dwCapacity;
 	DWORD m_dwSize;
 	LPSTR m_lpData;
-	UINT  m_nSkinId;
+	std::shared_ptr<CUISkin> m_spSkin;
 
 	CUIStream(const CUIStream &) = delete;
 	CUIStream &operator=(const CUIStream &) = delete;

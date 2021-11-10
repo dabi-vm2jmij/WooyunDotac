@@ -8,7 +8,7 @@ namespace UILib
 UILIB_API UINT LoadSkin(LPCWSTR lpSkinName, bool bUpdate = false);
 UILIB_API bool FreeSkin(UINT nSkinId, bool bUpdate = false);
 UILIB_API CImagex GetImage(LPCWSTR lpFileName);
-UILIB_API CUIStream *GetStream(LPCWSTR lpFileName);
+UILIB_API IUIStream *GetStream(LPCWSTR lpFileName);
 UILIB_API bool HasAlphaChannel(const CImage &image);
 UILIB_API void AlphaPng(CImage &image);
 UILIB_API void Scale9Draw(HDC hdcDst, const CRect &rcDst, HDC hdcSrc, const CRect &rcSrc, void (*fnDraw)(HDC, int, int, int, int, HDC, int, int, int, int));

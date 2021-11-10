@@ -17,15 +17,15 @@ public:
 	bool FreeSkin(UINT nSkinId, bool bUpdate);
 
 	CImagePtr GetImage(LPCWSTR lpFileName);
-	CUIStream *GetStream(LPCWSTR lpFileName);
+	IUIStream *GetStream(LPCWSTR lpFileName);
 
 private:
 	void UpdateImages();
-	CUIStream *FindStream(LPCWSTR lpFileName) const;
+	IUIStream *FindStream(LPCWSTR lpFileName) const;
 
 	DWORD m_dwTlsIndex;
 	CRITICAL_SECTION m_critSect;
-	vector<CUISkin *> m_vecSkins;
+	vector<std::shared_ptr<CUISkin>> m_vecSkins;
 
 	struct ImgInfo
 	{

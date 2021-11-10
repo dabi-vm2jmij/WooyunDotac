@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "UISkin.h"
 
-CUISkin::CUISkin(LPCWSTR lpSkinName) : m_nRefCount(1), m_lpAlloc(NULL), m_lpData(NULL)
+static UINT g_nMaxId;
+
+CUISkin::CUISkin(LPCWSTR lpSkinName) : m_nId(InterlockedIncrement(&g_nMaxId)), m_lpAlloc(NULL), m_lpData(NULL)
 {
 	*m_szSkinPath = 0;
 	LoadSkin(lpSkinName);
@@ -11,17 +13,6 @@ CUISkin::~CUISkin()
 {
 	if (m_lpAlloc)
 		free(m_lpAlloc);
-}
-
-void CUISkin::AddRef()
-{
-	InterlockedIncrement(&m_nRefCount);
-}
-
-void CUISkin::Release()
-{
-	if (InterlockedDecrement(&m_nRefCount) == 0)
-		delete this;
 }
 
 // lpSkinName 可以为路径、数据文件、数据内容、资源 Id
@@ -127,7 +118,7 @@ LPCSTR CUISkin::FindFile(LPCSTR lpBase, LPWSTR lpFileName) const
 	return NULL;
 }
 
-CUIStream *CUISkin::GetStream(LPCWSTR lpFileName)
+IUIStream *CUISkin::GetStream(LPCWSTR lpFileName)
 {
 	if (lpFileName == NULL)
 		return NULL;
@@ -138,7 +129,7 @@ CUIStream *CUISkin::GetStream(LPCWSTR lpFileName)
 	{
 		wcscpy_s(szFileName, m_szSkinPath);
 		wcscat_s(szFileName, lpFileName);
-		return CUIStream::FromFile(szFileName);
+		return IUIStream::FromFile(szFileName);
 	}
 
 	if (*(int *)m_lpData != 'JGK')
@@ -150,5 +141,5 @@ CUIStream *CUISkin::GetStream(LPCWSTR lpFileName)
 	if (lpData == NULL)
 		return NULL;
 
-	return CUIStream::FromData((LPCSTR)lpData + 4, *(int *)lpData);
+	return IUIStream::FromData((LPCSTR)lpData + 4, *(int *)lpData);
 }
