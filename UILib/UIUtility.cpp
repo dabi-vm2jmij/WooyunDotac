@@ -214,13 +214,9 @@ bool StrToColor(LPCWSTR lpStr, COLORREF &color)
 		return false;
 
 	LPWSTR lpEnd = NULL;
-	DWORD value = wcstoul(++lpStr, &lpEnd, 16);
+	color = BswapRGB(wcstoul(++lpStr, &lpEnd, 16));
 
-	if (lpStr + 6 != lpEnd || *lpEnd)
-		return false;
-
-	color = BswapRGB(value);
-	return true;
+	return lpEnd == lpStr + 6 && *lpEnd == 0;
 }
 
 DWORD BswapRGB(DWORD color)

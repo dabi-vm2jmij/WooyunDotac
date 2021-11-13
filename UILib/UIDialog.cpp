@@ -52,13 +52,12 @@ void CUIDialog::OnWindowPosChanging(WINDOWPOS *lpWndPos)
 {
 	__super::OnWindowPosChanging(lpWndPos);
 
-	if (m_bModal)
-	{
-		if (lpWndPos->flags & SWP_SHOWWINDOW)
-			GetParent().EnableWindow(FALSE);
-		else if (lpWndPos->flags & SWP_HIDEWINDOW)
-			GetParent().EnableWindow(TRUE);
-	}
+	if (!m_bModal)
+		;
+	else if (lpWndPos->flags & SWP_SHOWWINDOW)
+		GetParent().EnableWindow(FALSE);
+	else if (lpWndPos->flags & SWP_HIDEWINDOW)
+		GetParent().EnableWindow(TRUE);
 }
 
 void CUIDialog::OnClose()
@@ -69,12 +68,12 @@ void CUIDialog::OnClose()
 	__super::OnClose();
 }
 
-void CUIDialog::OnDestroy()
+void CUIDialog::OnFinalMessage(HWND hWnd)
 {
-	__super::OnDestroy();
+	if (m_fnOnFinal)
+		m_fnOnFinal();
 
-	if (m_fnOnDestroy)
-		m_fnOnDestroy();
+	__super::OnFinalMessage(hWnd);
 }
 
 void CUIDialog::OnOK()

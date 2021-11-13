@@ -92,50 +92,41 @@ public:
 	CUITheme();
 	~CUITheme();
 
+	BOOL m_bInited;
+
 	HRESULT (WINAPI *m_pBufferedPaintInit)();
 	HRESULT (WINAPI *m_pBufferedPaintUnInit)();
 	HANDLE  (WINAPI *m_pBeginBufferedPaint)(HDC, LPCRECT, BP_BUFFERFORMAT, LPVOID, HDC *);
 	HRESULT (WINAPI *m_pEndBufferedPaint)(HANDLE, BOOL);
-
-private:
-	HMODULE m_hModule;
 };
 
 CUITheme g_theme;
 
 }	// namespace
 
-CUITheme::CUITheme()
+CUITheme::CUITheme() : m_bInited(FALSE)
 {
-	if ((m_hModule = GetModuleHandleW(L"UxTheme.dll")) == NULL && (m_hModule = LoadLibraryW(L"UxTheme.dll")) == NULL)
+	HMODULE hModule = GetModuleHandleW(L"UxTheme.dll");
+	if (hModule == NULL && (hModule = LoadLibraryW(L"UxTheme.dll")) == NULL)
 		return;
 
-	(PVOID &)m_pBufferedPaintInit   = GetProcAddress(m_hModule, "BufferedPaintInit");
-	(PVOID &)m_pBufferedPaintUnInit = GetProcAddress(m_hModule, "BufferedPaintUnInit");
+	(PVOID &)m_pBufferedPaintInit   = GetProcAddress(hModule, "BufferedPaintInit");
+	(PVOID &)m_pBufferedPaintUnInit = GetProcAddress(hModule, "BufferedPaintUnInit");
+	(PVOID &)m_pBeginBufferedPaint  = GetProcAddress(hModule, "BeginBufferedPaint");
+	(PVOID &)m_pEndBufferedPaint    = GetProcAddress(hModule, "EndBufferedPaint");
 
-	if (m_pBufferedPaintInit == NULL || m_pBufferedPaintUnInit == NULL || m_pBufferedPaintInit() != S_OK)
-	{
-		FreeLibrary(m_hModule);
-		m_hModule = NULL;
-		return;
-	}
-
-	(PVOID &)m_pBeginBufferedPaint = GetProcAddress(m_hModule, "BeginBufferedPaint");
-	(PVOID &)m_pEndBufferedPaint   = GetProcAddress(m_hModule, "EndBufferedPaint");
+	m_bInited = m_pBufferedPaintInit && m_pBufferedPaintUnInit && m_pBeginBufferedPaint && m_pEndBufferedPaint && m_pBufferedPaintInit() == S_OK;
 }
 
 CUITheme::~CUITheme()
 {
-	if (m_hModule)
-	{
+	if (m_bInited)
 		m_pBufferedPaintUnInit();
-		FreeLibrary(m_hModule);
-	}
 }
 
 CUIMemDC::CUIMemDC(HDC hDC, LPCRECT lpClipRect) : m_hDC(hDC), m_hMemDC(NULL), m_hBufferedPaint(NULL), m_clipRect(*lpClipRect)
 {
-	if (g_theme.m_pBeginBufferedPaint && g_theme.m_pEndBufferedPaint)
+	if (g_theme.m_bInited)
 	{
 		if (m_hBufferedPaint = g_theme.m_pBeginBufferedPaint(hDC, m_clipRect, BPBF_TOPDOWNDIB, NULL, &m_hMemDC))
 			return;

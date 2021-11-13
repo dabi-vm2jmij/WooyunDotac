@@ -188,30 +188,25 @@ void CUIButtonEx::OnLoad(const IUIXmlAttrs &attrs)
 
 	OnLoadText(attrs);
 
-	// 四态颜色："#aaaaaa,#bbbbbb,#cccccc"
+	// 四态颜色："#aaaaaa,#bbbbbb,#cccccc,#dddddd"
 	LPCWSTR lpStr = attrs.GetStr(L"colors");
 	if (lpStr == NULL)
 		return;
 
 	COLORREF colors[_countof(m_colors)] = {};
+	int nCount = 0;
 
-	for (int i = 0; i != _countof(colors) && *lpStr == '#'; i++)
+	while (*lpStr)
 	{
-		LPWSTR lpEnd = NULL;
-		DWORD value = wcstoul(++lpStr, &lpEnd, 16);
+		LPCWSTR lpEnd = wcschr(lpStr, ',');
+		ATLVERIFY(StrToColor(lpEnd ? wstring(lpStr, lpEnd).c_str() : lpStr, colors[nCount]));
 
-		if (lpStr + 6 != lpEnd || *lpEnd && *lpEnd != ',')
+		if (++nCount == _countof(colors) || lpEnd == NULL)
 			break;
 
 		lpStr = lpEnd + 1;
-		colors[i] = BswapRGB(value);
-
-		if (*lpEnd == 0)
-		{
-			SetTextColors(colors, i + 1);
-			return;
-		}
 	}
 
-	ATLASSERT(0);
+	if (nCount > 1)
+		SetTextColors(colors, nCount);
 }
