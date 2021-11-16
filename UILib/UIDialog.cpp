@@ -92,6 +92,14 @@ void CUIDialog::OnCancel()
 		PostMessage(WM_SYSCOMMAND, SC_CLOSE);
 }
 
+void CUIDialog::OnTimer(UINT_PTR nIDEvent)
+{
+	if (m_fnOnTimer)
+		m_fnOnTimer(nIDEvent);
+
+	__super::OnTimer(nIDEvent);
+}
+
 LRESULT CUIDialog::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
 	switch (wParam)

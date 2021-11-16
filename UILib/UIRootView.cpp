@@ -57,6 +57,7 @@ BOOL CUIRootView::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		break;
 
 	case WM_MOUSELEAVE:
+		m_hCursor = NULL;
 		m_bMouseEnter = false;
 		CheckMouseLeave(UIHitTest());
 

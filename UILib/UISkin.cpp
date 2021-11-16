@@ -70,6 +70,12 @@ void CUISkin::LoadSkin(LPCWSTR lpSkinName)
 		return;
 
 	DWORD dwSize = GetFileSize(hFile, NULL);
+	if (dwSize < 4 || dwSize > 10 * 1024 * 1024)	// 10MB
+	{
+		CloseHandle(hFile);
+		ATLASSERT(0);
+		return;
+	}
 
 	if (m_lpData = m_lpAlloc = malloc(dwSize))
 		ReadFile(hFile, m_lpAlloc, dwSize, &dwSize, NULL);

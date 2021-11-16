@@ -16,6 +16,7 @@ public:
 	void BindFinal(function<void()> &&fnOnFinal) { m_fnOnFinal = std::move(fnOnFinal); }
 	void BindOK(function<void()> &&fnOnOK) { m_fnOnOK = std::move(fnOnOK); }
 	void BindCancel(function<void()> &&fnOnCancel) { m_fnOnCancel = std::move(fnOnCancel); }
+	void BindTimer(function<void(UINT)> &&fnOnTimer) { m_fnOnTimer = std::move(fnOnTimer); }
 	void UpdateDialog();
 
 protected:
@@ -25,6 +26,7 @@ protected:
 	virtual void OnFinalMessage(HWND hWnd) final;
 	virtual void OnOK();
 	virtual void OnCancel();
+	virtual void OnTimer(UINT_PTR nIDEvent) override;
 	LRESULT OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
 
 	bool m_bModal;
@@ -32,4 +34,5 @@ protected:
 	function<void()> m_fnOnFinal;
 	function<void()> m_fnOnOK;
 	function<void()> m_fnOnCancel;
+	function<void(UINT)> m_fnOnTimer;
 };

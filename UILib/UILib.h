@@ -14,6 +14,7 @@
 #include <atlwin.h>
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 using std::function;
