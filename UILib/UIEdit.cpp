@@ -253,6 +253,14 @@ void CUIEdit::OnVisible(bool bVisible)
 	}
 }
 
+void CUIEdit::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
+{
+	__super::OnRectChange(lpOldRect, lpClipRect);
+
+	// 重设光标位置
+	CalcCaretPos();
+}
+
 void CUIEdit::OnMouseMove(CPoint point)
 {
 	int iEnd = m_iEnd;
@@ -815,7 +823,7 @@ void CUIEdit::CalcCaretPos()
 	}
 
 	bool bCaret = point.x >= m_rcReal.left && point.x < m_rcReal.right;
-	GetRootView()->SetCaretPos(CRect(point, CSize(bCaret, m_nHeight)));
+	GetRootView()->SetCaretPos(CRect(point, CSize(bCaret, m_nHeight)) & m_rcReal);
 }
 
 void CUIEdit::CheckMaxText(LPCWSTR lpExist, LPWSTR lpText) const

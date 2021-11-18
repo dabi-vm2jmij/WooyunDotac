@@ -156,6 +156,14 @@ void CUIHotKey::OnVisible(bool bVisible)
 	}
 }
 
+void CUIHotKey::OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect)
+{
+	__super::OnRectChange(lpOldRect, lpClipRect);
+
+	// 重设光标位置
+	OnTextSize(m_textSize);
+}
+
 void CUIHotKey::OnLButtonDown(CPoint point)
 {
 	if (!m_bFocus)

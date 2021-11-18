@@ -37,6 +37,7 @@ protected:
 	virtual void OnPaint(CUIDC &dc) const override;
 	virtual void OnEnable(bool bEnable) override;
 	virtual void OnVisible(bool bVisible) override;
+	virtual void OnRectChange(LPCRECT lpOldRect, LPRECT lpClipRect) override;
 	virtual void OnLButtonDown(CPoint point) override;
 	virtual void OnLButtonUp(CPoint point) override;
 	virtual void OnRButtonDown(CPoint point) override;
