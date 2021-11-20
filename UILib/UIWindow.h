@@ -36,6 +36,7 @@ protected:
 	virtual void OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS *lpNCSP);
 	virtual long OnNcHitTest(CPoint point);
 	virtual void OnPaint();
+	virtual void OnPrint(HDC hDC);
 	virtual void OnSize(UINT nType, CSize size);
 	virtual void OnTimer(UINT_PTR nIDEvent) { DefWindowProc(); }
 	virtual void OnWindowPosChanging(WINDOWPOS *lpWndPos) { DefWindowProc(); }

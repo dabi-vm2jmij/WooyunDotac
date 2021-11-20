@@ -147,6 +147,10 @@ BOOL CUIWindow::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		OnPaint();
 		break;
 
+	case WM_PRINTCLIENT:
+		OnPrint((HDC)wParam);
+		break;
+
 	case WM_SIZE:
 		OnSize(wParam, lParam);
 		break;
@@ -259,6 +263,14 @@ void CUIWindow::OnPaint()
 		DoPaint(CUIDC(CUIMemDC(hDC, &ps.rcPaint), -(CPoint &)ps.rcPaint, NULL));
 
 	EndPaint(&ps);
+}
+
+void CUIWindow::OnPrint(HDC hDC)
+{
+	if (m_pLayered)
+		UpdateLayered(hDC);
+	else
+		DoPaint(CUIDC(hDC, CPoint(), NULL));
 }
 
 void CUIWindow::OnSize(UINT nType, CSize size)

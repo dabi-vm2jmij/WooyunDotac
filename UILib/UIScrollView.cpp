@@ -80,6 +80,9 @@ int CUIScrollView::CalcHeight() const
 
 	for (auto pItem : m_vecChilds)
 	{
+		if (!pItem->IsVisible())
+			continue;
+
 		CSize size = pItem->GetSize();
 		ATLASSERT(size.cy != MAXINT16);
 

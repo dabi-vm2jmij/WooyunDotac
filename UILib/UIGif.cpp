@@ -5,11 +5,24 @@ CUIGif::CUIGif(CUIView *pParent, LPCWSTR lpFileName) : CUIControl(pParent), m_pI
 {
 	m_bClickable = false;
 
-	if (auto pStream = ::GetStream(lpFileName))
+	IStream *pStream;
+	if (lpFileName && (pStream = ::GetStream(lpFileName)))
 	{
-		m_pImage = new Gdiplus::Image(pStream);
+		Init(pStream);
 		pStream->Release();
 	}
+}
+
+void CUIGif::Init(IStream *pStream)
+{
+	if (m_pImage)
+	{
+		ATLASSERT(0);
+		return;
+	}
+
+	if (pStream)
+		m_pImage = new Gdiplus::Image(pStream);
 
 	if (m_pImage == NULL || m_pImage->GetLastStatus() != Gdiplus::Ok)
 	{

@@ -8,6 +8,7 @@ public:
 	CUIGif(CUIView *pParent, LPCWSTR lpFileName);
 	virtual ~CUIGif();
 
+	void Init(IStream *pStream);
 	void Start(bool bLoop = true);
 	void Stop();
 	void Reset();
